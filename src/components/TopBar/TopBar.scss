@@ -1,0 +1,18 @@
+.logo {
+  content: url("../../../images/pinterest-logo.png");
+}
+
+.top-bar {
+  position: relative;
+  background-color: white;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    bottom: 1px;
+    z-index: -1;
+    transform: scale(1);
+    box-shadow: 0 0 12px 2px rgb(0 0 0 / 20%);
+  }
+}

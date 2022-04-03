@@ -1,0 +1,15 @@
+@import "../../styles/colors";
+
+.pin-builder-container {
+  display: flex;
+  width: 100%;
+  height: fit-content;
+  min-height: 100vh;
+  background-color: $light-gray;
+  justify-content: center;
+  align-items: center;
+
+  &__user-info {
+    margin-bottom: 2rem;
+  }
+}

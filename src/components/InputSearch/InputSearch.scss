@@ -1,0 +1,36 @@
+@import "../../styles/colors";
+
+.input-search-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 3rem;
+  background-color: $light-gray;
+  border-radius: 2rem;
+  padding-left: 20px;
+  box-sizing: border-box;
+  color: rgb(0 0 0 / 50%);
+  font-size: 0.85rem;
+
+  &:hover {
+    background-color: darken($light-gray, 2);
+  }
+
+  input {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border: none;
+    background: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    font-size: 1rem;
+  }
+}
+
+.input-container:focus {
+  outline: solid $light-blue;
+}

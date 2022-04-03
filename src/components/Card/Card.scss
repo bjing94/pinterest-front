@@ -1,0 +1,12 @@
+.card-container {
+  position: relative;
+  width: fit-content;
+  height: fit-content;
+  min-height: 400px;
+  min-width: 600px;
+  background-color: white;
+  border-radius: 1rem;
+  padding: 4rem;
+
+  box-sizing: border-box;
+}
