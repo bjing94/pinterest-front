@@ -12,23 +12,14 @@ import { darkGray } from "../../styles/colors";
 import { CreatePinDto } from "../../services/dto/create-pin.dto";
 
 import "./PinBuilder.scss";
-import { FileResponse } from "../../services/responses/responses";
+import { FildeData } from "../../services/responses/responses";
 import { AiFillDelete } from "react-icons/ai";
-
-function ProfileInfo() {
-  return (
-    <Flexbox className="pin-builder-container__user-info">
-      <RoundButton>
-        <FaUser size={24} />
-      </RoundButton>
-      <div>ОЛЕГ</div>
-    </Flexbox>
-  );
-}
+import ProfileInfo from "../../components/ProfileInfo/ProfileInfo";
 
 export default function PinBuilder() {
   const [uploadedImg, setUploadedImg] = useState<string | undefined>(undefined);
   const [imgHeight, setImgHeight] = useState(0);
+  const [username, setUsername] = useState("oleg");
 
   const titleRef: React.RefObject<HTMLTextAreaElement> =
     useRef<HTMLTextAreaElement>(null);
@@ -155,7 +146,10 @@ export default function PinBuilder() {
               fontSize="2rem"
               ref={titleRef}
             />
-            <ProfileInfo />
+            <ProfileInfo
+              username={username}
+              className="pin-builder__profile-info"
+            />
             <Input
               placeholder="Добавьте описание пина"
               tip="Когда люди обычно нажимают на ваш пин, они видят первые 50 символов."

@@ -1,27 +1,17 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { CreatePinDto } from "./dto/create-pin.dto";
-import { ErrorResponse, FileResponse } from "./responses/responses";
+import { ErrorData, FildeData, PinData } from "./responses/responses";
+const baseURL = `http://localhost:3000/`;
 
 const axiosInstance = axios.create({
-  baseURL: `http://localhost:3000/`,
+  baseURL: baseURL,
 });
 
-export async function getPin(pinId: string): Promise<string> {
+export async function getPin(pinId: string): Promise<PinData | null> {
   return axiosInstance
     .get(`pin/${pinId}`)
-    .then((data: AxiosResponse<CreatePinDto>) => {
-      return JSON.stringify(data);
-    })
-    .catch((err: AxiosError) => {
-      return err.response?.data.message;
-    });
-}
-
-export async function createPin(dto: CreatePinDto): Promise<string | null> {
-  return axiosInstance
-    .post("pin/create", dto)
-    .then((response: AxiosResponse) => {
-      return JSON.stringify(response.data);
+    .then((response: AxiosResponse<PinData>) => {
+      return response.data;
     })
     .catch((err: AxiosError) => {
       console.log(err.response?.data.message);
@@ -29,7 +19,19 @@ export async function createPin(dto: CreatePinDto): Promise<string | null> {
     });
 }
 
-export async function uploadFile(file: File): Promise<FileResponse | null> {
+export async function createPin(dto: CreatePinDto): Promise<PinData | null> {
+  return axiosInstance
+    .post("pin/create", dto)
+    .then((response: AxiosResponse<PinData>) => {
+      return response.data;
+    })
+    .catch((err: AxiosError) => {
+      console.log(err.response?.data.message);
+      return null;
+    });
+}
+
+export async function uploadFile(file: File): Promise<FildeData | null> {
   const bodyFormData = new FormData();
   bodyFormData.append("files", file);
   return axiosInstance
@@ -38,11 +40,30 @@ export async function uploadFile(file: File): Promise<FileResponse | null> {
         "Content-type": "multipart/form-data",
       },
     })
-    .then((response: AxiosResponse) => {
+    .then((response: AxiosResponse<FildeData>) => {
       return response.data;
     })
     .catch((err: AxiosError) => {
       console.log(err.response?.data.message);
       return null;
     });
+}
+
+export async function getStaticImage(imgId: string): Promise<string | null> {
+  const imgInfo = await axiosInstance
+    .get(`files/${imgId}`)
+    .then((response: AxiosResponse<FildeData>) => {
+      return response.data;
+    })
+    .catch((err: AxiosError) => {
+      console.log(err.response?.data.message);
+      return null;
+    });
+
+  if (!imgInfo) {
+    return null;
+  }
+  console.log(imgInfo.url);
+
+  return baseURL + `/${imgInfo.url}`;
 }

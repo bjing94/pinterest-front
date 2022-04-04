@@ -1,0 +1,25 @@
+@import "../../styles/colors";
+
+.pin {
+  &__page-container {
+    height: 100vh;
+    padding-top: 1.25rem;
+  }
+
+  &__image-container {
+    width: auto;
+    flex-basis: 50%;
+    border-radius: 1rem;
+  }
+
+  &__profile-info {
+    width: 100%;
+  }
+
+  &__save-btn {
+    background-color: $red;
+    &:hover {
+      background-color: darken($color: $red, $amount: 10%);
+    }
+  }
+}

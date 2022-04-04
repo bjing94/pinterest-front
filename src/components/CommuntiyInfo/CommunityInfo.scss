@@ -1,0 +1,10 @@
+@import "../../styles/colors";
+
+.community-info__subscribe-btn {
+  background-color: $light-gray;
+  color: black;
+
+  &:hover {
+    background-color: darken($color: $light-gray, $amount: 10%);
+  }
+}
