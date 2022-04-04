@@ -1,0 +1,7 @@
+.home-grid {
+  display: grid;
+  grid-template-rows: repeat(auto-fill, auto);
+  grid-template-columns: repeat(auto-fill, 236px);
+  grid-auto-flow: row;
+  gap: 20px;
+}

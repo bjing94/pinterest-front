@@ -67,7 +67,7 @@ export default function Pin() {
               flexBasis: "50%",
               marginLeft: "3rem",
               width: "100%",
-              marginTop: "1.5rem",
+              marginTop: "2rem",
             }}
           >
             <Flexbox justifyContent="space-between" style={{ width: "100%" }}>
@@ -96,7 +96,6 @@ export default function Pin() {
               <Typography fontSize={1}>{descrition}</Typography>
             </div>
             <div style={{ marginTop: "1rem" }} className="pin__profile-info">
-              <ProfileInfo username={user} />
               <CommunityInfo username={user} className="pin__profile-info" />
             </div>
             <CommentSection />

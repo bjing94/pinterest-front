@@ -1,4 +1,5 @@
 import React from "react";
+import { AiFillAmazonCircle } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
 import { lightGray } from "../../styles/colors";
 import { BaseStyle } from "../../types/types";
@@ -25,9 +26,16 @@ export default function CommunityInfo({
       justifyContent="space-between"
     >
       <Flexbox>
-        <RoundButton>{!avatar && <FaUser size={24} />}</RoundButton>
-        <Flexbox flexDirection="column" alignItems="flex-start">
-          <Typography fontSize={1}> {username}</Typography>
+        <RoundButton>{!avatar && <AiFillAmazonCircle size={48} />}</RoundButton>
+        <Flexbox
+          flexDirection="column"
+          alignItems="flex-start"
+          style={{ marginLeft: "0.5rem" }}
+        >
+          <Typography fontSize={1} fontWeight="bold">
+            {" "}
+            {username}
+          </Typography>
           <Typography fontSize={1}>0 subscribers</Typography>
         </Flexbox>
       </Flexbox>
