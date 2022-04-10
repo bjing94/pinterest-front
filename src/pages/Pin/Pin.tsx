@@ -72,23 +72,18 @@ export default function Pin() {
           >
             <Flexbox justifyContent="space-between" style={{ width: "100%" }}>
               <Flexbox>
-                <RoundButton>
+                <RoundButton size={32}>
                   <FiMoreHorizontal size={24} />
                 </RoundButton>
-                <RoundButton>
+                <RoundButton size={32}>
                   <FiShare size={24} />
                 </RoundButton>
-                <RoundButton>
+                <RoundButton size={32}>
                   <FiLink size={24} />
                 </RoundButton>
               </Flexbox>
               <Button className="pin__save-btn">Save</Button>
             </Flexbox>
-            {/* <div style={{ marginTop: "1rem" }}>
-              <Typography fontSize={1.3}>
-                Загружено: <a style={{ fontWeight: "bold" }}>{user}</a>
-              </Typography>
-            </div> */}
             <div style={{ marginTop: "1rem" }}>
               <Typography fontSize={2.2} fontWeight="bold">
                 {title}

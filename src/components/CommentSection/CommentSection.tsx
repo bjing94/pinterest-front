@@ -50,13 +50,17 @@ function CommentActions({
   return (
     <Flexbox justifyContent="space-between" className="comment__actions">
       <Flexbox>
-        <RoundButton onClick={onClickLikeButton} className="comment__btn">
+        <RoundButton
+          onClick={onClickLikeButton}
+          className="comment__btn"
+          size={24}
+        >
           <AiFillHeart size={18} color={liked ? red : darkGray} />
         </RoundButton>
-        <RoundButton className="comment__btn">
+        <RoundButton className="comment__btn" size={24}>
           <FaComment size={18} color={darkGray} />
         </RoundButton>
-        <RoundButton className="comment__btn">
+        <RoundButton className="comment__btn" size={24}>
           <FiMoreHorizontal size={18} color={darkGray} />
         </RoundButton>
       </Flexbox>
@@ -87,7 +91,7 @@ function CommentReply({
   const [useful, setUseful] = useState(isUseful);
   return (
     <Flexbox alignItems="flex-start" className="reply__container">
-      <RoundButton className="comment__avatar">
+      <RoundButton className="comment__avatar" size={32}>
         <AiFillAmazonCircle size={32} />
       </RoundButton>
       <Flexbox
@@ -129,8 +133,8 @@ function Comment() {
 
   return (
     <Flexbox className="comment__container" alignItems="flex-start">
-      <RoundButton className="comment__avatar">
-        <AiFillAmazonCircle size={48} />
+      <RoundButton className="comment__avatar" size={36}>
+        <AiFillAmazonCircle size={36} />
       </RoundButton>
       <Flexbox
         alignItems="flex-start"
@@ -185,6 +189,7 @@ export default function CommentSection() {
           }}
           style={{ transform: `${showComments ? "rotate(90deg)" : ""}` }}
           className="comment-section__btn"
+          size={32}
         >
           <IoIosArrowForward size={24} />
         </RoundButton>

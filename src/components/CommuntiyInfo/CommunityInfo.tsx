@@ -26,7 +26,9 @@ export default function CommunityInfo({
       justifyContent="space-between"
     >
       <Flexbox>
-        <RoundButton>{!avatar && <AiFillAmazonCircle size={48} />}</RoundButton>
+        <RoundButton size={32}>
+          {!avatar && <AiFillAmazonCircle size={32} />}
+        </RoundButton>
         <Flexbox
           flexDirection="column"
           alignItems="flex-start"

@@ -8,6 +8,7 @@ interface RoundButtonProps extends BaseStyle {
   type?: "default" | "action";
   style?: any;
   onClick?: any;
+  size?: number;
 }
 export default function RoundButton({
   children,
@@ -15,13 +16,14 @@ export default function RoundButton({
   style,
   onClick,
   className = "",
+  size = 16,
 }: RoundButtonProps) {
   return (
     <button
       className={`btn-round ${
         type === "action" ? "btn-round__action" : ""
       } ${className}`}
-      style={style}
+      style={{ ...style, width: `${size}px`, height: `${size}px` }}
       onClick={onClick}
     >
       {children}

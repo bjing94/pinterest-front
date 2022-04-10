@@ -1,65 +1,76 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaPlus, FaQuestion } from "react-icons/fa";
+import Masonry from "react-masonry-css";
+import { Link } from "react-router-dom";
+import Flexbox from "../../components/Flexbox/Flexbox";
 import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
+import Typography from "../../components/Typgoraphy/Typography";
+import { getRandomPins } from "../../services/PinterestService";
 
 import "./Home.scss";
 
+const breakpointColumnsObj = {
+  default: 7,
+  1820: 6, // 1800 or less
+  1600: 5,
+  1400: 4,
+  1100: 3,
+  900: 2,
+  600: 1,
+};
+
 export default function Home() {
+  const [pinsIds, setPinIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const getPins = async () => {
+      const data = await getRandomPins();
+      if (data) {
+        setPinIds(
+          data.map((pin) => {
+            return pin._id;
+          })
+        );
+      }
+    };
+
+    getPins();
+  }, []);
+
+  const pinCards = pinsIds.map((id) => {
+    return (
+      <Flexbox justifyContent="center" style={{ width: "100%" }}>
+        <PinCard pinId={id} />
+      </Flexbox>
+    );
+  });
+
   return (
-    <div className="home-grid">
-      <RoundButton
-        type="action"
-        style={{ position: "fixed", right: "1rem", bottom: "10rem" }}
-      >
-        <FaPlus size={24} />
-      </RoundButton>
+    <div className="home-container">
+      <Link to="/pin-builder">
+        <RoundButton
+          type="action"
+          style={{ position: "fixed", right: "1rem", bottom: "10rem" }}
+          size={48}
+        >
+          <FaPlus size={24} />
+        </RoundButton>
+      </Link>
       <RoundButton
         type="action"
         style={{ position: "fixed", right: "1rem", bottom: "5rem" }}
+        size={48}
       >
         <FaQuestion size={24} />
       </RoundButton>
-      <PinCard
-        src={
-          "https://i.pinimg.com/236x/96/b2/ad/96b2ad9a1548d30f2ebdb12a638f9c1b.jpg"
-        }
-      />
-      <PinCard
-        src={
-          "https://i.pinimg.com/236x/d4/7e/01/d47e013a97ae11c92d823db06755f06c.jpg"
-        }
-      />
-      <PinCard
-        src={
-          "https://i.pinimg.com/236x/96/b2/ad/96b2ad9a1548d30f2ebdb12a638f9c1b.jpg"
-        }
-      />
-      <PinCard
-        src={
-          "https://i.pinimg.com/236x/d4/7e/01/d47e013a97ae11c92d823db06755f06c.jpg"
-        }
-      />
-      <PinCard
-        src={
-          "https://i.pinimg.com/236x/d4/7e/01/d47e013a97ae11c92d823db06755f06c.jpg"
-        }
-      />
-      <PinCard
-        src={
-          "https://i.pinimg.com/236x/96/b2/ad/96b2ad9a1548d30f2ebdb12a638f9c1b.jpg"
-        }
-      />
-      <PinCard
-        src={
-          "https://i.pinimg.com/236x/d4/7e/01/d47e013a97ae11c92d823db06755f06c.jpg"
-        }
-      />
-      <PinCard
-        src={
-          "https://i.pinimg.com/236x/d4/7e/01/d47e013a97ae11c92d823db06755f06c.jpg"
-        }
-      />
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="my-masonry-grid"
+        columnClassName="my-masonry-grid_column"
+      >
+        {pinCards}
+      </Masonry>
     </div>
   );
 }

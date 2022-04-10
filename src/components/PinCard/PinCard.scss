@@ -1,3 +1,16 @@
+@import "/src/styles/colors.scss";
+
 .pin-card {
   width: 236px;
+  height: fit-content;
+
+  &__overlay {
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+  }
+
+  &__btn {
+    background-color: $red;
+  }
 }

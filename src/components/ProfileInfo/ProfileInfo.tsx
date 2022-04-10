@@ -19,7 +19,9 @@ export default function ProfileInfo({
 }: ProfileInfoProps) {
   return (
     <Flexbox className={`profile-info ${className}`}>
-      <RoundButton>{!avatar && <AiFillAmazonCircle size={32} />}</RoundButton>
+      <RoundButton size={32}>
+        {!avatar && <AiFillAmazonCircle size={32} />}
+      </RoundButton>
       <Typography fontSize={1}>{username}</Typography>
     </Flexbox>
   );

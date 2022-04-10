@@ -103,7 +103,7 @@ export default function PinBuilder() {
     <div className="pin-builder-container">
       <Card>
         <Flexbox justifyContent="space-between">
-          <RoundButton>
+          <RoundButton size={32}>
             <FiMoreHorizontal size={24} color={darkGray} />
           </RoundButton>
           <Button onClick={handleCreatePin}>Сохранить</Button>
@@ -123,7 +123,7 @@ export default function PinBuilder() {
               className="input-pin-container__image"
             >
               <Flexbox alignItems="center" style={{ height: "100%" }}>
-                <RoundButton type="action" onClick={handleDeleteImg}>
+                <RoundButton type="action" onClick={handleDeleteImg} size={32}>
                   <AiFillDelete size={32} />
                 </RoundButton>
               </Flexbox>

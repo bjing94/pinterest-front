@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
 
+import "./ResponsiveImage.scss";
+
 interface ResponsiveImageProps {
   src: string;
+  overlayContent?: any;
 }
+
 const ResponsiveImage = React.forwardRef<
   HTMLImageElement,
   ResponsiveImageProps
->(({ src }, ref) => {
+>(({ src, overlayContent }, ref) => {
   const [imgHeight, setImgHeight] = useState(0);
 
   const handleUploadImg = () => {
-    console.log("Src", src);
     const img = new Image();
     img.src = src;
     img.onload = function () {
-      console.log("Image dimensions: ", img.width, img.height);
       const multiplier = 340 / img.width;
-      console.log("Suggested dimensions:", 340, img.height * multiplier);
       setImgHeight(img.height * multiplier);
     };
   };
@@ -26,12 +27,22 @@ const ResponsiveImage = React.forwardRef<
   }, [src]);
 
   return (
-    <img
-      src={src}
-      ref={ref}
-      style={{ width: "100%", borderRadius: "1rem" }}
-      height={imgHeight}
-    />
+    <div className="responsive-image__container">
+      <img
+        src={src}
+        ref={ref}
+        style={{ width: "100%", borderRadius: "1rem" }}
+        height={imgHeight}
+      />
+      {overlayContent && (
+        <div
+          className="responsive-image__overlay"
+          style={{ height: `${imgHeight}px` }}
+        >
+          {overlayContent}
+        </div>
+      )}
+    </div>
   );
 });
 
