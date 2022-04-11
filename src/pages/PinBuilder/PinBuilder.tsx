@@ -1,10 +1,9 @@
 import React, { useRef, useState } from "react";
-import { FaUser } from "react-icons/fa";
 import { FiMoreHorizontal } from "react-icons/fi";
 import Button from "../../components/Button/Button";
 import Card from "../../components/Card/Card";
 import Flexbox from "../../components/Flexbox/Flexbox";
-import { Input } from "../../components/Input/Input";
+import { ResponsiveInput } from "../../components/ResponsiveInput/ResponsiveInput";
 import { InputPin } from "../../components/InputPin/InputPin";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import { createPin, uploadFile } from "../../services/PinterestService";
@@ -12,7 +11,6 @@ import { darkGray } from "../../styles/colors";
 import { CreatePinDto } from "../../services/dto/create-pin.dto";
 
 import "./PinBuilder.scss";
-import { FildeData } from "../../services/responses/responses";
 import { AiFillDelete } from "react-icons/ai";
 import ProfileInfo from "../../components/ProfileInfo/ProfileInfo";
 
@@ -139,7 +137,7 @@ export default function PinBuilder() {
             justifyContent="flex-start"
             alignItems="flex-start"
           >
-            <Input
+            <ResponsiveInput
               placeholder="Добавьте название"
               tip="В лентах видны только первые 40 символов"
               symbolsLimit={100}
@@ -150,7 +148,7 @@ export default function PinBuilder() {
               username={username}
               className="pin-builder__profile-info"
             />
-            <Input
+            <ResponsiveInput
               placeholder="Добавьте описание пина"
               tip="Когда люди обычно нажимают на ваш пин, они видят первые 50 символов."
               symbolsLimit={500}

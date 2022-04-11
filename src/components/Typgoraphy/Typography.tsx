@@ -8,6 +8,7 @@ interface TypographyProps extends BaseStyle {
   fontWeight?: string;
   color?: string;
   children?: any;
+  textAlign?: string;
 }
 export default function Typography({
   fontSize = 2,
@@ -15,6 +16,7 @@ export default function Typography({
   children,
   fontWeight,
   className = "",
+  textAlign = "center",
 }: TypographyProps) {
   const lineHeight = fontSize * 1.5;
   return (
@@ -24,6 +26,7 @@ export default function Typography({
         lineHeight: `${lineHeight}rem`,
         color: color,
         fontWeight,
+        textAlign: "center",
       }}
       className={className}
     >

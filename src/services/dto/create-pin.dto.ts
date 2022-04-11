@@ -19,3 +19,9 @@ export interface CreatePinDto {
 
   comments?: CommentDto[];
 }
+
+export interface CreateUserDto {
+  userId: string;
+  email: string;
+  password: string;
+}

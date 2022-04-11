@@ -1,24 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import { IoIosArrowForward } from "react-icons/io";
+import React, { useEffect, useState } from "react";
 import { FiLink, FiMoreHorizontal, FiShare } from "react-icons/fi";
-import { RouterProps, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import Card from "../../components/Card/Card";
 import Flexbox from "../../components/Flexbox/Flexbox";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import Typography from "../../components/Typgoraphy/Typography";
 import { getPin, getStaticImage } from "../../services/PinterestService";
-import { darkGray } from "../../styles/colors";
 
 import "./Pin.scss";
-import ProfileInfo from "../../components/ProfileInfo/ProfileInfo";
 import CommunityInfo from "../../components/CommuntiyInfo/CommunityInfo";
 import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
 import CommentSection from "../../components/CommentSection/CommentSection";
 
-interface PinProps {
-  match?: any;
-}
+// interface PinProps {
+//   match?: any;
+// }
 
 export default function Pin() {
   const { id } = useParams();

@@ -23,7 +23,7 @@ export default function Flexbox({
   alignItems,
   children,
   style,
-  className,
+  className = "",
 }: FlexboxProps) {
   return (
     <div

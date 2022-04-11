@@ -12,23 +12,17 @@ import RoundButton from "../RoundButton/RoundButton";
 
 import "./TopBar.scss";
 
-export default function TopBar() {
-  const [isAuth, setIsAuth] = useState(false);
+interface TopBarProps {
+  onClickLogin?: any;
+  onClickRegister?: any;
+  isAuth: boolean;
+}
 
-  const checkAuth = async () => {
-    const res = await checkLogin();
-    setIsAuth(res);
-  };
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const handleLogin = async () => {
-    await login({ email: "kovriklol@gmail.com", password: "12345678" });
-    // checkAuth();
-  };
-
+export default function TopBar({
+  onClickLogin,
+  onClickRegister,
+  isAuth,
+}: TopBarProps) {
   const darkGray = " #767676";
 
   return (
@@ -64,7 +58,8 @@ export default function TopBar() {
                 </Flexbox>
               ) : (
                 <Flexbox>
-                  <Button onClick={handleLogin}>Login</Button>
+                  <Button onClick={onClickLogin}>Login</Button>
+                  <Button onClick={onClickRegister}>Register</Button>
                 </Flexbox>
               )}
             </Col>

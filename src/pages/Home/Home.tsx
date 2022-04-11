@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import Flexbox from "../../components/Flexbox/Flexbox";
 import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
-import Typography from "../../components/Typgoraphy/Typography";
 import { getRandomPins } from "../../services/PinterestService";
 
 import "./Home.scss";

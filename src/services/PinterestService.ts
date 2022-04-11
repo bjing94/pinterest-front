@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { CreatePinDto } from "./dto/create-pin.dto";
+import { response } from "express";
+import { CreatePinDto, CreateUserDto } from "./dto/create-pin.dto";
 import { ErrorData, FildeData, PinData } from "./responses/responses";
 
 const baseURL = `http://localhost:3000/`;
@@ -85,18 +86,60 @@ export async function getStaticImage(imgId: string): Promise<string | null> {
 export async function login(dto: {
   email: string;
   password: string;
-}): Promise<any | null> {
+}): Promise<
+  | AxiosResponse<
+      | { message: string }
+      | { statusCode: number; message: string; error: string }
+    >
+  | undefined
+> {
   return axiosInstance
     .post(`auth/login`, dto)
-    .then((response: AxiosResponse<any>) => {
-      console.log("Set cookie:", response.headers["Set-cookie"]);
-      console.log("Response:", response);
-      return response.data;
+    .then((response: AxiosResponse<{ message: string }>) => {
+      return response;
     })
-    .catch((err: AxiosError) => {
-      console.log(err);
-      console.log(err.response?.data);
-      return null;
+    .catch(
+      (
+        err: AxiosError<{ statusCode: number; message: string; error: string }>
+      ) => {
+        return err.response;
+      }
+    );
+}
+
+export async function register(
+  dto: CreateUserDto
+): Promise<
+  | AxiosResponse<
+      | { message: string }
+      | { statusCode: number; message: string; error: string }
+    >
+  | undefined
+> {
+  return axiosInstance
+    .post(`auth/register`, dto)
+    .then((response: AxiosResponse<{ message: string }>) => {
+      return response;
+    })
+    .catch(
+      (
+        err: AxiosError<{ statusCode: number; message: string; error: string }>
+      ) => {
+        return err.response;
+      }
+    );
+}
+
+export async function getUser(
+  userId: string
+): Promise<AxiosResponse<CreateUserDto | ErrorData> | undefined> {
+  return axiosInstance
+    .get(`user/${userId}`)
+    .then((response: AxiosResponse<CreateUserDto>) => {
+      return response;
+    })
+    .catch((error: AxiosError<ErrorData>) => {
+      return error.response;
     });
 }
 

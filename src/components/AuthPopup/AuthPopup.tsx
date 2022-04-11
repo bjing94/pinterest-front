@@ -1,0 +1,151 @@
+import React, { useRef, useState } from "react";
+import { AiOutlineClose } from "react-icons/ai";
+import { login, register } from "../../services/PinterestService";
+import Button from "../Button/Button";
+import Flexbox from "../Flexbox/Flexbox";
+import Input from "../Input";
+import RoundButton from "../RoundButton/RoundButton";
+import Typography from "../Typgoraphy/Typography";
+
+import "./AuthPopup.scss";
+
+interface AuthPopupProps {
+  onClose: any;
+  onSubmit: any;
+  registerMode?: boolean;
+}
+
+export default function AuthPopup({
+  onClose,
+  onSubmit,
+  registerMode = false,
+}: AuthPopupProps) {
+  const [error, setError] = useState("");
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const repeatPasswordRef = useRef<HTMLInputElement>(null);
+  const userIdRef = useRef<HTMLInputElement>(null);
+
+  const handleLogin = async () => {
+    const email = emailRef?.current?.value;
+    const password = passwordRef?.current?.value;
+    const repeatPassword = repeatPasswordRef?.current?.value;
+    const userId = userIdRef?.current?.value;
+
+    if (!email) {
+      setError("Please enter a valid email");
+      return;
+    }
+    if (!password) {
+      setError("Please enter a password");
+      return;
+    }
+    if (registerMode) {
+      if (!userId) {
+        setError("Please enter a unique id!");
+        return;
+      }
+
+      if (!repeatPassword) {
+        setError("Please repeat password");
+        return;
+      }
+
+      if (password != repeatPassword) {
+        setError("Password don't match");
+        return;
+      }
+
+      const res = await register({
+        userId: userId,
+        email: email,
+        password: password,
+      });
+
+      if (res?.status == 201) {
+        setError("");
+        onClose();
+      } else {
+        setError(res?.data.message ?? "");
+      }
+    } else {
+      const res = await login({ email: email, password: password });
+      if (res?.status == 200) {
+        onSubmit();
+        onClose();
+      } else {
+        setError(res?.data.message ?? "");
+      }
+    }
+  };
+
+  return (
+    <div className="auth-popup__background">
+      <div className="auth-popup__container">
+        <Flexbox flexDirection="column">
+          <Flexbox
+            justifyContent="space-between"
+            style={{ width: "100%", paddingLeft: "168px" }}
+          >
+            <RoundButton size={48}>
+              <img className="logo" width={32} height={32} />
+            </RoundButton>
+            <RoundButton size={32} onClick={onClose}>
+              <AiOutlineClose size={24} />
+            </RoundButton>
+          </Flexbox>
+          <div style={{ width: "400px" }}>
+            <Typography>Welcome to Pinterest</Typography>
+          </div>
+          <Flexbox flexDirection="column" className="auth-popup__info">
+            {error && (
+              <Typography fontSize={1} color="red">
+                {error}
+              </Typography>
+            )}
+            {registerMode && (
+              <Input
+                placeholder="super-id"
+                className="auth-popup__input"
+                ref={userIdRef}
+              />
+            )}
+            <Input
+              placeholder="example@gmail.com"
+              className="auth-popup__input"
+              ref={emailRef}
+            />
+            <Input
+              placeholder="awesome_password"
+              className="auth-popup__input"
+              ref={passwordRef}
+            />
+            {registerMode && (
+              <Input
+                placeholder="awesome_password"
+                className="auth-popup__input"
+                ref={repeatPasswordRef}
+              />
+            )}
+            {!registerMode && (
+              <Button
+                className="auth-popup__login-button"
+                onClick={handleLogin}
+              >
+                Login
+              </Button>
+            )}
+            {registerMode && (
+              <Button
+                className="auth-popup__register-button"
+                onClick={handleLogin}
+              >
+                Register
+              </Button>
+            )}
+          </Flexbox>
+        </Flexbox>
+      </div>
+    </div>
+  );
+}
