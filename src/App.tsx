@@ -8,16 +8,21 @@ import PinBuilder from "./pages/PinBuilder/PinBuilder";
 import "./App.scss";
 import Toolbar from "./components/Toolbar/Toolbar";
 import AuthPopup from "./components/AuthPopup/AuthPopup";
-import { checkLogin } from "./services/PinterestService";
 import User from "./pages/User";
+import { checkLogin } from "./services/AuthService";
 
 function App() {
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showRegisterPopup, setShowRegisterPopup] = useState(false);
   const [isAuth, setIsAuth] = useState(false);
 
+  useEffect(() => {
+    checkLogin().then((res) => {
+      setIsAuth(res);
+    });
+  }, []);
   return (
-    <div className="App" style={{ height: "400px" }}>
+    <div className="App">
       <TopBar
         isAuth={isAuth}
         onClickLogin={() => {
@@ -27,7 +32,6 @@ function App() {
           setShowRegisterPopup(true);
         }}
       />
-      <Toolbar />
       {showAuthPopup && (
         <AuthPopup
           onClose={() => {

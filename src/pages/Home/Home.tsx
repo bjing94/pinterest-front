@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 import Flexbox from "../../components/Flexbox/Flexbox";
 import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
-import { getRandomPins } from "../../services/PinterestService";
+import Toolbar from "../../components/Toolbar/Toolbar";
+import { getRandomPins } from "../../services/PinService";
 
 import "./Home.scss";
 
@@ -39,7 +40,11 @@ export default function Home() {
 
   const pinCards = pinsIds.map((id) => {
     return (
-      <Flexbox justifyContent="center" style={{ width: "100%" }}>
+      <Flexbox
+        justifyContent="center"
+        style={{ width: "100%" }}
+        key={`pin-card-${id}`}
+      >
         <PinCard pinId={id} />
       </Flexbox>
     );
@@ -47,6 +52,7 @@ export default function Home() {
 
   return (
     <div className="home-container">
+      <Toolbar />
       <Link to="/pin-builder">
         <RoundButton
           type="action"

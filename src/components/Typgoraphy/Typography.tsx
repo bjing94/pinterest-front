@@ -8,7 +8,14 @@ interface TypographyProps extends BaseStyle {
   fontWeight?: string;
   color?: string;
   children?: any;
-  textAlign?: string;
+  textAlign?:
+    | "start"
+    | "end"
+    | "left"
+    | "right"
+    | "center"
+    | "justify"
+    | "match-parent";
 }
 export default function Typography({
   fontSize = 2,
@@ -26,7 +33,7 @@ export default function Typography({
         lineHeight: `${lineHeight}rem`,
         color: color,
         fontWeight,
-        textAlign: "center",
+        textAlign: textAlign,
       }}
       className={className}
     >

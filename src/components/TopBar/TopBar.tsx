@@ -3,7 +3,6 @@ import { Col, Grid, Row } from "react-flexbox-grid";
 import { AiFillBell, AiFillMessage } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { checkLogin, login } from "../../services/PinterestService";
 import Button from "../Button/Button";
 import Container from "../Container/Container";
 import Flexbox from "../Flexbox/Flexbox";

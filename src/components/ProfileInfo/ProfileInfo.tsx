@@ -1,28 +1,31 @@
 import { AiFillAmazonCircle } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
 import { BaseStyle } from "../../types/types";
+import Avatar from "../Avatar/Avatar";
+import Box from "../Box/Box";
 import Flexbox from "../Flexbox/Flexbox";
-import RoundButton from "../RoundButton/RoundButton";
 import Typography from "../Typgoraphy/Typography";
 
 import "./ProfileInfo.scss";
 
 interface ProfileInfoProps extends BaseStyle {
   username: string;
-  avatar?: string;
+  avatarId: string;
 }
 
 export default function ProfileInfo({
   username,
-  avatar,
+  avatarId,
   className = "",
 }: ProfileInfoProps) {
   return (
     <Flexbox className={`profile-info ${className}`}>
-      <RoundButton size={32}>
-        {!avatar && <AiFillAmazonCircle size={32} />}
-      </RoundButton>
-      <Typography fontSize={1}>{username}</Typography>
+      <Avatar size={36} imgId={avatarId} />
+      <Box margin="0 0 0 10px">
+        <Typography fontSize={1} fontWeight="bold">
+          {username}
+        </Typography>
+      </Box>
     </Flexbox>
   );
 }

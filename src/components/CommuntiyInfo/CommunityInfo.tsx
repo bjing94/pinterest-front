@@ -12,12 +12,18 @@ import "./CommunityInfo.scss";
 
 interface CommunityInfoProps extends BaseStyle {
   username: string;
-  avatar?: string;
+  avatar: string;
+  isSubscribed: boolean;
+  subscribersCount: number;
+  onClickSubscribe?: any;
 }
 
 export default function CommunityInfo({
   username,
   avatar,
+  isSubscribed,
+  subscribersCount,
+  onClickSubscribe,
   className = "",
 }: CommunityInfoProps) {
   return (
@@ -26,9 +32,10 @@ export default function CommunityInfo({
       justifyContent="space-between"
     >
       <Flexbox>
-        <RoundButton size={32}>
-          {!avatar && <AiFillAmazonCircle size={32} />}
-        </RoundButton>
+        <RoundButton
+          size={32}
+          style={{ backgroundImage: `url(${avatar})` }}
+        ></RoundButton>
         <Flexbox
           flexDirection="column"
           alignItems="flex-start"
@@ -38,10 +45,20 @@ export default function CommunityInfo({
             {" "}
             {username}
           </Typography>
-          <Typography fontSize={1}>0 subscribers</Typography>
+          <Typography fontSize={1}>{subscribersCount} subscribers</Typography>
         </Flexbox>
       </Flexbox>
-      <Button className="community-info__subscribe-btn">Subscribe</Button>
+      {!isSubscribed && (
+        <Button
+          className="community-info__subscribe-btn"
+          onClick={onClickSubscribe}
+        >
+          Subscribe
+        </Button>
+      )}
+      {isSubscribed && (
+        <Button className="community-info__subscribe-btn">Subscribed</Button>
+      )}
     </Flexbox>
   );
 }

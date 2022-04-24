@@ -16,6 +16,8 @@ interface FlexboxProps extends BaseStyle {
   alignItems?: "flex-start" | "flex-end" | "center" | "stretch";
   children?: any;
   style?: React.CSSProperties;
+  fluid?: boolean;
+  onClick?: any;
 }
 export default function Flexbox({
   flexDirection,
@@ -24,11 +26,14 @@ export default function Flexbox({
   children,
   style,
   className = "",
+  fluid = false,
+  onClick,
 }: FlexboxProps) {
   return (
     <div
-      className={`my-flexbox ${className}`}
+      className={`my-flexbox ${className} ${fluid ? "my-flexbox-fluid" : ""}`}
       style={{ ...style, justifyContent, flexDirection, alignItems }}
+      onClick={onClick}
     >
       {children}
     </div>

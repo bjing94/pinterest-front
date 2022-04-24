@@ -1,11 +1,3 @@
-interface CommentDto {
-  username: string;
-
-  content: string;
-
-  likes: number;
-}
-
 export interface CreatePinDto {
   title: string;
 
@@ -17,11 +9,14 @@ export interface CreatePinDto {
 
   content: string;
 
-  comments?: CommentDto[];
+  comments?: string[];
+
+  boardId: string;
 }
 
 export interface CreateUserDto {
-  userId: string;
+  username: string;
+  displayId: string;
   email: string;
   password: string;
 }

@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { FiMoreHorizontal, FiShare } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { getPin, getStaticImage } from "../../services/PinterestService";
+import { getStaticImage } from "../../services/FileService";
+import { getPin } from "../../services/PinService";
+import { UserData } from "../../services/responses/responses";
+import { getUser } from "../../services/UserService";
 import { red } from "../../styles/colors";
 import Button from "../Button/Button";
 import Flexbox from "../Flexbox/Flexbox";
@@ -18,17 +21,21 @@ interface PinCardProps {
 
 export default function PinCard({ pinId }: PinCardProps) {
   const [user, setUser] = useState("");
-  const [descrition, setDescrition] = useState("");
   const [title, setTitle] = useState("");
   const [imgSrc, setImgSrc] = useState("");
+  const [userInfo, setUserInfo] = useState<UserData | undefined>(undefined);
 
   const getPinInfo = async () => {
     if (pinId) {
       const pinInfo = await getPin(pinId);
       if (pinInfo) {
-        setDescrition(pinInfo.content);
         setTitle(pinInfo.title);
         setUser(pinInfo.username);
+
+        const userData = await getUser(pinInfo.userId);
+        if (userData && userData.status == 200) {
+          setUserInfo(userData.data as UserData);
+        }
 
         const link = await getStaticImage(pinInfo.imgId);
         if (link) {
@@ -62,6 +69,9 @@ export default function PinCard({ pinId }: PinCardProps) {
       </Flexbox>
     </Flexbox>
   );
+  if (!userInfo) {
+    return <div></div>;
+  }
   return (
     <Flexbox
       className="pin-card"
@@ -74,7 +84,12 @@ export default function PinCard({ pinId }: PinCardProps) {
       <Typography fontSize={1} fontWeight="bold">
         {title}
       </Typography>
-      <ProfileInfo username={user} />
+      <Link to={`/user/${userInfo?.displayId ?? ""}`}>
+        <ProfileInfo
+          username={userInfo?.username ?? ""}
+          avatarId={userInfo?.avatarSrc}
+        />
+      </Link>
     </Flexbox>
   );
 }

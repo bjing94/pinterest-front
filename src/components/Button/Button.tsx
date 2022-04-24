@@ -8,6 +8,7 @@ interface ButtonProps extends BaseStyle {
   onClick?: any;
   color?: string;
   backgroundColor?: string;
+  active?: boolean;
 }
 export default function Button({
   children,
@@ -15,9 +16,13 @@ export default function Button({
   color = "white",
   backgroundColor = "black",
   className = "",
+  active = true,
 }: ButtonProps) {
   return (
-    <button className={`btn ${className}`} onClick={onClick}>
+    <button
+      className={`btn ${className} ${active ? "" : "inactive"}`}
+      onClick={onClick}
+    >
       {children}
     </button>
   );

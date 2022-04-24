@@ -9,59 +9,65 @@ interface ResponsiveInputProps extends BaseStyle {
   tip?: string;
   fontSize?: string;
   symbolsLimit?: number;
+  value?: string;
+  onInput?: any;
 }
 
 export const ResponsiveInput = React.forwardRef<
   HTMLTextAreaElement,
   ResponsiveInputProps
->(({ style, placeholder, tip, symbolsLimit, fontSize }, ref) => {
-  const [showTip, setShowTip] = useState(false);
-  const [currentValue, setCurrentValue] = useState("");
-  const [symbolsRemaining, setSymbolsRemaining] = useState(symbolsLimit);
+>(
+  (
+    { style, placeholder, tip, symbolsLimit, fontSize, value, onInput },
+    ref
+  ) => {
+    const [showTip, setShowTip] = useState(false);
+    const [symbolsRemaining, setSymbolsRemaining] = useState(symbolsLimit);
 
-  const styles: React.CSSProperties = {
-    "--input-content": ` '${currentValue}'`,
-  } as React.CSSProperties;
+    const styles: React.CSSProperties = {
+      "--input-content": ` '${value}'`,
+    } as React.CSSProperties;
 
-  return (
-    <div className="input-container" style={{ ...styles, fontSize }}>
-      <textarea
-        name="text"
-        onInput={(event) => {
-          if (symbolsLimit) {
-            if (event.currentTarget.value.length <= symbolsLimit) {
-              setCurrentValue(event.currentTarget.value);
-              setSymbolsRemaining(
-                symbolsLimit - event.currentTarget.value.length
-              );
+    return (
+      <div className="input-container" style={{ ...styles, fontSize }}>
+        <textarea
+          name="text"
+          onInput={(event) => {
+            if (symbolsLimit) {
+              if (event.currentTarget.value.length <= symbolsLimit) {
+                onInput(event.currentTarget.value);
+                setSymbolsRemaining(
+                  symbolsLimit - event.currentTarget.value.length
+                );
+              }
+            } else {
+              onInput(event.currentTarget.value);
             }
-          } else {
-            setCurrentValue(event.currentTarget.value);
-          }
-        }}
-        onFocus={() => {
-          setShowTip(true);
-        }}
-        onBlur={() => {
-          setShowTip(false);
-        }}
-        rows={1}
-        placeholder={placeholder}
-        style={style}
-        value={currentValue}
-        ref={ref}
-      ></textarea>
-      <Flexbox
-        className="input-tip"
-        alignItems="flex-start"
-        justifyContent="space-between"
-        style={{ visibility: showTip ? "visible" : "hidden" }}
-      >
-        <div className="input-tip__text">{tip}</div>
-        {symbolsLimit && (
-          <div className="input-tip__limit">{symbolsRemaining}</div>
-        )}
-      </Flexbox>
-    </div>
-  );
-});
+          }}
+          onFocus={() => {
+            setShowTip(true);
+          }}
+          onBlur={() => {
+            setShowTip(false);
+          }}
+          rows={1}
+          placeholder={placeholder}
+          style={style}
+          value={value}
+          ref={ref}
+        ></textarea>
+        <Flexbox
+          className="input-tip"
+          alignItems="flex-start"
+          justifyContent="space-between"
+          style={{ visibility: showTip ? "visible" : "hidden" }}
+        >
+          <div className="input-tip__text">{tip}</div>
+          {symbolsLimit && (
+            <div className="input-tip__limit">{symbolsRemaining}</div>
+          )}
+        </Flexbox>
+      </div>
+    );
+  }
+);

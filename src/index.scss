@@ -1,8 +1,18 @@
 body {
   margin: 0;
+  height: 100vh;
+}
+
+#root {
+  height: 100%;
 }
 
 * {
   box-sizing: border-box;
   font-family: "Roboto", sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }

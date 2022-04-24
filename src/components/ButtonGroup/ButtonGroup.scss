@@ -1,0 +1,13 @@
+.btn-group {
+  & > *:first-child {
+    border-radius: 1rem 0rem 0rem 1rem;
+  }
+
+  & > *:last-child {
+    border-radius: 0rem 1rem 1rem 0rem;
+  }
+
+  & > *:only-child {
+    border-radius: 1rem 1rem 1rem 1rem;
+  }
+}

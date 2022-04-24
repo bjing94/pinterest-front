@@ -5,10 +5,23 @@ import "./Card.scss";
 
 interface CardProps extends BaseStyle {
   children?: any;
+  onClick?: any;
+  id?: string;
 }
-export default function Card({ children, style }: CardProps) {
+export default function Card({
+  children,
+  style,
+  className = "",
+  onClick,
+  id,
+}: CardProps) {
   return (
-    <div className="card-container" style={style}>
+    <div
+      className={`card-container ${className}`}
+      style={style}
+      onClick={onClick}
+      id={id}
+    >
       {" "}
       {children}
     </div>

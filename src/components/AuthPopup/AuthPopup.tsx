@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import { login, register } from "../../services/PinterestService";
+import { register, login } from "../../services/AuthService";
 import Button from "../Button/Button";
 import Flexbox from "../Flexbox/Flexbox";
 import Input from "../Input";
@@ -24,13 +24,15 @@ export default function AuthPopup({
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const repeatPasswordRef = useRef<HTMLInputElement>(null);
-  const userIdRef = useRef<HTMLInputElement>(null);
+  const displayIdRef = useRef<HTMLInputElement>(null);
+  const usernameRef = useRef<HTMLInputElement>(null);
 
   const handleLogin = async () => {
     const email = emailRef?.current?.value;
     const password = passwordRef?.current?.value;
     const repeatPassword = repeatPasswordRef?.current?.value;
-    const userId = userIdRef?.current?.value;
+    const displayId = displayIdRef?.current?.value;
+    const username = usernameRef?.current?.value;
 
     if (!email) {
       setError("Please enter a valid email");
@@ -41,7 +43,12 @@ export default function AuthPopup({
       return;
     }
     if (registerMode) {
-      if (!userId) {
+      if (!username) {
+        setError("Please enter a name!");
+        return;
+      }
+
+      if (!displayId) {
         setError("Please enter a unique id!");
         return;
       }
@@ -57,7 +64,8 @@ export default function AuthPopup({
       }
 
       const res = await register({
-        userId: userId,
+        username: username,
+        displayId: displayId,
         email: email,
         password: password,
       });
@@ -105,9 +113,16 @@ export default function AuthPopup({
             )}
             {registerMode && (
               <Input
+                placeholder="my name"
+                className="auth-popup__input"
+                ref={usernameRef}
+              />
+            )}
+            {registerMode && (
+              <Input
                 placeholder="super-id"
                 className="auth-popup__input"
-                ref={userIdRef}
+                ref={displayIdRef}
               />
             )}
             <Input

@@ -1,4 +1,8 @@
 .my-flexbox {
+  position: relative;
   display: flex;
   align-items: center;
+  &-fluid {
+    width: 100%;
+  }
 }

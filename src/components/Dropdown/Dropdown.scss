@@ -1,0 +1,19 @@
+@import "/src/styles/colors";
+
+.dropdown {
+  &__list {
+    position: absolute;
+    width: 100%;
+    height: fit-content;
+    min-height: fit-content;
+    z-index: 2;
+  }
+
+  &__item {
+    width: 100%;
+    cursor: pointer;
+    &:hover {
+      background-color: $light-gray;
+    }
+  }
+}

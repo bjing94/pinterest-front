@@ -1,15 +1,22 @@
 @import "../../styles/colors";
 
-.pin-builder-container {
-  display: flex;
-  width: 100%;
-  height: fit-content;
-  min-height: 100vh;
-  background-color: $light-gray;
-  justify-content: center;
-  align-items: center;
-}
+.pin-builder {
+  &-container {
+    display: flex;
+    width: 100%;
+    height: fit-content;
+    min-height: 100vh;
+    background-color: $light-gray;
+    justify-content: center;
+    align-items: center;
+  }
 
-.pin-builder__profile-info {
-  margin-bottom: 2rem;
+  &__profile-info {
+    margin-bottom: 2rem;
+  }
+
+  &__card {
+    width: 870px;
+    min-width: 870px;
+  }
 }

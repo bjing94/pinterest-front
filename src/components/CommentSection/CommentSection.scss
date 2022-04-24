@@ -48,6 +48,27 @@
   &__actions {
     width: 100%;
   }
+
+  &__input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 10px;
+  }
+
+  &__input-cancel-btn {
+    background-color: $light-gray;
+    color: black;
+  }
+
+  &__input-send-btn {
+    background-color: $red;
+
+    &.inactive {
+      background-color: $light-gray;
+      color: $dark-gray;
+    }
+  }
 }
 
 .reply {
