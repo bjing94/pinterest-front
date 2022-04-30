@@ -8,6 +8,7 @@ interface BoxProps extends BaseStyle {
   children?: any;
   width?: string;
   height?: string;
+  onClick?: any;
 }
 
 export default function Box({
@@ -18,6 +19,7 @@ export default function Box({
   width,
   height,
   className = "",
+  onClick,
 }: BoxProps) {
   return (
     <div
@@ -29,6 +31,7 @@ export default function Box({
         height: height,
       }}
       className={className}
+      onClick={onClick}
     >
       {children}
     </div>

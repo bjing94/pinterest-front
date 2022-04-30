@@ -4,25 +4,10 @@ import Flexbox from "../Flexbox/Flexbox";
 
 import "./Dropdown.scss";
 
-function DropdownList() {
-  return (
-    <div className="dropdown__list">
-      <Card style={{ padding: 0, minWidth: 0 }}>
-        <Flexbox fluid flexDirection="column">
-          <div>item 1</div>
-          <div>item 2</div>
-          <div>item 3</div>
-          <div>item 4</div>
-        </Flexbox>
-      </Card>
-    </div>
-  );
-}
-
 interface DropdownProps {
   width?: string;
   padding?: string;
-  children?: ReactChild[];
+  children?: any;
   onClickItem?: any;
   left?: string;
   top?: string;
@@ -38,7 +23,7 @@ export default function Dropdown({
 }: DropdownProps) {
   let childElements = null;
   if (children) {
-    childElements = children.map((child) => {
+    childElements = children.map((child: any) => {
       return (
         <div className="dropdown__item" onClick={onClickItem}>
           {child}
@@ -54,6 +39,7 @@ export default function Dropdown({
         width: width,
         left: left,
         top: top,
+        borderRadius: "0.5em",
       }}
       className="dropdown__list"
     >

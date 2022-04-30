@@ -107,7 +107,7 @@ export default function AuthPopup({
           </div>
           <Flexbox flexDirection="column" className="auth-popup__info">
             {error && (
-              <Typography fontSize={1} color="red">
+              <Typography fontSize={1} color="error">
                 {error}
               </Typography>
             )}

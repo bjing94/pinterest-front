@@ -6,7 +6,12 @@ import { FiMoreHorizontal } from "react-icons/fi";
 import { IoIosArrowForward } from "react-icons/io";
 import convertAgeToString from "../../helpers/AgeToString";
 import { getCurrentUser } from "../../services/AuthService";
-import { createComment, getComment } from "../../services/CommentService";
+import {
+  createComment,
+  deleteComment,
+  getComment,
+  updateComment,
+} from "../../services/CommentService";
 import { getPin, updatePin } from "../../services/PinService";
 import { CommentData, UserData } from "../../services/responses/responses";
 import { getUser } from "../../services/UserService";
@@ -15,6 +20,7 @@ import AutoTextarea from "../AutoTextarea";
 import Avatar from "../Avatar/Avatar";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
+import Dropdown from "../Dropdown";
 import Flexbox from "../Flexbox/Flexbox";
 import { ResponsiveInput } from "../ResponsiveInput/ResponsiveInput";
 import RoundButton from "../RoundButton/RoundButton";
@@ -24,10 +30,11 @@ import "./CommentSection.scss";
 
 interface CommentSectionProps {
   commentIds: string[];
-  currentUserId: string;
+  currentUserId: string | null;
   onCreate: any;
   onLike: any;
   onUseful: any;
+  onDelete: any;
 }
 
 interface CommentReplyProps {
@@ -72,7 +79,10 @@ function CommentInput({ show, onSubmit }: CommentInputProps) {
               className="comment__input-send-btn"
               active={buttonActive}
               onClick={() => {
+                if (!buttonActive) return;
                 onSubmit(commentValue);
+                setCommentValue("");
+                setButtonActive(false);
               }}
             >
               Send
@@ -108,19 +118,27 @@ function CommentContent({ content, username, age }: CommentContentDto) {
   );
 }
 
+interface CommentActionsProps {
+  useful: boolean;
+  liked: boolean;
+  onClickLikeButton: any;
+  onClickUsefulButton: any;
+  usefulCount: number;
+  onDelete: any;
+  isAuthor: boolean;
+}
+
 function CommentActions({
   liked,
   onClickLikeButton,
   onClickUsefulButton,
   useful,
   usefulCount,
-}: {
-  useful: boolean;
-  liked: boolean;
-  onClickLikeButton: any;
-  onClickUsefulButton: any;
-  usefulCount: number;
-}) {
+  onDelete,
+  isAuthor,
+}: CommentActionsProps) {
+  const [showMoreDropdown, setShowMoreDropdown] = useState(false);
+
   return (
     <Flexbox justifyContent="space-between" className="comment__actions">
       <Flexbox>
@@ -131,12 +149,34 @@ function CommentActions({
         >
           <AiFillHeart size={18} color={liked ? red : darkGray} />
         </RoundButton>
-        <RoundButton className="comment__btn" size={24}>
-          <FaComment size={18} color={darkGray} />
-        </RoundButton>
-        <RoundButton className="comment__btn" size={24}>
+        <RoundButton
+          className="comment__btn"
+          size={24}
+          onClick={() => {
+            setShowMoreDropdown(!showMoreDropdown);
+          }}
+        >
           <FiMoreHorizontal size={18} color={darkGray} />
         </RoundButton>
+        {showMoreDropdown && (
+          <Dropdown width="60px" left="32px">
+            {isAuthor && (
+              <Box
+                width="100%"
+                onClick={() => {
+                  onDelete();
+                }}
+              >
+                <Typography fontSize={0.8} fontWeight="bold">
+                  Delete
+                </Typography>
+              </Box>
+            )}
+            <Typography fontSize={0.8} fontWeight="bold">
+              Share
+            </Typography>
+          </Dropdown>
+        )}
       </Flexbox>
       <button onClick={onClickUsefulButton} className="comment__btn-useful">
         <Flexbox>
@@ -145,60 +185,9 @@ function CommentActions({
             color={useful ? red : darkGray}
             style={{ marginRight: "0.2rem" }}
           />
-          <Typography fontSize={0.8} color={useful ? red : darkGray}>
-            {`Useful ${usefulCount}`}
-          </Typography>
+          <Typography fontSize={0.8}>{`Useful ${usefulCount}`}</Typography>
         </Flexbox>
       </button>
-    </Flexbox>
-  );
-}
-
-function CommentReply({
-  username,
-  content,
-  isLiked = false,
-  isUseful = false,
-  date,
-  usefulCount,
-}: CommentReplyProps) {
-  const [liked, setLiked] = useState(isLiked);
-  const [useful, setUseful] = useState(isUseful);
-  return (
-    <Flexbox alignItems="flex-start" className="reply__container">
-      <RoundButton className="comment__avatar" size={32}>
-        <AiFillAmazonCircle size={32} />
-      </RoundButton>
-      <Flexbox
-        alignItems="flex-start"
-        flexDirection="column"
-        style={{ flexGrow: 1 }}
-      >
-        <div className="comment__content">
-          <Flexbox flexDirection="column" alignItems="flex-start">
-            <Flexbox>
-              <Typography fontSize={0.8} fontWeight="bold">
-                {username}
-              </Typography>
-              <Typography fontSize={0.8} className="comment__date">
-                {date}
-              </Typography>
-            </Flexbox>
-            <Typography fontSize={0.8}>{content}</Typography>
-          </Flexbox>
-        </div>
-        <CommentActions
-          liked={liked}
-          useful={useful}
-          usefulCount={usefulCount}
-          onClickLikeButton={() => {
-            setLiked(!liked);
-          }}
-          onClickUsefulButton={() => {
-            setUseful(!useful);
-          }}
-        />
-      </Flexbox>
     </Flexbox>
   );
 }
@@ -210,6 +199,8 @@ interface CommentProps {
   isUseful: boolean;
   onClickLikeButton: any;
   onClickUsefulButton: any;
+  onDelete: any;
+  isAuthor: boolean;
 }
 
 function Comment({
@@ -219,6 +210,8 @@ function Comment({
   isUseful,
   onClickLikeButton,
   onClickUsefulButton,
+  onDelete,
+  isAuthor,
 }: CommentProps) {
   const [liked, setLiked] = useState(isLiked);
   const [useful, setUseful] = useState(isUseful);
@@ -231,7 +224,7 @@ function Comment({
         return;
       }
       const userData = response.data as UserData;
-      console.log(username);
+
       setUsername(userData.username);
       setAvatarId(userData.avatarSrc);
     });
@@ -261,7 +254,7 @@ function Comment({
         <CommentActions
           liked={liked}
           useful={useful}
-          usefulCount={5}
+          usefulCount={comment.usefulBy.length}
           onClickLikeButton={() => {
             onClickLikeButton(!liked);
             setLiked(!liked);
@@ -270,21 +263,9 @@ function Comment({
             onClickUsefulButton(!useful);
             setUseful(!useful);
           }}
+          onDelete={onDelete}
+          isAuthor={isAuthor}
         />
-        {/* <CommentReply
-          username="john"
-          content="lol hecker is angry"
-          isLiked={false}
-          isUseful={false}
-          date="14 weeks."
-        />
-        <CommentReply
-          username="jake"
-          content="floppers will flopp"
-          isLiked={false}
-          isUseful={false}
-          date="14 weeks."
-        /> */}
       </Flexbox>
     </Flexbox>
   );
@@ -296,6 +277,7 @@ export default function CommentSection({
   onCreate,
   onLike,
   onUseful,
+  onDelete,
 }: CommentSectionProps) {
   const [showComments, setShowComments] = useState(true);
   const [comments, setComments] = useState<CommentData[]>([]);
@@ -317,7 +299,6 @@ export default function CommentSection({
         return comment !== undefined;
       });
 
-    console.log(newComments);
     setComments(newComments);
   };
 
@@ -325,21 +306,49 @@ export default function CommentSection({
     getComments();
   }, [commentIds]);
 
-  if (currentUserId.length === 0) {
-    return <div></div>;
-  }
-
   const commentElements = comments.map((comment) => {
-    const isLiked = comment.likedBy.includes(currentUserId);
-    const isUseful = comment.usefulBy.includes(currentUserId);
+    let isLiked, isUseful;
+    if (!currentUserId) {
+      return (
+        <Comment
+          isLiked={false}
+          isUseful={false}
+          comment={comment}
+          show={showComments}
+          onClickLikeButton={() => {
+            console.log("Log in!");
+          }}
+          onClickUsefulButton={() => {
+            console.log("Log in!");
+          }}
+          onDelete={() => {
+            console.log("Log in!");
+          }}
+          isAuthor={false}
+          key={`comment-${comment._id}`}
+        />
+      );
+    }
+    isLiked = comment.likedBy.includes(currentUserId);
+    isUseful = comment.usefulBy.includes(currentUserId);
+
     return (
       <Comment
         isLiked={isLiked}
         isUseful={isUseful}
         comment={comment}
         show={showComments}
-        onClickLikeButton={onLike}
-        onClickUsefulButton={onUseful}
+        onClickLikeButton={() => {
+          onLike(comment._id);
+        }}
+        onClickUsefulButton={() => {
+          onUseful(comment._id);
+        }}
+        onDelete={() => {
+          onDelete(comment._id);
+        }}
+        isAuthor={comment.userId === currentUserId}
+        key={`comment-${comment._id}`}
       />
     );
   });
@@ -365,7 +374,9 @@ export default function CommentSection({
         </RoundButton>
       </Flexbox>
       {commentElements}
-      <CommentInput show={showComments} onSubmit={onCreate} />
+      {currentUserId && (
+        <CommentInput show={showComments} onSubmit={onCreate} />
+      )}
     </Flexbox>
   );
 }

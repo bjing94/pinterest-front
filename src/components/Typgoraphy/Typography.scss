@@ -1,0 +1,15 @@
+@import "/src/styles/colors";
+
+.typography {
+  &.primary {
+    color: black;
+  }
+
+  &.secondary {
+    color: white;
+  }
+
+  &.error {
+    color: $red;
+  }
+}

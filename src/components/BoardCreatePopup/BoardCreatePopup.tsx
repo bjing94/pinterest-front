@@ -1,22 +1,18 @@
 import React, { useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import {
-  register,
-  login,
-  getCurrentUser,
-} from "../../../../services/AuthService";
-import { createBoard } from "../../../../services/BoardService";
+import { register, login, getCurrentUser } from "../../services/AuthService";
+import { createBoard } from "../../services/BoardService";
 import {
   BoardData,
   ErrorData,
   UserData,
-} from "../../../../services/responses/responses";
-import Box from "../../../../components/Box/Box";
-import Button from "../../../../components/Button/Button";
-import Flexbox from "../../../../components/Flexbox/Flexbox";
-import Input from "../../../../components/Input";
-import RoundButton from "../../../../components/RoundButton/RoundButton";
-import Typography from "../../../../components/Typgoraphy/Typography";
+} from "../../services/responses/responses";
+import Box from "../Box/Box";
+import Button from "../Button/Button";
+import Flexbox from "../Flexbox/Flexbox";
+import Input from "../Input";
+import RoundButton from "../RoundButton/RoundButton";
+import Typography from "../Typgoraphy/Typography";
 
 import "./BoardCreatePopup.scss";
 
@@ -31,13 +27,17 @@ export default function BoardCreatePopup({
   onSubmit,
 }: BoardCreatePopupProps) {
   const titleRef = useRef<HTMLInputElement>(null);
+  const [errorText, setErrorText] = useState("");
 
   const handleCreateBoard = async () => {
+    setErrorText("");
     if (!titleRef || !titleRef.current) {
+      setErrorText("Reference error!");
       return;
     }
     const currentUser = await getCurrentUser();
     if (!currentUser || currentUser.status !== 200) {
+      setErrorText("Please log in!");
       return;
     }
     const userData = currentUser.data as UserData;
@@ -48,15 +48,17 @@ export default function BoardCreatePopup({
     });
 
     if (!newBoard) {
+      setErrorText("Server error!");
       return;
     }
     if (newBoard.status !== 201) {
       const error = newBoard.data as ErrorData;
-      console.log(error.statusCode, error.message);
+      setErrorText(error.message);
       return;
     } else {
       const board = newBoard.data as BoardData;
       console.log(board);
+      onClose();
     }
   };
 
@@ -65,6 +67,11 @@ export default function BoardCreatePopup({
       <div className="create-board-popup__background" onClick={onClose}></div>
       <div className="create-board-popup__container" style={{ width: "400px" }}>
         <Flexbox flexDirection="column" fluid>
+          {errorText && (
+            <Typography fontSize={1} color="error">
+              {errorText}
+            </Typography>
+          )}
           <Typography fontSize={1.75} fontWeight="bold">
             Создание доски
           </Typography>

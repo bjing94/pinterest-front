@@ -45,7 +45,14 @@ export default function Home() {
         style={{ width: "100%" }}
         key={`pin-card-${id}`}
       >
-        <PinCard pinId={id} />
+        <PinCard
+          isSaved={false}
+          boards={[]}
+          onSetBoardId={() => {}}
+          onSavePin={() => {}}
+          onShowCreateBoard={() => {}}
+          pinId={id}
+        />
       </Flexbox>
     );
   });

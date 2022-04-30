@@ -6,7 +6,7 @@ import "./Typography.scss";
 interface TypographyProps extends BaseStyle {
   fontSize?: number;
   fontWeight?: string;
-  color?: string;
+  color?: "primary" | "secondary" | "error";
   children?: any;
   textAlign?:
     | "start"
@@ -19,7 +19,7 @@ interface TypographyProps extends BaseStyle {
 }
 export default function Typography({
   fontSize = 2,
-  color,
+  color = "primary",
   children,
   fontWeight,
   className = "",
@@ -31,11 +31,10 @@ export default function Typography({
       style={{
         fontSize: `${fontSize}rem`,
         lineHeight: `${lineHeight}rem`,
-        color: color,
         fontWeight,
         textAlign: textAlign,
       }}
-      className={className}
+      className={`typography ${className} ${color}`}
     >
       {children}
     </div>

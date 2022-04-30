@@ -48,17 +48,13 @@ export default function CommunityInfo({
           <Typography fontSize={1}>{subscribersCount} subscribers</Typography>
         </Flexbox>
       </Flexbox>
-      {!isSubscribed && (
-        <Button
-          className="community-info__subscribe-btn"
-          onClick={onClickSubscribe}
-        >
-          Subscribe
-        </Button>
-      )}
-      {isSubscribed && (
-        <Button className="community-info__subscribe-btn">Subscribed</Button>
-      )}
+
+      <Button
+        onClick={onClickSubscribe}
+        color={`${isSubscribed ? "secondary" : "primary"}`}
+      >
+        {`${isSubscribed ? "Subscribed" : "Subscribe"}`}
+      </Button>
     </Flexbox>
   );
 }

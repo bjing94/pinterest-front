@@ -46,3 +46,17 @@ export async function getStaticImage(imgId: string): Promise<string | null> {
 
   return baseURL + `/${imgInfo.url}`;
 }
+
+export async function downloadStaticImage(imgId: string) {
+  const link = axiosInstance.defaults.baseURL + "files/download/" + imgId;
+  return link;
+  // return axiosInstance
+  //   .get(`files/download/${imgId}`)
+  //   .then((response: AxiosResponse<FildeData>) => {
+  //     return response;
+  //   })
+  //   .catch((err: AxiosError) => {
+  //     console.log(err.response?.data.message);
+  //     return null;
+  //   });
+}

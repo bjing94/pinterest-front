@@ -2,18 +2,18 @@ import { AxiosResponse } from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { BsPlus } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
-import { getBoard } from "../../../../services/BoardService";
-import { getStaticImage } from "../../../../services/FileService";
-import { getPin } from "../../../../services/PinService";
-import { BoardData } from "../../../../services/responses/responses";
-import Box from "../../../../components/Box/Box";
-import Button from "../../../../components/Button/Button";
-import ButtonGroup from "../../../../components/ButtonGroup/ButtonGroup";
-import Card from "../../../../components/Card/Card";
-import Flexbox from "../../../../components/Flexbox/Flexbox";
-import InputSearch from "../../../../components/InputSearch/InputSearch";
-import RoundButton from "../../../../components/RoundButton/RoundButton";
-import Typography from "../../../../components/Typgoraphy/Typography";
+import { getBoard } from "../../services/BoardService";
+import { getStaticImage } from "../../services/FileService";
+import { getPin } from "../../services/PinService";
+import { BoardData } from "../../services/responses/responses";
+import { BaseStyle } from "../../types/types";
+import Box from "../Box/Box";
+import Button from "../Button/Button";
+import Card from "../Card/Card";
+import Flexbox from "../Flexbox/Flexbox";
+import InputSearch from "../InputSearch/InputSearch";
+import RoundButton from "../RoundButton/RoundButton";
+import Typography from "../Typgoraphy/Typography";
 
 import "./DropdownBoards.scss";
 
@@ -27,6 +27,7 @@ function DropdownFooter({ onClick }: FooterProps) {
       className="board-dropdown__footer"
       justifyContent="flex-start"
       onClick={(e: Event) => {
+        e.preventDefault();
         e.stopPropagation();
         onClick();
       }}
@@ -34,7 +35,7 @@ function DropdownFooter({ onClick }: FooterProps) {
       <RoundButton className="create-board__btn" size={32}>
         <BsPlus size={32} />
       </RoundButton>
-      <Typography fontSize={1}>Создать доску</Typography>
+      <Typography fontSize={1}>Create board</Typography>
     </Flexbox>
   );
 }
@@ -128,7 +129,13 @@ function DropdownList({ boards, onClickFooter, onSelect }: DropdownListProps) {
     });
 
   return (
-    <div className="board-dropdown__list">
+    <div
+      className="board-dropdown__list"
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+    >
       <Card className="board-dropdown__card">
         <Flexbox
           style={{ height: "100%" }}
@@ -167,24 +174,29 @@ function DropdownList({ boards, onClickFooter, onSelect }: DropdownListProps) {
   );
 }
 
-interface DropdownProps {
+interface DropdownProps extends BaseStyle {
   boardIds: string[];
   onClickCreateBoard?: any;
   onSelect: (boardId: string) => void;
-  onClickSave: () => void;
   onClickArrow: (e: Event) => void;
   showDropdown: boolean;
+  className?: string;
+  arrowStyle?: any;
+  textColor?: "primary" | "secondary" | "error";
 }
 
 export default function DropdownBoards({
   boardIds,
   onClickCreateBoard,
   onSelect,
-  onClickSave,
   showDropdown,
   onClickArrow,
+  style,
+  className,
+  arrowStyle,
+  textColor = "primary",
 }: DropdownProps) {
-  const [selection, setSelection] = useState(boardIds[0]);
+  const [selection, setSelection] = useState<string | null>(null);
   const [boards, setBoards] = useState<BoardData[]>([]);
 
   useEffect(() => {
@@ -207,41 +219,38 @@ export default function DropdownBoards({
     handleGetBoards();
   }, []);
 
-  if (boards.length === 0) {
-    return <div>Loading</div>;
+  let title = "";
+  if (boards.length !== 0 && selection) {
+    const selectedBoard = boards.filter((b) => {
+      return b._id === selection;
+    })[0];
+    title = selectedBoard.title;
+    if (title.length > 10) {
+      title = title.slice(0, 10);
+      title += "...";
+    }
+  } else {
+    title = "Profile";
   }
 
-  const selectedBoard = boards.filter((b) => {
-    return b._id === selection;
-  })[0];
-
-  if (!selectedBoard) {
-    return <div>Loading</div>;
-  }
-  const { title } = selectedBoard;
   return (
-    <div style={{ width: "236px", position: "relative" }}>
-      <ButtonGroup>
-        <div className="board-dropdown">
-          <Flexbox fluid justifyContent="space-between">
-            <Typography fontSize={1.2}>{title}</Typography>
-            <RoundButton
-              size={32}
-              onClick={(e: Event) => {
-                onClickArrow(e);
-              }}
-              style={{ transform: `${showDropdown ? "rotate(90deg)" : ""}` }}
-            >
-              <IoIosArrowForward size={24} />
-            </RoundButton>
-          </Flexbox>
-        </div>
-        {!showDropdown && (
-          <Button className="board-dropdown__save-btn" onClick={onClickSave}>
-            Save
-          </Button>
-        )}
-      </ButtonGroup>
+    <div style={{ width: "100%", position: "relative" }}>
+      <div className="board-dropdown" style={style}>
+        <Flexbox fluid justifyContent="flex-end">
+          <Typography fontSize={1.2} color={textColor} textAlign="end">
+            {title}
+          </Typography>
+          <RoundButton
+            size={32}
+            onClick={(e: Event) => {
+              onClickArrow(e);
+            }}
+            style={{ transform: `${showDropdown ? "rotate(90deg)" : ""}` }}
+          >
+            <IoIosArrowForward size={24} style={arrowStyle} />
+          </RoundButton>
+        </Flexbox>
+      </div>
       {showDropdown && (
         <DropdownList
           boards={boards}

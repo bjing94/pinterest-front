@@ -1,12 +1,15 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { axiosInstance } from "./axiosInstance";
+import { CreateUserDto } from "./dto/create-pin.dto";
+import { FindUserDto } from "./dto/find-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 import { ErrorData, UserData } from "./responses/responses";
 
 export async function subscribe(
-  displayId: string
+  userId: string
 ): Promise<AxiosResponse<UserData | ErrorData> | undefined> {
   return axiosInstance
-    .post(`user/subscribe/${displayId}`)
+    .post(`user/subscribe/${userId}`)
     .then((response: AxiosResponse<UserData>) => {
       return response;
     })
@@ -24,6 +27,35 @@ export async function getUser(
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
+      return error.response;
+    });
+}
+
+export async function findUser(
+  dto: FindUserDto
+): Promise<AxiosResponse<UserData | ErrorData> | undefined> {
+  return axiosInstance
+    .post(`search/users`, dto)
+    .then((response: AxiosResponse<UserData>) => {
+      return response;
+    })
+    .catch((error: AxiosError<ErrorData>) => {
+      return error.response;
+    });
+}
+
+export async function updateUser(
+  userId: string,
+  dto: UpdateUserDto
+): Promise<AxiosResponse<UserData | ErrorData> | undefined> {
+  return axiosInstance
+    .patch(`user/${userId}`, dto)
+    .then((response: AxiosResponse<UserData>) => {
+      console.log(response);
+      return response;
+    })
+    .catch((error: AxiosError<ErrorData>) => {
+      console.log(error);
       return error.response;
     });
 }

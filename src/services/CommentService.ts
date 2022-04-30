@@ -42,3 +42,16 @@ export async function getComment(
       return error.response;
     });
 }
+
+export async function deleteComment(
+  id: string
+): Promise<AxiosResponse<CommentData | ErrorData> | undefined> {
+  return axiosInstance
+    .delete(`/comment/${id}`)
+    .then((response: AxiosResponse<CommentData>) => {
+      return response;
+    })
+    .catch((error: AxiosError<ErrorData>) => {
+      return error.response;
+    });
+}

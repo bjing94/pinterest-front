@@ -15,11 +15,4 @@
   &__profile-info {
     width: 100%;
   }
-
-  &__save-btn {
-    background-color: $red;
-    &:hover {
-      background-color: darken($color: $red, $amount: 10%);
-    }
-  }
 }

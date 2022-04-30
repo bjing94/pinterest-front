@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Col, Grid, Row } from "react-flexbox-grid";
 import { AiFillBell, AiFillMessage } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import UserContext from "../../store/userContext";
 import Button from "../Button/Button";
 import Container from "../Container/Container";
 import Flexbox from "../Flexbox/Flexbox";
@@ -14,15 +15,13 @@ import "./TopBar.scss";
 interface TopBarProps {
   onClickLogin?: any;
   onClickRegister?: any;
-  isAuth: boolean;
 }
 
-export default function TopBar({
-  onClickLogin,
-  onClickRegister,
-  isAuth,
-}: TopBarProps) {
+export default function TopBar({ onClickLogin, onClickRegister }: TopBarProps) {
+  const location = useLocation();
   const darkGray = " #767676";
+  const currUserInfo = useContext(UserContext);
+  const { isAuth, displayId } = currUserInfo;
 
   return (
     <div className="top-bar ">
@@ -35,7 +34,14 @@ export default function TopBar({
                   <img className="logo" width={24} height={24} />
                 </RoundButton>
                 <Link to="/">
-                  <Button>Главная</Button>
+                  <Button
+                    color={`${
+                      location.pathname === "/" ? "secondary" : "primary"
+                    }`}
+                    type={`${location.pathname === "/" ? "filled" : "text"}`}
+                  >
+                    Home
+                  </Button>
                 </Link>
               </Flexbox>
             </Col>
@@ -51,14 +57,20 @@ export default function TopBar({
                   <RoundButton size={32}>
                     <AiFillMessage size={24} fill={darkGray} />
                   </RoundButton>
-                  <RoundButton size={32}>
-                    <FaUser size={24} fill={darkGray} />
-                  </RoundButton>
+                  <Link to={`/user/${displayId}`}>
+                    <RoundButton size={32}>
+                      <FaUser size={24} fill={darkGray} />
+                    </RoundButton>
+                  </Link>
                 </Flexbox>
               ) : (
                 <Flexbox>
-                  <Button onClick={onClickLogin}>Login</Button>
-                  <Button onClick={onClickRegister}>Register</Button>
+                  <Button onClick={onClickLogin} color="secondary">
+                    Login
+                  </Button>
+                  <Button onClick={onClickRegister} color="secondary">
+                    Register
+                  </Button>
                 </Flexbox>
               )}
             </Col>

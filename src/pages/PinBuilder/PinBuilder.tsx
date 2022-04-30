@@ -21,13 +21,19 @@ import { getCurrentUser } from "../../services/AuthService";
 import { uploadFile } from "../../services/FileService";
 import { createPin } from "../../services/PinService";
 import Typography from "../../components/Typgoraphy/Typography";
-import DropdownBoards from "./components/DropdownBoards/DropdownBoards";
-import BoardCreatePopup from "./components/BoardCreatePopup";
+import DropdownBoards from "../../components/DropdownBoards/DropdownBoards";
+import BoardCreatePopup from "../../components/BoardCreatePopup";
 import PinLoader from "./components/PinLoader/PinLoader";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import Dropdown from "../../components/Dropdown";
+import ButtonGroup from "../../components/ButtonGroup/ButtonGroup";
+import { Navigate } from "react-router-dom";
 
-export default function PinBuilder() {
+interface PinBuilderProps {
+  isAuth?: boolean;
+}
+
+export default function PinBuilder({ isAuth }: PinBuilderProps) {
   const [uploadedImg, setUploadedImg] = useState<string | undefined>(undefined);
   const [imgHeight, setImgHeight] = useState(0);
   const [error, setError] = useState("");
@@ -161,6 +167,10 @@ export default function PinBuilder() {
     });
   }, []);
 
+  if (!isAuth) {
+    return <Navigate to="/" />;
+  }
+
   if (!userInfo) {
     return <div>Please log in!</div>;
   }
@@ -213,25 +223,32 @@ export default function PinBuilder() {
               </Typography>
             </Dropdown>
           )}
-          <DropdownBoards
-            boardIds={boards}
-            onClickCreateBoard={() => {
-              setShowCreateBoard(true);
-            }}
-            onSelect={(boardId: string) => {
-              console.log("Board id", boardId);
-              setBoardId(boardId);
-              setShowBoardsDropdown(!showBoardsDropdown);
-            }}
-            onClickSave={() => {
-              handleCreatePin();
-            }}
-            showDropdown={showBoardsDropdown}
-            onClickArrow={(event: Event) => {
-              event.stopPropagation();
-              setShowBoardsDropdown(!showBoardsDropdown);
-            }}
-          />
+          <ButtonGroup style={{ width: "236px" }}>
+            <DropdownBoards
+              boardIds={boards}
+              onClickCreateBoard={() => {
+                setShowCreateBoard(true);
+              }}
+              onSelect={(boardId: string) => {
+                console.log("Board id", boardId);
+                setBoardId(boardId);
+                setShowBoardsDropdown(!showBoardsDropdown);
+              }}
+              showDropdown={showBoardsDropdown}
+              onClickArrow={(event: Event) => {
+                event.stopPropagation();
+                setShowBoardsDropdown(!showBoardsDropdown);
+              }}
+            />
+            {!showBoardsDropdown && (
+              <Button
+                onClick={handleCreatePin}
+                style={{ height: "48px", background: "red" }}
+              >
+                Save
+              </Button>
+            )}
+          </ButtonGroup>
         </Flexbox>
         <Flexbox alignItems="flex-start" style={{ marginTop: "2rem" }}>
           <InputPin

@@ -98,13 +98,25 @@ export default function UserBoardCard({ id }: UserBoardCardProps) {
       alignItems="flex-start"
     >
       <Flexbox className="user-board__images">
-        <img className="user-board__main-img" src={coverImages[0]} />
+        <img
+          className="user-board__main-img"
+          src={coverImages[0] ?? ""}
+          style={{ background: `${coverImages[0] ? "none" : "gray"}` }}
+        />
         <Flexbox
           style={{ width: "100%", height: "100%" }}
           flexDirection="column"
         >
-          <img className="user-board__top-img" src={coverImages[1]} />
-          <img className="user-board__bottom-img" src={coverImages[2]} />
+          <img
+            className="user-board__top-img"
+            src={coverImages[1] ?? ""}
+            style={{ background: `${coverImages[1] ? "none" : "gray"}` }}
+          />
+          <img
+            className="user-board__bottom-img"
+            src={coverImages[2] ?? ""}
+            style={{ background: `${coverImages[2] ? "none" : "gray"}` }}
+          />
         </Flexbox>
       </Flexbox>
       <div style={{ marginLeft: "10px" }}>

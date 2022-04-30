@@ -1,13 +1,58 @@
+@import "/src/styles/colors";
+
 .btn {
   display: flex;
   font-size: 16px;
   font-weight: 700;
   border: none;
   border-radius: 2rem;
-  padding: 1rem;
+  padding: 0.75em 1em 0.75em 1em;
   color: white;
   background-color: black;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+
+  &.filled {
+    &.primary {
+      color: white;
+      background-color: $red;
+    }
+
+    &.secondary {
+      color: white;
+      background-color: $black;
+    }
+
+    &.inactive {
+      background-color: $light-gray;
+      color: black;
+      cursor: not-allowed;
+    }
+  }
+
+  &.text {
+    background: none;
+    &.primary {
+      color: black;
+    }
+
+    &.secondary {
+      color: white;
+    }
+  }
+
+  &.outline {
+    border: solid 2px;
+    background: none;
+    &.primary {
+      border-color: black;
+      color: black;
+    }
+
+    &.secondary {
+      border-color: white;
+      color: white;
+    }
+  }
 }

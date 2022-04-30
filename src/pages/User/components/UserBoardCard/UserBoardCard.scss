@@ -6,21 +6,21 @@
     width: 252px;
     height: 450px;
   }
-  &__main-img {
+  &__main-img,
+  &__top-img,
+  &__bottom-img {
     width: 100%;
     height: 100%;
+  }
+  &__main-img {
     border-radius: 1rem 0rem 0rem 1rem;
     border-right: 2px solid white;
   }
   &__top-img {
-    width: 100%;
-    height: 100%;
     border-radius: 0rem 1rem 0rem 0rem;
     border-bottom: 1px solid white;
   }
   &__bottom-img {
-    width: 100%;
-    height: 100%;
     border-radius: 0rem 0rem 1rem 0rem;
     border-top: 1px solid white;
   }
