@@ -4,6 +4,7 @@ import { AiFillBell, AiFillMessage } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import UserContext from "../../store/userContext";
+import Box from "../Box/Box";
 import Button from "../Button/Button";
 import Container from "../Container/Container";
 import Flexbox from "../Flexbox/Flexbox";
@@ -46,7 +47,7 @@ export default function TopBar({ onClickLogin, onClickRegister }: TopBarProps) {
               </Flexbox>
             </Col>
             <Col xs={true} style={{ flexGrow: 1 }}>
-              <InputSearch placeholder="Поиск" />
+              <InputSearch placeholder="Search" />
             </Col>
             <Col xs={true} style={{ flexGrow: 0 }}>
               {isAuth ? (
@@ -68,9 +69,11 @@ export default function TopBar({ onClickLogin, onClickRegister }: TopBarProps) {
                   <Button onClick={onClickLogin} color="secondary">
                     Login
                   </Button>
-                  <Button onClick={onClickRegister} color="secondary">
-                    Register
-                  </Button>
+                  <Box margin="0px 0px 0px 10px">
+                    <Button onClick={onClickRegister} color="secondary">
+                      Register
+                    </Button>
+                  </Box>
                 </Flexbox>
               )}
             </Col>

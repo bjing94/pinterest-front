@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { AiFillAmazonCircle } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import UserContext from "../../store/userContext";
 import { lightGray } from "../../styles/colors";
 import { BaseStyle } from "../../types/types";
+import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";
 import Flexbox from "../Flexbox/Flexbox";
 import RoundButton from "../RoundButton/RoundButton";
@@ -12,7 +15,8 @@ import "./CommunityInfo.scss";
 
 interface CommunityInfoProps extends BaseStyle {
   username: string;
-  avatar: string;
+  avatarId: string;
+  displayId: string;
   isSubscribed: boolean;
   subscribersCount: number;
   onClickSubscribe?: any;
@@ -20,41 +24,45 @@ interface CommunityInfoProps extends BaseStyle {
 
 export default function CommunityInfo({
   username,
-  avatar,
+  avatarId,
+  displayId,
   isSubscribed,
   subscribersCount,
   onClickSubscribe,
   className = "",
 }: CommunityInfoProps) {
+  const { isAuth } = useContext(UserContext);
+
   return (
     <Flexbox
       className={`profile-info ${className}`}
       justifyContent="space-between"
     >
-      <Flexbox>
-        <RoundButton
-          size={32}
-          style={{ backgroundImage: `url(${avatar})` }}
-        ></RoundButton>
-        <Flexbox
-          flexDirection="column"
-          alignItems="flex-start"
-          style={{ marginLeft: "0.5rem" }}
-        >
-          <Typography fontSize={1} fontWeight="bold">
-            {" "}
-            {username}
-          </Typography>
-          <Typography fontSize={1}>{subscribersCount} subscribers</Typography>
+      <Link to={`/user/${displayId}`}>
+        <Flexbox>
+          <Avatar imgId={avatarId} size={32} />
+          <Flexbox
+            flexDirection="column"
+            alignItems="flex-start"
+            style={{ marginLeft: "0.5rem" }}
+          >
+            <Typography fontSize={1} fontWeight="bold">
+              {" "}
+              {username}
+            </Typography>
+            <Typography fontSize={1}>{subscribersCount} subscribers</Typography>
+          </Flexbox>
         </Flexbox>
-      </Flexbox>
+      </Link>
 
-      <Button
-        onClick={onClickSubscribe}
-        color={`${isSubscribed ? "secondary" : "primary"}`}
-      >
-        {`${isSubscribed ? "Subscribed" : "Subscribe"}`}
-      </Button>
+      {isAuth && (
+        <Button
+          onClick={onClickSubscribe}
+          color={`${isSubscribed ? "secondary" : "primary"}`}
+        >
+          {`${isSubscribed ? "Subscribed" : "Subscribe"}`}
+        </Button>
+      )}
     </Flexbox>
   );
 }

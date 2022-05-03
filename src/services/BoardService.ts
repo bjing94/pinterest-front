@@ -16,6 +16,26 @@ export async function getBoard(
     });
 }
 
+export async function getBoards(ids: string[]): Promise<BoardData[]> {
+  const boardResponses = await Promise.all(
+    ids.map((boardId) => {
+      return getBoard(boardId);
+    })
+  );
+
+  const boardsData: BoardData[] = boardResponses
+    .map((response) => {
+      if (response !== undefined && response.status === 200) {
+        return response.data as BoardData;
+      }
+    })
+    .filter((data): data is BoardData => {
+      return data !== undefined;
+    });
+
+  return boardsData;
+}
+
 export async function createBoard(dto: CreateBoardDto) {
   return axiosInstance
     .post(`board/create`, dto)

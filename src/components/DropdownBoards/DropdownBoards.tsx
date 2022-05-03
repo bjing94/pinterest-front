@@ -5,7 +5,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import { getBoard } from "../../services/BoardService";
 import { getStaticImage } from "../../services/FileService";
 import { getPin } from "../../services/PinService";
-import { BoardData } from "../../services/responses/responses";
+import { BoardData, PinData } from "../../services/responses/responses";
 import { BaseStyle } from "../../types/types";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
@@ -54,11 +54,12 @@ function DropdownItem({ boardData, onClick }: DropdownItemProps) {
       return;
     }
 
-    const pin = await getPin(pins[0]);
-    if (!pin) {
+    const pinResponse = await getPin(pins[0]);
+
+    if (!pinResponse || pinResponse.status !== 200) {
       return;
     }
-
+    const pin = pinResponse.data as PinData;
     const img = await getStaticImage(pin.imgId);
     if (!img) {
       return;

@@ -1,0 +1,102 @@
+import { AxiosResponse } from "axios";
+import React, { useEffect, useState } from "react";
+import { AiOutlineClose } from "react-icons/ai";
+import { FaCross, FaWindowClose } from "react-icons/fa";
+import Avatar from "../../../../components/Avatar/Avatar";
+import Box from "../../../../components/Box/Box";
+import Button from "../../../../components/Button/Button";
+import Card from "../../../../components/Card/Card";
+import Flexbox from "../../../../components/Flexbox/Flexbox";
+import RoundButton from "../../../../components/RoundButton/RoundButton";
+import Toolbar from "../../../../components/Toolbar/Toolbar";
+import Typography from "../../../../components/Typgoraphy/Typography";
+import { UserData } from "../../../../services/responses/responses";
+import { getUser } from "../../../../services/UserService";
+
+import "./UsersPopup.scss";
+
+interface UsersPopupProps {
+  userIds: string[];
+  title: string;
+  onClose: () => void;
+}
+
+export default function UsersPopup({
+  userIds,
+  title,
+  onClose,
+}: UsersPopupProps) {
+  const [amountLoaded, setAmountLoaded] = useState(20);
+  const [users, setUsers] = useState<UserData[]>([]);
+
+  const loadUsers = async () => {
+    const userResponses = await Promise.all(
+      userIds.slice(0, amountLoaded).map((id) => {
+        return getUser(id);
+      })
+    );
+
+    const users: UserData[] = userResponses
+      .filter((response): response is AxiosResponse<UserData> => {
+        return response !== undefined && response.status === 200;
+      })
+      .map((response) => {
+        return response.data;
+      });
+
+    setUsers(users);
+  };
+
+  const handleShowMore = () => {
+    setAmountLoaded(amountLoaded + 20);
+  };
+
+  const userElements = users.map((user) => {
+    return (
+      <Flexbox fluid>
+        <Box margin="0px 10px 0px 0px">
+          <Avatar size={50} imgId={user.avatarSrc} />
+        </Box>
+        <Box margin="0px 10px 0px 0px" className="users-popup__username">
+          <Typography fontSize={1.25} fontWeight="bold" textAlign="start">
+            {user.username}
+          </Typography>
+        </Box>
+        <Button>Subscribe</Button>
+      </Flexbox>
+    );
+  });
+
+  useEffect(() => {
+    loadUsers();
+  }, [amountLoaded]);
+  return (
+    <div className="users-popup__background">
+      <Box margin="100px 0px 0px 0px">
+        <Card className="users-popup__container">
+          <Flexbox flexDirection="column" style={{ height: "100%" }}>
+            <Box margin="0px 0px 20px 0px" width="400px">
+              <Flexbox fluid justifyContent="center" alignItems="center">
+                <Typography fontSize={1.5} fontWeight="bold">
+                  {title}
+                </Typography>
+                <RoundButton size={32} onClick={onClose}>
+                  <AiOutlineClose size={24} />
+                </RoundButton>
+              </Flexbox>
+            </Box>
+            <div className="users-popup__list">
+              {userElements}
+              {/* <div style={{ background: "red", height: "800px" }}></div> */}
+              {amountLoaded > 10 && userIds.length > amountLoaded && (
+                <Flexbox fluid justifyContent="center">
+                  <Button>Show more</Button>
+                </Flexbox>
+              )}
+            </div>
+          </Flexbox>
+        </Card>
+      </Box>
+    </div>
+  );
+}

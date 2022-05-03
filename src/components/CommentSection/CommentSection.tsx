@@ -289,16 +289,13 @@ export default function CommentSection({
       })
     );
 
-    const newComments: CommentData[] = commentsResponse
-      .map((response) => {
-        if (response !== undefined && response.status === 200) {
-          return response.data as CommentData;
-        }
+    const newComments = commentsResponse
+      .filter((response): response is AxiosResponse<CommentData> => {
+        return response !== undefined && response.status === 200;
       })
-      .filter((comment): comment is CommentData => {
-        return comment !== undefined;
+      .map((response) => {
+        return response.data as CommentData;
       });
-
     setComments(newComments);
   };
 

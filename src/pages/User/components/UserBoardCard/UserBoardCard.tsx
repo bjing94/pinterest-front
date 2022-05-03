@@ -1,10 +1,15 @@
+import { AxiosResponse } from "axios";
 import React, { useEffect, useState } from "react";
 import Flexbox from "../../../../components/Flexbox/Flexbox";
 import Typography from "../../../../components/Typgoraphy/Typography";
 import { getBoard } from "../../../../services/BoardService";
 import { getStaticImage } from "../../../../services/FileService";
 import { getPin } from "../../../../services/PinService";
-import { BoardData, ErrorData } from "../../../../services/responses/responses";
+import {
+  BoardData,
+  ErrorData,
+  PinData,
+} from "../../../../services/responses/responses";
 
 import "./UserBoardCard.scss";
 
@@ -16,7 +21,15 @@ const getSrcFromPins = async (pinIds: string[]) => {
     return getPin(pinId);
   });
 
-  const pinDatas = await Promise.all(pins);
+  const pinResponses = await Promise.all(pins);
+  const pinDatas = pinResponses
+    .filter((response): response is AxiosResponse<PinData> => {
+      return response !== undefined && response.status === 200;
+    })
+    .map((response) => {
+      return response.data as PinData;
+    });
+
   const imgPromises = pinDatas.map((pinData) => {
     if (pinData) {
       return getStaticImage(pinData.imgId);

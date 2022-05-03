@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { AiFillAmazonCircle } from "react-icons/ai";
 import { FiLink, FiShare } from "react-icons/fi";
 import Masonry from "react-masonry-css";
@@ -26,6 +26,8 @@ import BoardCreatePopup from "../../components/BoardCreatePopup";
 import Box from "../../components/Box/Box";
 
 import "./User.scss";
+import UsersPopup from "./components/UsersPopup/UsersPopup";
+import UserContext from "../../store/userContext";
 
 const breakpointColumnsObj = {
   default: 7,
@@ -39,6 +41,8 @@ const breakpointColumnsObj = {
 
 export default function User() {
   const { id: displayId } = useParams();
+  const { setTextPopup } = useContext(UserContext);
+
   const [profileInfo, setProfileInfo] = useState<UserData | undefined>();
   const [showCreated, setShowCreated] = useState(true);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -55,9 +59,9 @@ export default function User() {
   >([]);
 
   // Other information
-  const [popupText, setPopupText] = useState("");
   const [showCreateBoard, setShowCreateBoard] = useState(false);
-  const [popupTextTimerId, setPopupTextTimerId] = useState(-1);
+  const [showSubscribersPopup, setShowSubscribersPopup] = useState(false);
+  const [showSubscribtionsPopup, setShowSubscribtionsPopup] = useState(false);
 
   const checkSubscribed = async () => {
     if (!profileInfo) {
@@ -86,24 +90,12 @@ export default function User() {
     }
   };
 
-  const showPopupInfo = (text: string) => {
-    if (popupTextTimerId !== -1) {
-      clearTimeout(popupTextTimerId);
-    }
-    setPopupText(text);
-    setPopupTextTimerId(
-      window.setTimeout(() => {
-        setPopupText("");
-      }, 5000)
-    );
-  };
-
   const handleCopyUserLink = async () => {
     const url = window.location.href;
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        showPopupInfo("Copied to clipboard.");
+        setTextPopup("Copied to clipboard.");
       })
       .catch(() => {
         console.log("Didn't copy!");
@@ -206,7 +198,7 @@ export default function User() {
     );
   }
 
-  if (!profileInfo || !currentUserInfo) {
+  if (!profileInfo) {
     return (
       <Flexbox
         style={{ width: "100%", height: "100%" }}
@@ -232,7 +224,7 @@ export default function User() {
         <PinCard
           pinId={id}
           isSaved={isSaved}
-          boards={currentUserInfo.boards}
+          boards={[]}
           onSavePin={(pinId) => {
             handleSavePin(pinId);
           }}
@@ -260,10 +252,28 @@ export default function User() {
   });
 
   console.log("User info:", profileInfo);
-  const isOwner = currentUserInfo._id === profileInfo._id;
+  const isOwner = currentUserInfo && currentUserInfo._id === profileInfo._id;
   if (!isOwner) {
     return (
       <div>
+        {showSubscribersPopup && (
+          <UsersPopup
+            userIds={profileInfo.subscribers}
+            title={`${profileInfo.subscribers.length} subscribers`}
+            onClose={() => {
+              setShowSubscribersPopup(false);
+            }}
+          />
+        )}
+        {showSubscribtionsPopup && (
+          <UsersPopup
+            userIds={profileInfo.subscriptions}
+            title={`${profileInfo.subscriptions.length} subscribtions`}
+            onClose={() => {
+              setShowSubscribtionsPopup(false);
+            }}
+          />
+        )}
         {showCreateBoard && (
           <BoardCreatePopup
             onClose={() => {
@@ -272,7 +282,6 @@ export default function User() {
             onSubmit={() => {}}
           />
         )}
-        {popupText && <TextPopup>{popupText}</TextPopup>}
         <Toolbar />
         <Flexbox flexDirection="column" alignItems="center">
           <RoundButton
@@ -285,16 +294,31 @@ export default function User() {
           </Typography>
           <div style={{ marginTop: "1rem" }}>
             <Flexbox>
-              <Typography fontSize={1} fontWeight="bold">
-                {profileInfo.subscribers.length} subscribers
-              </Typography>
-              <Typography
-                fontSize={1}
-                fontWeight="bold"
-                className="user__subscriptions"
+              <Button
+                type="text"
+                onClick={() => {
+                  setShowSubscribersPopup(true);
+                }}
               >
-                {profileInfo.subscriptions.length} subscriptions
-              </Typography>
+                <Typography fontSize={1} fontWeight="bold">
+                  {profileInfo.subscribers.length} subscribers
+                </Typography>
+              </Button>
+
+              <Button
+                type="text"
+                onClick={() => {
+                  setShowSubscribtionsPopup(true);
+                }}
+              >
+                <Typography
+                  fontSize={1}
+                  fontWeight="bold"
+                  className="user__subscriptions"
+                >
+                  {profileInfo.subscriptions.length} subscriptions
+                </Typography>
+              </Button>
             </Flexbox>
           </div>
           <Box margin="20px 0 0 0">
@@ -302,10 +326,10 @@ export default function User() {
               <RoundButton size={48} onClick={handleCopyUserLink}>
                 <FiLink size={24} />
               </RoundButton>
-              {!isSubscribed && (
+              {!isSubscribed && currentUserInfo && (
                 <Button onClick={handleSubscribe}>Subscribe</Button>
               )}
-              {isSubscribed && (
+              {isSubscribed && currentUserInfo && (
                 <Button className="user__subscribed-btn" color="secondary">
                   Subscribed
                 </Button>
@@ -351,6 +375,24 @@ export default function User() {
   } else {
     return (
       <div>
+        {showSubscribersPopup && (
+          <UsersPopup
+            userIds={profileInfo.subscribers}
+            title={`${profileInfo.subscribers.length} subscribers`}
+            onClose={() => {
+              setShowSubscribersPopup(false);
+            }}
+          />
+        )}
+        {showSubscribtionsPopup && (
+          <UsersPopup
+            userIds={profileInfo.subscriptions}
+            title={`${profileInfo.subscriptions.length} subscribtions`}
+            onClose={() => {
+              setShowSubscribtionsPopup(false);
+            }}
+          />
+        )}
         {showCreateBoard && (
           <BoardCreatePopup
             onClose={() => {
@@ -359,7 +401,6 @@ export default function User() {
             onSubmit={() => {}}
           />
         )}
-        {popupText && <TextPopup>{popupText}</TextPopup>}
         <Toolbar />
         <Flexbox flexDirection="column" alignItems="center">
           <RoundButton
@@ -372,16 +413,31 @@ export default function User() {
           </Typography>
           <div style={{ marginTop: "1rem" }}>
             <Flexbox>
-              <Typography fontSize={1} fontWeight="bold">
-                {profileInfo.subscribers.length} subscribers
-              </Typography>
-              <Typography
-                fontSize={1}
-                fontWeight="bold"
-                className="user__subscriptions"
+              <Button
+                type="text"
+                onClick={() => {
+                  setShowSubscribersPopup(true);
+                }}
               >
-                {profileInfo.subscriptions.length} subscriptions
-              </Typography>
+                <Typography fontSize={1} fontWeight="bold">
+                  {profileInfo.subscribers.length} subscribers
+                </Typography>
+              </Button>
+
+              <Button
+                type="text"
+                onClick={() => {
+                  setShowSubscribtionsPopup(true);
+                }}
+              >
+                <Typography
+                  fontSize={1}
+                  fontWeight="bold"
+                  className="user__subscriptions"
+                >
+                  {profileInfo.subscriptions.length} subscriptions
+                </Typography>
+              </Button>
             </Flexbox>
           </div>
           <Box margin="20px 0 0 0">

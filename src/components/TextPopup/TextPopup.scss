@@ -1,9 +1,9 @@
 .text-popup {
-  position: absolute;
+  position: fixed;
   z-index: 2;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 20px;
+  bottom: 40px;
 
   & .card-container {
     padding: 20px;
@@ -12,5 +12,17 @@
     width: fit-content;
     background-color: black;
     color: white;
+  }
+
+  animation: slideUp 0.5s;
+}
+
+@keyframes slideUp {
+  from {
+    bottom: -80px;
+  }
+
+  to {
+    bottom: 40px;
   }
 }

@@ -15,15 +15,16 @@ export async function getRandomPins(): Promise<PinData[] | null> {
     });
 }
 
-export async function getPin(pinId: string): Promise<PinData | null> {
+export async function getPin(
+  pinId: string
+): Promise<AxiosResponse<PinData | ErrorData> | undefined> {
   return axiosInstance
     .get(`pin/${pinId}`)
     .then((response: AxiosResponse<PinData>) => {
-      return response.data;
+      return response;
     })
     .catch((err: AxiosError) => {
-      console.log(err.response?.data.message);
-      return null;
+      return err.response;
     });
 }
 

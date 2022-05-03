@@ -15,8 +15,9 @@ import { red } from "../../styles/colors";
 import "./PinCard.scss";
 import UserContext from "../../store/userContext";
 import { getUser } from "../../services/UserService";
-import { UserData } from "../../services/responses/responses";
+import { PinData, UserData } from "../../services/responses/responses";
 import ProfileInfo from "../ProfileInfo/ProfileInfo";
+import LoadingPage from "../../pages/LoadingPage/LoadingPage";
 
 interface PinCardProps {
   pinId: string;
@@ -37,20 +38,27 @@ export default function PinCard({
   onShowCreateBoard,
   showInfo = false,
 }: PinCardProps) {
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState<string | undefined>(undefined);
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [showBoards, setShowBoards] = useState(false);
-  const [imgSrc, setImgSrc] = useState("");
+  const [imgSrc, setImgSrc] = useState<string | undefined>(undefined);
   const [showOverlay, setShowOverlay] = useState(false);
-  const [userDisplayId, setUserDisplayId] = useState("");
-  const [avatarId, setAvatarId] = useState("");
-  const [title, setTitle] = useState("");
+  const [userDisplayId, setUserDisplayId] = useState<string | undefined>(
+    undefined
+  );
+  const [avatarId, setAvatarId] = useState<string | undefined>(undefined);
+  const [title, setTitle] = useState<string | undefined>(undefined);
 
-  const { isAuth } = useContext(UserContext);
+  const { isAuth, setTextPopup } = useContext(UserContext);
 
   const getPinInfo = async () => {
     if (pinId) {
-      const pinInfo = await getPin(pinId);
+      const pinResponse = await getPin(pinId);
+      if (!pinResponse || pinResponse.status !== 200) {
+        return;
+      }
+
+      const pinInfo = pinResponse.data as PinData;
       if (pinInfo) {
         setUser(pinInfo.username);
         setTitle(pinInfo.title);
@@ -74,7 +82,9 @@ export default function PinCard({
     const url = window.location.origin + "/pin/" + pinId;
     navigator.clipboard
       .writeText(url)
-      .then(() => {})
+      .then(() => {
+        setTextPopup("Copied to clipboard.");
+      })
       .catch(() => {
         console.log("Didn't copy!");
       });
@@ -115,11 +125,12 @@ export default function PinCard({
           />
 
           <Button
-            className={`pin__save-btn ${isSaved ? "saved" : ""}`}
+            className={`pin__save-btn`}
             onClick={(e: Event) => {
               e.preventDefault();
               onSavePin(pinId);
             }}
+            color={`${isSaved ? "secondary" : "primary"}`}
           >
             {isSaved ? "Saved" : "Save"}
           </Button>
@@ -150,6 +161,16 @@ export default function PinCard({
       </Flexbox>
     </Flexbox>
   );
+
+  const isLoaded =
+    imgSrc !== undefined &&
+    user !== undefined &&
+    avatarId !== undefined &&
+    userDisplayId !== undefined;
+  if (!isLoaded) {
+    return <div></div>;
+  }
+
   return (
     <div
       className="user-pin-card__container"
@@ -160,12 +181,16 @@ export default function PinCard({
       <Link to={`/pin/${pinId}`}>
         <ResponsiveImage src={imgSrc} overlayContent={overlayContent} />
       </Link>
-      <Typography fontSize={1} fontWeight="bold" textAlign="start">
-        {title}
-      </Typography>
-      <Link to={`/user/${userDisplayId}`}>
-        <ProfileInfo username={user} avatarId={avatarId} />
-      </Link>
+      {showInfo && (
+        <>
+          <Typography fontSize={1} fontWeight="bold" textAlign="start">
+            {title}
+          </Typography>
+          <Link to={`/user/${userDisplayId}`}>
+            <ProfileInfo username={user} avatarId={avatarId} />
+          </Link>
+        </>
+      )}
     </div>
   );
 }

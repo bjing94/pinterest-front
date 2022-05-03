@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FiLink, FiMoreHorizontal } from "react-icons/fi";
 import { useParams } from "react-router-dom";
 import Button from "../../components/Button/Button";
@@ -20,6 +20,8 @@ import { checkLogin, getCurrentUser } from "../../services/AuthService";
 import {
   BoardData,
   CommentData,
+  ErrorData,
+  PinData,
   UserData,
 } from "../../services/responses/responses";
 import { getUser, subscribe, updateUser } from "../../services/UserService";
@@ -30,14 +32,17 @@ import {
   getComment,
   updateComment,
 } from "../../services/CommentService";
-import TextPopup from "../../components/TextPopup";
 import Dropdown from "../../components/Dropdown";
 import DropdownBoards from "../../components/DropdownBoards/DropdownBoards";
 import { getBoard, updateBoard } from "../../services/BoardService";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
+import UserContext from "../../store/userContext";
+import ErrorPage from "../ErrorPages/ErrorPage";
+import LoadingPage from "../LoadingPage/LoadingPage";
 
 export default function Pin() {
   const { id } = useParams();
+  const { setTextPopup } = useContext(UserContext);
 
   // Current user information
   const [boardId, setBoardId] = useState<string | undefined>(undefined);
@@ -50,7 +55,7 @@ export default function Pin() {
 
   // Author information
   const [authorInfo, setAuthorInfo] = useState<UserData | undefined>(undefined);
-  const [avatarSrc, setAvatarSrc] = useState("");
+  const [avatarId, setAvatarId] = useState("");
 
   // Pin information
   const [description, setDescription] = useState<string | undefined>(undefined);
@@ -61,13 +66,14 @@ export default function Pin() {
   );
   const [comments, setComments] = useState<string[] | undefined>(undefined);
 
-  // Other information
-  const [popupText, setPopupText] = useState("");
-
   // Show/hide
   const [showOptionsDropdown, setShowOptionsDropdown] = useState(false);
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [showBoards, setShowBoards] = useState(false);
+
+  //Error handling
+  const [errorMsg, setErrorMsg] = useState("");
+  const [errorCode, setErrorCode] = useState(0);
 
   const getCurrentUserInfo = async () => {
     const resAuth = await checkLogin();
@@ -88,9 +94,13 @@ export default function Pin() {
 
   const getPinInfo = async () => {
     if (id) {
-      const pinInfo = await getPin(id);
+      const pinResponse = await getPin(id);
       console.log("PinId", id);
-      if (pinInfo) {
+      if (!pinResponse) {
+        return;
+      }
+      if (pinResponse.status === 200) {
+        const pinInfo = pinResponse.data as PinData;
         setDescription(pinInfo.content);
         setTitle(pinInfo.title);
         setComments(pinInfo.comments ?? []);
@@ -103,18 +113,21 @@ export default function Pin() {
 
           const avatarSrc = await getStaticImage(userData.avatarSrc);
           if (avatarSrc) {
-            setAvatarSrc(avatarSrc);
+            setAvatarId(avatarSrc);
           }
         }
 
         downloadStaticImage(pinInfo.imgId).then((res: string) => {
           setDownloadLink(res);
         });
-
         const link = await getStaticImage(pinInfo.imgId);
         if (link) {
           setImgSrc(link);
         }
+      } else {
+        const error = pinResponse.data as ErrorData;
+        setErrorMsg(error.message);
+        setErrorCode(error.statusCode);
       }
     }
   };
@@ -199,10 +212,7 @@ export default function Pin() {
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        setPopupText("Copied to clipboard.");
-        setTimeout(() => {
-          setPopupText("");
-        }, 5000);
+        setTextPopup("Copied to clipboard.");
       })
       .catch(() => {
         console.log("Didn't copy!");
@@ -260,22 +270,24 @@ export default function Pin() {
       content: content,
     });
     if (!commentResponse || commentResponse.status !== 201) {
+      console.log("Comment wasnt created");
       return;
     }
     const commentData = commentResponse.data as CommentData;
 
     const pinResponse = await getPin(id);
-    if (!pinResponse) {
+    if (!pinResponse || pinResponse.status !== 200) {
+      console.log("Pin not  found");
       return;
     }
 
-    const newPin = { ...pinResponse };
+    const newPin = { ...(pinResponse.data as PinData) };
     if (!newPin.comments) {
       return;
     }
     newPin.comments.push(commentData._id);
     const updatedResponse = await updatePin(id, newPin);
-
+    console.log(updatedResponse);
     getPinInfo();
   };
 
@@ -290,11 +302,11 @@ export default function Pin() {
     }
 
     const pinResponse = await getPin(id);
-    if (!pinResponse) {
+    if (!pinResponse || pinResponse.status !== 200) {
       return;
     }
 
-    const newPin = { ...pinResponse };
+    const newPin = { ...(pinResponse.data as PinData) };
     if (!newPin.comments) {
       return;
     }
@@ -368,6 +380,10 @@ export default function Pin() {
     return <div>No such pin!</div>;
   }
 
+  if (errorMsg) {
+    return <ErrorPage errorCode={errorCode} />;
+  }
+
   const userInfoReady =
     isSaved !== undefined &&
     isSubscribed !== undefined &&
@@ -378,29 +394,11 @@ export default function Pin() {
     downloadLink !== undefined &&
     imgSrc !== undefined &&
     title !== undefined &&
-    description !== undefined;
+    description !== undefined &&
+    authorInfo !== undefined;
 
   if ((!userInfoReady && isAuth === undefined) || !pinInfoReady) {
-    return (
-      <Flexbox
-        justifyContent="flex-start"
-        alignItems="center"
-        className="pin__page-container"
-        flexDirection="column"
-        onClick={() => {
-          setShowOptionsDropdown(false);
-          setShowBoards(false);
-        }}
-      >
-        <Flexbox
-          alignItems="center"
-          justifyContent="center"
-          style={{ width: "100%", height: "100%" }}
-        >
-          <Typography>Loading!</Typography>
-        </Flexbox>
-      </Flexbox>
-    );
+    return <LoadingPage />;
   }
 
   if (!isAuth && pinInfoReady) {
@@ -423,7 +421,6 @@ export default function Pin() {
             onSubmit={(value: string) => {}}
           />
         )}
-        {popupText.length > 0 && <TextPopup>{popupText}</TextPopup>}
         <Toolbar />
         <Card style={{ width: "1016px", padding: "2rem" }}>
           <Flexbox alignItems="flex-start">
@@ -491,7 +488,8 @@ export default function Pin() {
                   username={authorInfo?.username ?? ""}
                   subscribersCount={authorInfo?.subscribers.length ?? 0}
                   className="pin__profile-info"
-                  avatar={avatarSrc}
+                  avatarId={authorInfo.avatarSrc}
+                  displayId={authorInfo.displayId}
                 />
               </div>
               <CommentSection
@@ -531,7 +529,6 @@ export default function Pin() {
             onSubmit={(value: string) => {}}
           />
         )}
-        {popupText.length > 0 && <TextPopup>{popupText}</TextPopup>}
         <Toolbar />
         <Card style={{ width: "1016px", padding: "2rem" }}>
           <Flexbox alignItems="flex-start">
@@ -624,8 +621,9 @@ export default function Pin() {
                   username={authorInfo?.username ?? ""}
                   subscribersCount={authorInfo?.subscribers.length ?? 0}
                   className="pin__profile-info"
-                  avatar={avatarSrc}
+                  avatarId={authorInfo.avatarSrc}
                   onClickSubscribe={handleSubscribe}
+                  displayId={authorInfo.displayId}
                 />
               </div>
               <CommentSection

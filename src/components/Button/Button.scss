@@ -17,6 +17,9 @@
     &.primary {
       color: white;
       background-color: $red;
+      &:hover {
+        background-color: darken($color: $red, $amount: 5);
+      }
     }
 
     &.secondary {
@@ -39,6 +42,10 @@
 
     &.secondary {
       color: white;
+    }
+
+    &:hover {
+      background-color: rgba($color: #000000, $alpha: 0.1);
     }
   }
 
