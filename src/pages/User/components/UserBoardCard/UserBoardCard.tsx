@@ -1,6 +1,8 @@
 import { AxiosResponse } from "axios";
 import React, { useEffect, useState } from "react";
+import { FaEdit } from "react-icons/fa";
 import Flexbox from "../../../../components/Flexbox/Flexbox";
+import RoundButton from "../../../../components/RoundButton/RoundButton";
 import Typography from "../../../../components/Typgoraphy/Typography";
 import { getBoard } from "../../../../services/BoardService";
 import { getStaticImage } from "../../../../services/FileService";
@@ -15,7 +17,9 @@ import "./UserBoardCard.scss";
 
 interface UserBoardCardProps {
   id: string;
+  onEdit: () => void;
 }
+
 const getSrcFromPins = async (pinIds: string[]) => {
   const pins = pinIds.map((pinId) => {
     return getPin(pinId);
@@ -74,7 +78,7 @@ const getTimeSpent = (milliseconds: number) => {
   return `${Math.floor(milliseconds * toYears)} years`;
 };
 
-export default function UserBoardCard({ id }: UserBoardCardProps) {
+export default function UserBoardCard({ id, onEdit }: UserBoardCardProps) {
   const [coverImages, setCoverImages] = useState<string[]>([]);
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
@@ -82,7 +86,6 @@ export default function UserBoardCard({ id }: UserBoardCardProps) {
 
   useEffect(() => {
     const handleGetBoard = async () => {
-      console.log("Getting board!");
       const board = await getBoard(id);
       if (board) {
         if (board.status == 200) {
@@ -104,6 +107,9 @@ export default function UserBoardCard({ id }: UserBoardCardProps) {
     handleGetBoard();
   }, []);
 
+  if (!title) {
+    return <div> Something went wrong!</div>;
+  }
   return (
     <Flexbox
       flexDirection="column"
@@ -111,6 +117,11 @@ export default function UserBoardCard({ id }: UserBoardCardProps) {
       alignItems="flex-start"
     >
       <Flexbox className="user-board__images">
+        <div className="user-board__overlay">
+          <RoundButton type="action" size={32} onClick={onEdit}>
+            <FaEdit size={24} />
+          </RoundButton>
+        </div>
         <img
           className="user-board__main-img"
           src={coverImages[0] ?? ""}

@@ -98,7 +98,11 @@ export default function Home() {
     const isSaved =
       userBoards.findIndex((board) => board.pins.includes(id)) !== -1 ||
       currentSavedPins.includes(id);
-    console.log(isSaved);
+    if (!isSaved) {
+      console.log("ID:", id);
+      console.log(userBoards);
+      console.log(currentSavedPins);
+    }
     return (
       <Flexbox
         justifyContent="center"

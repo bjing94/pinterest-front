@@ -1,6 +1,7 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { axiosInstance } from "./axiosInstance";
-import { CreateBoardDto, UpdateBoardDto } from "./dto/create-board.dto";
+import { CreateBoardDto } from "./dto/create-board.dto";
+import { UpdateBoardDto } from "./dto/update-board.dto";
 import { BoardData, ErrorData } from "./responses/responses";
 
 export async function getBoard(
@@ -50,6 +51,17 @@ export async function createBoard(dto: CreateBoardDto) {
 export async function updateBoard(id: string, dto: UpdateBoardDto) {
   return axiosInstance
     .patch(`board/${id}`, dto)
+    .then((response: AxiosResponse<BoardData>) => {
+      return response;
+    })
+    .catch((err: AxiosError<ErrorData>) => {
+      return err.response;
+    });
+}
+
+export async function deleteBoard(id: string) {
+  return axiosInstance
+    .delete(`board/${id}`)
     .then((response: AxiosResponse<BoardData>) => {
       return response;
     })

@@ -28,6 +28,7 @@ import Box from "../../components/Box/Box";
 import "./User.scss";
 import UsersPopup from "./components/UsersPopup/UsersPopup";
 import UserContext from "../../store/userContext";
+import EditBoardPopup from "./components/EditBoardPopup/EditBoardPopup";
 
 const breakpointColumnsObj = {
   default: 7,
@@ -62,6 +63,8 @@ export default function User() {
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [showSubscribersPopup, setShowSubscribersPopup] = useState(false);
   const [showSubscribtionsPopup, setShowSubscribtionsPopup] = useState(false);
+  const [showEditBoard, setShowEditBoard] = useState(false);
+  const [editedBoardId, setEditedBoardId] = useState("");
 
   const checkSubscribed = async () => {
     if (!profileInfo) {
@@ -246,16 +249,30 @@ export default function User() {
         style={{ width: "100%" }}
         key={`board-card-${boardId}`}
       >
-        <UserBoardCard id={boardId} />
+        <UserBoardCard
+          id={boardId}
+          onEdit={() => {
+            setShowEditBoard(true);
+            setEditedBoardId(boardId);
+          }}
+        />
       </Flexbox>
     );
   });
-
-  console.log("User info:", profileInfo);
+  console.log(profileInfo.boards);
   const isOwner = currentUserInfo && currentUserInfo._id === profileInfo._id;
   if (!isOwner) {
     return (
       <div>
+        {showEditBoard && (
+          <EditBoardPopup
+            boardId={editedBoardId}
+            title={"Edit board"}
+            onClose={() => {
+              setShowEditBoard(false);
+            }}
+          />
+        )}
         {showSubscribersPopup && (
           <UsersPopup
             userIds={profileInfo.subscribers}
@@ -375,6 +392,15 @@ export default function User() {
   } else {
     return (
       <div>
+        {showEditBoard && (
+          <EditBoardPopup
+            boardId={editedBoardId}
+            title={"Edit board"}
+            onClose={() => {
+              setShowEditBoard(false);
+            }}
+          />
+        )}
         {showSubscribersPopup && (
           <UsersPopup
             userIds={profileInfo.subscribers}
