@@ -13,6 +13,7 @@ import { UserProvider } from "./store/userContext";
 import { BoardData, UserData } from "./services/responses/responses";
 import TextPopup from "./components/TextPopup";
 import { getBoards } from "./services/BoardService";
+import BoardPage from "./pages/BoardPage/BoardPage";
 
 function App() {
   const [showAuthPopup, setShowAuthPopup] = useState(false);
@@ -23,7 +24,7 @@ function App() {
   const [textPopupTimer, setTextPopupTimer] = useState<number>();
   const [currentBoards, setCurrentBoards] = useState<BoardData[] | null>(null);
 
-  const currUser = async () => {
+  const getAuthUserInfo = async () => {
     const userResponse = await getCurrentUser();
     if (!userResponse || userResponse.status !== 200) return;
     const user = userResponse.data as UserData;
@@ -54,7 +55,7 @@ function App() {
 
   useEffect(() => {
     checkIsAuth();
-    currUser();
+    getAuthUserInfo();
   }, []);
 
   return (
@@ -64,6 +65,7 @@ function App() {
         _id: currentUser?._id || "",
         displayId: currentUser?.displayId || "",
         setTextPopup: handleSetTextPopup,
+        updateUserInfo: getAuthUserInfo,
         userBoards: currentBoards || [],
         currentSavedPins: currentUser?.savedPins || [],
       }}
@@ -93,7 +95,9 @@ function App() {
             onClose={() => {
               setShowRegisterPopup(false);
             }}
-            onSubmit={() => {}}
+            onSubmit={() => {
+              getAuthUserInfo();
+            }}
             registerMode={true}
           />
         )}
@@ -102,6 +106,7 @@ function App() {
           <Route path="/pin-builder" element={<PinBuilder isAuth={isAuth} />} />
           <Route path="/pin/:id" element={<Pin />} />
           <Route path="/user/:id" element={<User />} />
+          <Route path="/board/:id" element={<BoardPage />} />
         </Routes>
       </div>
     </UserProvider>

@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaCross, FaWindowClose } from "react-icons/fa";
 import Avatar from "../../../../components/Avatar/Avatar";
@@ -12,6 +12,7 @@ import Toolbar from "../../../../components/Toolbar/Toolbar";
 import Typography from "../../../../components/Typgoraphy/Typography";
 import { UserData } from "../../../../services/responses/responses";
 import { getUser } from "../../../../services/UserService";
+import UserContext from "../../../../store/userContext";
 
 import "./UsersPopup.scss";
 
@@ -19,13 +20,17 @@ interface UsersPopupProps {
   userIds: string[];
   title: string;
   onClose: () => void;
+  onSubscribe: (userId: string) => void;
 }
 
 export default function UsersPopup({
   userIds,
   title,
   onClose,
+  onSubscribe,
 }: UsersPopupProps) {
+  const { _id: currentUserId } = useContext(UserContext);
+
   const [amountLoaded, setAmountLoaded] = useState(20);
   const [users, setUsers] = useState<UserData[]>([]);
 
@@ -52,17 +57,19 @@ export default function UsersPopup({
   };
 
   const userElements = users.map((user) => {
+    const isSubscribed = user.subscribers.includes(currentUserId);
     return (
       <Flexbox fluid>
         <Box margin="0px 10px 0px 0px">
           <Avatar size={50} imgId={user.avatarSrc} />
         </Box>
         <Box margin="0px 10px 0px 0px" className="users-popup__username">
-          <Typography fontSize={1.25} fontWeight="bold" textAlign="start">
+          <Typography fontSize={14} fontWeight="bold" textAlign="start">
             {user.username}
           </Typography>
         </Box>
-        <Button>Subscribe</Button>
+        {!isSubscribed && <Button onClick={onSubscribe}>Subscribe</Button>}
+        {isSubscribed && <Button color="secondary">Subscribed</Button>}
       </Flexbox>
     );
   });
@@ -77,7 +84,7 @@ export default function UsersPopup({
           <Flexbox flexDirection="column" style={{ height: "100%" }}>
             <Box margin="0px 0px 20px 0px" width="400px">
               <Flexbox fluid justifyContent="center" alignItems="center">
-                <Typography fontSize={1.5} fontWeight="bold">
+                <Typography fontSize={16} fontWeight="bold">
                   {title}
                 </Typography>
                 <RoundButton size={32} onClick={onClose}>

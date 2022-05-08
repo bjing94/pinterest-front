@@ -82,7 +82,7 @@ export default function EditBoardPopup({
           <Flexbox flexDirection="column" style={{ height: "100%" }}>
             <Box margin="0px 0px 20px 0px" width="400px">
               <Flexbox fluid justifyContent="center" alignItems="center">
-                <Typography fontSize={1.5} fontWeight="bold">
+                <Typography fontSize={14} fontWeight="bold">
                   {title}
                 </Typography>
                 <RoundButton size={32} onClick={onClose}>

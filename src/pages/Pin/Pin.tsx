@@ -15,7 +15,7 @@ import {
   downloadStaticImage,
   getStaticImage,
 } from "../../services/FileService";
-import { getPin, updatePin } from "../../services/PinService";
+import { deletePin, getPin, updatePin } from "../../services/PinService";
 import { checkLogin, getCurrentUser } from "../../services/AuthService";
 import {
   BoardData,
@@ -34,7 +34,7 @@ import {
 } from "../../services/CommentService";
 import Dropdown from "../../components/Dropdown";
 import DropdownBoards from "../../components/DropdownBoards/DropdownBoards";
-import { getBoard, updateBoard } from "../../services/BoardService";
+import { getBoard, getBoards, updateBoard } from "../../services/BoardService";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
 import UserContext from "../../store/userContext";
 import ErrorPage from "../ErrorPages/ErrorPage";
@@ -70,6 +70,9 @@ export default function Pin() {
   const [showOptionsDropdown, setShowOptionsDropdown] = useState(false);
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [showBoards, setShowBoards] = useState(false);
+
+  // Responsive design
+  const [isTablet, setIsTablet] = useState(false);
 
   //Error handling
   const [errorMsg, setErrorMsg] = useState("");
@@ -158,23 +161,7 @@ export default function Pin() {
       return;
     }
     const userData = userResponse.data as UserData;
-
-    const boardResponses = await Promise.all(
-      userData.boards.map((boardId) => {
-        return getBoard(boardId);
-      })
-    );
-
-    const currentBoardsData: BoardData[] = boardResponses
-      .map((response) => {
-        if (response !== undefined && response.status === 200) {
-          return response.data as BoardData;
-        }
-      })
-      .filter((data): data is BoardData => {
-        return data !== undefined;
-      });
-
+    const currentBoardsData = await getBoards(userData.boards);
     console.log("Current boards: ", currentBoardsData);
 
     // check if saved in boards
@@ -451,11 +438,11 @@ export default function Pin() {
                       }}
                     >
                       <a href={downloadLink} download={`${title}-img`}>
-                        <Typography fontSize={1} fontWeight="bold">
+                        <Typography fontSize={12} fontWeight="bold">
                           Download image
                         </Typography>
                       </a>
-                      <Typography fontSize={1} fontWeight="bold">
+                      <Typography fontSize={12} fontWeight="bold">
                         Report
                       </Typography>
                     </Dropdown>
@@ -475,10 +462,10 @@ export default function Pin() {
                 </Flexbox>
               </Flexbox>
               <div style={{ marginTop: "1rem" }}>
-                <Typography fontSize={2.2} fontWeight="bold" textAlign="start">
+                <Typography fontSize={24} fontWeight="bold" textAlign="start">
                   {title}
                 </Typography>
-                <Typography fontSize={1} textAlign="start">
+                <Typography fontSize={12} textAlign="start">
                   {description}
                 </Typography>
               </div>
@@ -530,8 +517,8 @@ export default function Pin() {
           />
         )}
         <Toolbar />
-        <Card style={{ width: "1016px", padding: "2rem" }}>
-          <Flexbox alignItems="flex-start">
+        <Card className="pin__card">
+          <Flexbox alignItems="flex-start" className="pin__content">
             <div className="pin__image-container">
               <ResponsiveImage src={imgSrc} />
             </div>
@@ -539,14 +526,9 @@ export default function Pin() {
               flexDirection="column"
               justifyContent="flex-start"
               alignItems="flex-start"
-              style={{
-                flexBasis: "50%",
-                marginLeft: "3rem",
-                width: "100%",
-                marginTop: "2rem",
-              }}
+              className="pin__info"
             >
-              <Flexbox justifyContent="space-between" style={{ width: "100%" }}>
+              <Flexbox justifyContent="space-between" fluid>
                 <Flexbox>
                   {showOptionsDropdown && (
                     <Dropdown
@@ -559,11 +541,11 @@ export default function Pin() {
                       }}
                     >
                       <a href={downloadLink} download={`${title}-img`}>
-                        <Typography fontSize={1} fontWeight="bold">
+                        <Typography fontSize={12} fontWeight="bold">
                           Download image
                         </Typography>
                       </a>
-                      <Typography fontSize={1} fontWeight="bold">
+                      <Typography fontSize={12} fontWeight="bold">
                         Report
                       </Typography>
                     </Dropdown>
@@ -608,10 +590,10 @@ export default function Pin() {
                 </Flexbox>
               </Flexbox>
               <div style={{ marginTop: "1rem" }}>
-                <Typography fontSize={2.2} fontWeight="bold" textAlign="start">
+                <Typography fontSize={24} fontWeight="bold" textAlign="start">
                   {title}
                 </Typography>
-                <Typography fontSize={1} textAlign="start">
+                <Typography fontSize={12} textAlign="start">
                   {description}
                 </Typography>
               </div>

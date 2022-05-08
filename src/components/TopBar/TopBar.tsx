@@ -39,7 +39,7 @@ export default function TopBar({ onClickLogin, onClickRegister }: TopBarProps) {
                     color={`${
                       location.pathname === "/" ? "secondary" : "primary"
                     }`}
-                    type={`${location.pathname === "/" ? "filled" : "text"}`}
+                    variant={`${location.pathname === "/" ? "filled" : "text"}`}
                   >
                     Home
                   </Button>

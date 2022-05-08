@@ -1,10 +1,11 @@
 import React, { ReactChild } from "react";
+import { BaseStyle } from "../../types/types";
 import Card from "../Card/Card";
 import Flexbox from "../Flexbox/Flexbox";
 
 import "./Dropdown.scss";
 
-interface DropdownProps {
+interface DropdownProps extends BaseStyle {
   width?: string;
   padding?: string;
   children?: any;
@@ -20,14 +21,15 @@ export default function Dropdown({
   onClickItem,
   left = "50%",
   top = "100%",
+  className = "",
 }: DropdownProps) {
   let childElements = null;
   if (children) {
     childElements = children.map((child: any) => {
       return (
-        <div className="dropdown__item" onClick={onClickItem}>
+        <li className={`dropdown__item`} onClick={onClickItem}>
           {child}
-        </div>
+        </li>
       );
     });
   }
@@ -41,7 +43,7 @@ export default function Dropdown({
         top: top,
         borderRadius: "0.5em",
       }}
-      className="dropdown__list"
+      className={`dropdown__list ${className}`}
     >
       <Flexbox fluid flexDirection="column">
         {childElements}

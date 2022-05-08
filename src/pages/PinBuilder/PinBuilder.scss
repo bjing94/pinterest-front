@@ -19,4 +19,10 @@
     width: 870px;
     min-width: 870px;
   }
+
+  &__dropdown {
+    .board-dropdown__selection {
+      text-align: start !important;
+    }
+  }
 }

@@ -24,6 +24,7 @@ export default function Box({
   return (
     <div
       style={{
+        position: "relative",
         padding: padding,
         margin: margin,
         border: border,

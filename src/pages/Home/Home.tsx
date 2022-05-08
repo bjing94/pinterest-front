@@ -42,7 +42,6 @@ export default function Home() {
     const response = await getCurrentUser();
     if (response && response.status == 200) {
       if (!boardId) {
-        console.log("Saving to profile: ");
         // save to profile
         const userInfo = response.data as UserData;
         userInfo.savedPins.push(id);
@@ -98,11 +97,6 @@ export default function Home() {
     const isSaved =
       userBoards.findIndex((board) => board.pins.includes(id)) !== -1 ||
       currentSavedPins.includes(id);
-    if (!isSaved) {
-      console.log("ID:", id);
-      console.log(userBoards);
-      console.log(currentSavedPins);
-    }
     return (
       <Flexbox
         justifyContent="center"
@@ -111,7 +105,7 @@ export default function Home() {
       >
         <PinCard
           isSaved={isSaved}
-          boards={boards}
+          boards={userBoards.map((board) => board._id)}
           onSetBoardId={(boardId) => {
             setBoardId(boardId);
           }}

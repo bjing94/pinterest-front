@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import React, { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import Flexbox from "../../../../components/Flexbox/Flexbox";
 import RoundButton from "../../../../components/RoundButton/RoundButton";
 import Typography from "../../../../components/Typgoraphy/Typography";
@@ -84,6 +85,8 @@ export default function UserBoardCard({ id, onEdit }: UserBoardCardProps) {
   const [amount, setAmount] = useState<number>(0);
   const [age, setAge] = useState<string>("");
 
+  const [showOverlay, setShowOverlay] = useState(false);
+
   useEffect(() => {
     const handleGetBoard = async () => {
       const board = await getBoard(id);
@@ -117,11 +120,22 @@ export default function UserBoardCard({ id, onEdit }: UserBoardCardProps) {
       alignItems="flex-start"
     >
       <Flexbox className="user-board__images">
-        <div className="user-board__overlay">
-          <RoundButton type="action" size={32} onClick={onEdit}>
-            <FaEdit size={24} />
-          </RoundButton>
-        </div>
+        <Link to={`/board/${id}`}>
+          <div className="user-board__overlay">
+            <RoundButton
+              type="action"
+              size={32}
+              onClick={(event: any) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onEdit();
+              }}
+            >
+              <FaEdit size={24} />
+            </RoundButton>
+          </div>
+        </Link>
+
         <img
           className="user-board__main-img"
           src={coverImages[0] ?? ""}
@@ -144,19 +158,15 @@ export default function UserBoardCard({ id, onEdit }: UserBoardCardProps) {
         </Flexbox>
       </Flexbox>
       <div style={{ marginLeft: "10px" }}>
-        <Typography fontSize={1} fontWeight="bold" textAlign="start">
+        <Typography fontSize={12} fontWeight="bold" textAlign="start">
           {title}
         </Typography>
         <Flexbox>
-          <Typography fontSize={0.75} textAlign="start">
+          <Typography fontSize={10} textAlign="start">
             {amount} pins
           </Typography>
         </Flexbox>
-        <Typography
-          fontSize={0.75}
-          textAlign="start"
-          className="user-board__age"
-        >
+        <Typography fontSize={10} textAlign="start" className="user-board__age">
           {age}
         </Typography>
       </div>

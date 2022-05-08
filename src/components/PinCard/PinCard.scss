@@ -2,6 +2,7 @@
   &__container {
     width: 236px;
     height: fit-content;
+    max-height: 500px;
 
     & .responsive-image__overlay:hover {
       background: rgba($color: #000000, $alpha: 0.5);

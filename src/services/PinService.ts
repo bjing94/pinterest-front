@@ -1,6 +1,7 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { axiosInstance } from "./axiosInstance";
 import { CreatePinDto } from "./dto/create-pin.dto";
+import { UpdatePinDto } from "./dto/update-pin.dto";
 import { ErrorData, PinData } from "./responses/responses";
 
 export async function getRandomPins(): Promise<PinData[] | null> {
@@ -43,10 +44,23 @@ export async function createPin(
 
 export async function updatePin(
   pinId: string,
-  dto: CreatePinDto
+  dto: UpdatePinDto
 ): Promise<AxiosResponse<PinData | ErrorData> | undefined> {
   return axiosInstance
     .patch(`pin/${pinId}`, dto)
+    .then((response: AxiosResponse<PinData>) => {
+      return response;
+    })
+    .catch((err: AxiosError) => {
+      return err.response;
+    });
+}
+
+export async function deletePin(
+  pinId: string
+): Promise<AxiosResponse<PinData | ErrorData> | undefined> {
+  return axiosInstance
+    .delete(`pin/${pinId}`)
     .then((response: AxiosResponse<PinData>) => {
       return response;
     })

@@ -41,7 +41,7 @@ export interface UserData {
 export interface BoardData {
   _id: string;
   title: string;
-  userDisplayId: string;
+  userId: string;
   pins: string[];
   createdAt: string;
   updatedAt: string;

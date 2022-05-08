@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { FiMoreHorizontal } from "react-icons/fi";
 import Button from "../../components/Button/Button";
 import Card from "../../components/Card/Card";
@@ -28,12 +28,15 @@ import Toolbar from "../../components/Toolbar/Toolbar";
 import Dropdown from "../../components/Dropdown";
 import ButtonGroup from "../../components/ButtonGroup/ButtonGroup";
 import { Navigate } from "react-router-dom";
+import UserContext from "../../store/userContext";
 
 interface PinBuilderProps {
   isAuth?: boolean;
 }
 
 export default function PinBuilder({ isAuth }: PinBuilderProps) {
+  const { setTextPopup } = useContext(UserContext);
+
   const [uploadedImg, setUploadedImg] = useState<string | undefined>(undefined);
   const [imgHeight, setImgHeight] = useState(0);
   const [error, setError] = useState("");
@@ -108,6 +111,7 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
 
     console.log("Pin: ", pinResponse);
     setIsLoading(false);
+    setTextPopup("Pin created");
   };
 
   const handleDeleteImg = () => {
@@ -193,7 +197,7 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
         id="builder-card"
       >
         {isLoading && <PinLoader />}
-        {error && <Typography fontSize={1}>{`Error: ${error}`}</Typography>}
+        {error && <Typography fontSize={12}>{`Error: ${error}`}</Typography>}
         <Flexbox justifyContent="space-between">
           <RoundButton
             size={32}
@@ -214,11 +218,11 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
               left="-60px"
             >
               <div onClick={handleDeletePin}>
-                <Typography fontSize={1} fontWeight="bold">
+                <Typography fontSize={12} fontWeight="bold">
                   Delete
                 </Typography>
               </div>
-              <Typography fontSize={1} fontWeight="bold">
+              <Typography fontSize={12} fontWeight="bold">
                 Duplicate
               </Typography>
             </Dropdown>
@@ -239,6 +243,7 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
                 event.stopPropagation();
                 setShowBoardsDropdown(!showBoardsDropdown);
               }}
+              className="pin-builder__dropdown"
             />
             {!showBoardsDropdown && (
               <Button

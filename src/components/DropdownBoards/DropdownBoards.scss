@@ -104,6 +104,10 @@
     background-color: $red;
     height: 48px;
   }
+
+  &__selection {
+    width: 100%;
+  }
 }
 
 .create-board__btn {

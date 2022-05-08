@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLAttributes } from "react";
 import { BaseStyle } from "../../types/types";
 
 import "./Button.scss";
@@ -9,7 +9,8 @@ interface ButtonProps extends BaseStyle {
   color?: "primary" | "secondary";
   backgroundColor?: string;
   active?: boolean;
-  type?: "filled" | "text" | "outline";
+  variant?: "filled" | "text" | "outline";
+  type?: "button" | "submit" | "reset";
 }
 export default function Button({
   children,
@@ -18,15 +19,17 @@ export default function Button({
   className = "",
   active = true,
   style,
-  type = "filled",
+  variant = "filled",
+  type = "button",
 }: ButtonProps) {
   return (
     <button
       className={`btn ${className} ${
         active ? "" : "inactive"
-      } ${color} ${type}`}
+      } ${color} ${variant}`}
       onClick={onClick}
       style={style}
+      type={type}
     >
       {children}
     </button>

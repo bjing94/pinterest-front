@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FiLink, FiMoreHorizontal, FiShare } from "react-icons/fi";
+import { FiEdit, FiLink, FiMoreHorizontal, FiShare } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
@@ -27,6 +27,8 @@ interface PinCardProps {
   onSavePin: (pinId: string) => void;
   onShowCreateBoard: any;
   showInfo?: boolean;
+  isOwner?: boolean;
+  onEdit?: any;
 }
 
 export default function PinCard({
@@ -37,6 +39,8 @@ export default function PinCard({
   onSavePin,
   onShowCreateBoard,
   showInfo = false,
+  isOwner = false,
+  onEdit,
 }: PinCardProps) {
   const [user, setUser] = useState<string | undefined>(undefined);
   const [showCreateBoard, setShowCreateBoard] = useState(false);
@@ -137,7 +141,7 @@ export default function PinCard({
         </Flexbox>
       )}
       <Flexbox fluid justifyContent="flex-end">
-        <Box margin="0px 10px 0px 0px">
+        {!isOwner && (
           <RoundButton
             type="action"
             size={32}
@@ -148,16 +152,33 @@ export default function PinCard({
           >
             <FiLink size={24} />
           </RoundButton>
-        </Box>
-        <RoundButton
-          type="action"
-          size={32}
-          onClick={(e: Event) => {
-            e.preventDefault();
-          }}
-        >
-          <FiMoreHorizontal size={24} />
-        </RoundButton>
+        )}
+        {isOwner && (
+          <>
+            <Box margin="0px 10px 0px 0px">
+              <RoundButton
+                type="action"
+                size={32}
+                onClick={(e: Event) => {
+                  e.preventDefault();
+                  handleCopyPinLink();
+                }}
+              >
+                <FiLink size={24} />
+              </RoundButton>
+            </Box>
+            <RoundButton
+              type="action"
+              size={32}
+              onClick={(e: Event) => {
+                e.preventDefault();
+                onEdit();
+              }}
+            >
+              <FiEdit size={24} />
+            </RoundButton>
+          </>
+        )}
       </Flexbox>
     </Flexbox>
   );
@@ -179,11 +200,15 @@ export default function PinCard({
       }}
     >
       <Link to={`/pin/${pinId}`}>
-        <ResponsiveImage src={imgSrc} overlayContent={overlayContent} />
+        <ResponsiveImage
+          src={imgSrc}
+          overlayContent={overlayContent}
+          maxHeight="500px"
+        />
       </Link>
       {showInfo && (
         <>
-          <Typography fontSize={1} fontWeight="bold" textAlign="start">
+          <Typography fontSize={18} fontWeight="bold" textAlign="start">
             {title}
           </Typography>
           <Link to={`/user/${userDisplayId}`}>

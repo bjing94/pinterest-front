@@ -5,42 +5,27 @@ import "./ResponsiveImage.scss";
 interface ResponsiveImageProps {
   src: string;
   overlayContent?: any;
+  maxHeight?: string;
+  minHeight?: string;
 }
 
 const ResponsiveImage = React.forwardRef<
   HTMLImageElement,
   ResponsiveImageProps
->(({ src, overlayContent }, ref) => {
+>(({ src, overlayContent, maxHeight = "none", minHeight = "none" }, ref) => {
   const [imgHeight, setImgHeight] = useState(0);
 
-  const handleUploadImg = () => {
-    const img = new Image();
-    img.src = src;
-    img.onload = function () {
-      const multiplier = 340 / img.width;
-      setImgHeight(img.height * multiplier);
-    };
-  };
-
-  useEffect(() => {
-    handleUploadImg();
-  }, [src]);
+  useEffect(() => {}, [src]);
+  console.log(maxHeight);
 
   return (
-    <div className="responsive-image__container">
-      <img
-        src={src}
-        ref={ref}
-        style={{ width: "100%", borderRadius: "1rem" }}
-        height={imgHeight}
-      />
+    <div
+      className="responsive-image__container"
+      style={{ maxHeight: maxHeight, minHeight }}
+    >
+      <img src={src} ref={ref} />
       {overlayContent && (
-        <div
-          className="responsive-image__overlay"
-          style={{ height: `${imgHeight}px` }}
-        >
-          {overlayContent}
-        </div>
+        <div className="responsive-image__overlay">{overlayContent}</div>
       )}
     </div>
   );

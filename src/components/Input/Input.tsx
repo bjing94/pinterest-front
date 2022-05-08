@@ -4,7 +4,7 @@ import Box from "../Box/Box";
 
 import "./Input.scss";
 
-interface InputProps extends BaseStyle {
+interface InputProps {
   placeholder?: string;
   fontSize?: string;
   value?: string;
@@ -12,9 +12,12 @@ interface InputProps extends BaseStyle {
   label?: string;
 }
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
+const Input = React.forwardRef<
+  HTMLInputElement,
+  InputProps & React.InputHTMLAttributes<HTMLInputElement>
+>(
   (
-    { placeholder, fontSize = 14, className = "", value, onInput, label },
+    { placeholder, fontSize = 14, className = "", value, onInput, label, type },
     ref
   ) => {
     return (
@@ -29,6 +32,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           style={{ fontSize: `${fontSize}px` }}
           value={value}
           onInput={onInput}
+          type={type}
           id="rounded-input"
         />
       </>

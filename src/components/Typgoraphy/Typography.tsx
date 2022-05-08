@@ -18,7 +18,7 @@ interface TypographyProps extends BaseStyle {
     | "match-parent";
 }
 export default function Typography({
-  fontSize = 2,
+  fontSize = 24,
   color = "primary",
   children,
   fontWeight,
@@ -29,8 +29,8 @@ export default function Typography({
   return (
     <div
       style={{
-        fontSize: `${fontSize}rem`,
-        lineHeight: `${lineHeight}rem`,
+        fontSize: `${fontSize}px`,
+        lineHeight: `${lineHeight}px`,
         fontWeight,
         textAlign: textAlign,
       }}

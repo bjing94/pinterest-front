@@ -46,11 +46,13 @@ export default function CommunityInfo({
             alignItems="flex-start"
             style={{ marginLeft: "0.5rem" }}
           >
-            <Typography fontSize={1} fontWeight="bold">
+            <Typography fontSize={12} fontWeight="bold">
               {" "}
               {username}
             </Typography>
-            <Typography fontSize={1}>{subscribersCount} subscribers</Typography>
+            <Typography fontSize={12}>
+              {subscribersCount} subscribers
+            </Typography>
           </Flexbox>
         </Flexbox>
       </Link>

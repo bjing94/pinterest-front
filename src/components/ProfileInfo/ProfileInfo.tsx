@@ -22,7 +22,7 @@ export default function ProfileInfo({
     <Flexbox className={`profile-info ${className}`}>
       <Avatar size={36} imgId={avatarId} />
       <Box margin="0 0 0 10px">
-        <Typography fontSize={1} fontWeight="bold">
+        <Typography fontSize={14} fontWeight="bold">
           {username}
         </Typography>
       </Box>

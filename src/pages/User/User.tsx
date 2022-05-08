@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { AiFillAmazonCircle } from "react-icons/ai";
 import { FiLink, FiShare } from "react-icons/fi";
 import Masonry from "react-masonry-css";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import ButtonSection from "../../components/ButtonSection";
 import Flexbox from "../../components/Flexbox/Flexbox";
@@ -21,7 +21,12 @@ import { checkLogin, getCurrentUser } from "../../services/AuthService";
 import { getStaticImage } from "../../services/FileService";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import TextPopup from "../../components/TextPopup";
-import { getBoard, updateBoard } from "../../services/BoardService";
+import {
+  createBoard,
+  getBoard,
+  getBoards,
+  updateBoard,
+} from "../../services/BoardService";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
 import Box from "../../components/Box/Box";
 
@@ -29,6 +34,10 @@ import "./User.scss";
 import UsersPopup from "./components/UsersPopup/UsersPopup";
 import UserContext from "../../store/userContext";
 import EditBoardPopup from "./components/EditBoardPopup/EditBoardPopup";
+import { deletePin, updatePin } from "../../services/PinService";
+import EditPinPopup from "./components/EditPinPopup/EditPinPopup";
+import { UpdatePinDto } from "../../services/dto/update-pin.dto";
+import ErrorPage from "../ErrorPages/ErrorPage";
 
 const breakpointColumnsObj = {
   default: 7,
@@ -42,7 +51,11 @@ const breakpointColumnsObj = {
 
 export default function User() {
   const { id: displayId } = useParams();
-  const { setTextPopup } = useContext(UserContext);
+  const {
+    setTextPopup,
+    userBoards,
+    _id: currentUserId,
+  } = useContext(UserContext);
 
   const [profileInfo, setProfileInfo] = useState<UserData | undefined>();
   const [showCreated, setShowCreated] = useState(true);
@@ -66,6 +79,9 @@ export default function User() {
   const [showEditBoard, setShowEditBoard] = useState(false);
   const [editedBoardId, setEditedBoardId] = useState("");
 
+  const [showEditPin, setShowEditPin] = useState(false);
+  const [editedPinId, setEditedPinId] = useState("");
+
   const checkSubscribed = async () => {
     if (!profileInfo) {
       return;
@@ -74,20 +90,20 @@ export default function User() {
     if (res) {
       if (res.status == 200) {
         const { _id } = res.data as UserData;
-        if (profileInfo.subscribers.find((a) => a === _id) === undefined) {
+        if (profileInfo.subscribers.find((a) => a === _id) !== undefined) {
           setIsSubscribed(true);
         }
       }
     }
   };
 
-  const handleSubscribe = async () => {
+  const handleSubscribe = async (subscribeToId: string) => {
     if (!profileInfo) {
       return;
     }
     const isAuth = await checkLogin();
     if (isAuth) {
-      await subscribe(profileInfo.displayId);
+      await subscribe(subscribeToId);
     } else {
       console.log("Not authenticated!");
     }
@@ -103,6 +119,84 @@ export default function User() {
       .catch(() => {
         console.log("Didn't copy!");
       });
+  };
+
+  const handleDeletePin = async (pinId: string) => {
+    const response = await deletePin(pinId);
+
+    if (!response || response.status !== 200) {
+      return;
+    }
+
+    setTextPopup("Pin deleted.");
+    getProfileInfo();
+  };
+
+  const handleUpdatePin = async (
+    dto: UpdatePinDto,
+    oldId: string,
+    newId: string,
+    createBoardTitle?: string
+  ) => {
+    let newBoardId = newId;
+    let oldBoardId = oldId;
+
+    if (createBoardTitle) {
+      // create new board
+      const createBoardResponse = await createBoard({
+        title: createBoardTitle,
+        pins: [editedPinId],
+        userId: currentUserId,
+      });
+      if (!createBoardResponse || createBoardResponse.status !== 201) {
+        console.log("Error creating board.");
+        return;
+      }
+
+      newBoardId = (createBoardResponse.data as BoardData)._id;
+    }
+
+    if (oldBoardId !== "" && oldBoardId !== newBoardId) {
+      // change old board
+      const oldBoardResponse = await getBoard(oldBoardId);
+
+      if (!oldBoardResponse || oldBoardResponse.status !== 200) {
+        console.log("Error getting old board.");
+        return;
+      }
+      const oldBoard = oldBoardResponse.data as BoardData;
+
+      oldBoard.pins = oldBoard.pins.filter((pinId) => pinId !== editedPinId);
+
+      const updateOldResponse = await updateBoard(oldBoardId, oldBoard);
+      if (!updateOldResponse) {
+        console.log("Error updating old board.");
+        return;
+      }
+    }
+
+    if (!createBoardTitle && newBoardId !== "" && oldBoardId !== newBoardId) {
+      // update new board if it's not fresh
+      const newBoardResponse = await getBoard(newBoardId);
+
+      if (!newBoardResponse || newBoardResponse.status !== 200) {
+        console.log("Error getting new board.");
+        return;
+      }
+      const newBoard = newBoardResponse.data as BoardData;
+
+      newBoard.pins.push(editedPinId);
+
+      const updateNewResponse = await updateBoard(newBoardId, newBoard);
+      if (!updateNewResponse) {
+        console.log("Error updating new board");
+        return;
+      }
+    }
+
+    updatePin(editedPinId, dto); // update pin info
+    setTextPopup("Pin updated.");
+    getProfileInfo();
   };
 
   const handleSavePin = async (pindId: string) => {
@@ -139,21 +233,7 @@ export default function User() {
     const userData = response.data as UserData;
     setCurrentUserInfo(userData);
 
-    const boardResponses = await Promise.all(
-      userData.boards.map((boardId) => {
-        return getBoard(boardId);
-      })
-    );
-
-    const currentBoardsData: BoardData[] = boardResponses
-      .map((response) => {
-        if (response !== undefined && response.status === 200) {
-          return response.data as BoardData;
-        }
-      })
-      .filter((data): data is BoardData => {
-        return data !== undefined;
-      });
+    const currentBoardsData: BoardData[] = await getBoards(userData.boards);
 
     const newBoardsToPins: { boardId: string; pins: string[] }[] = [];
     currentBoardsData.forEach((board) => {
@@ -163,33 +243,34 @@ export default function User() {
     setBoardToPins(newBoardsToPins);
   };
 
-  useEffect(() => {
-    const getProfileInfo = async () => {
-      console.log("Searching for user:", displayId);
-      if (displayId) {
-        const response = await findUser({ displayId: displayId });
-        console.log(response);
+  const getProfileInfo = async () => {
+    console.log("Searching for user:", displayId);
+    if (displayId) {
+      const response = await findUser({ displayId: displayId });
+      console.log(response);
 
-        if (response) {
-          if (response.status == 200) {
-            const user = response.data as UserData;
-            setProfileInfo(user);
-            await checkSubscribed();
+      if (response) {
+        if (response.status == 200) {
+          const user = response.data as UserData;
+          setProfileInfo(user);
+          await checkSubscribed();
 
-            const staticSrc = await getStaticImage(user.avatarSrc);
-            setAvatar(staticSrc ?? "");
-            setIsLoading(false);
-          } else {
-            setIsLoading(false);
-          }
+          const staticSrc = await getStaticImage(user.avatarSrc);
+          setAvatar(staticSrc ?? "");
+          setIsLoading(false);
         } else {
           setIsLoading(false);
         }
+      } else {
+        setIsLoading(false);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     getProfileInfo();
     getCurrentUserInfo();
-  }, []);
+  }, [currentUserId]);
 
   useEffect(() => {}, [profileInfo, currentUserInfo]);
 
@@ -202,17 +283,11 @@ export default function User() {
   }
 
   if (!profileInfo) {
-    return (
-      <Flexbox
-        style={{ width: "100%", height: "100%" }}
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Typography>User not found!</Typography>
-      </Flexbox>
-    );
+    return <ErrorPage errorCode={404} />;
   }
 
+  const isOwner = currentUserId === profileInfo._id;
+  console.log(currentUserId, profileInfo._id);
   const pinElements = profileInfo.createdPins.map((id) => {
     const isSaved = !!boardsToPins.find((data) => {
       return data.pins.includes(id);
@@ -227,7 +302,8 @@ export default function User() {
         <PinCard
           pinId={id}
           isSaved={isSaved}
-          boards={[]}
+          isOwner={isOwner}
+          boards={userBoards.map((board) => board._id)}
           onSavePin={(pinId) => {
             handleSavePin(pinId);
           }}
@@ -236,6 +312,10 @@ export default function User() {
           }}
           onShowCreateBoard={() => {
             setShowCreateBoard(!showCreateBoard);
+          }}
+          onEdit={() => {
+            setShowEditPin(true);
+            setEditedPinId(id);
           }}
         />
       </Flexbox>
@@ -259,8 +339,8 @@ export default function User() {
       </Flexbox>
     );
   });
-  console.log(profileInfo.boards);
-  const isOwner = currentUserInfo && currentUserInfo._id === profileInfo._id;
+  console.log("Subbed:", isSubscribed);
+
   if (!isOwner) {
     return (
       <div>
@@ -280,6 +360,7 @@ export default function User() {
             onClose={() => {
               setShowSubscribersPopup(false);
             }}
+            onSubscribe={handleSubscribe}
           />
         )}
         {showSubscribtionsPopup && (
@@ -289,6 +370,7 @@ export default function User() {
             onClose={() => {
               setShowSubscribtionsPopup(false);
             }}
+            onSubscribe={handleSubscribe}
           />
         )}
         {showCreateBoard && (
@@ -306,30 +388,30 @@ export default function User() {
             style={{ background: `url(${avatar}) center center` }}
           ></RoundButton>
           <Typography fontWeight="bold">{profileInfo.username}</Typography>
-          <Typography fontSize={1}>
+          <Typography fontSize={14}>
             {`@${profileInfo.displayId} ${profileInfo.description ?? ""}`}
           </Typography>
           <div style={{ marginTop: "1rem" }}>
             <Flexbox>
               <Button
-                type="text"
+                variant="text"
                 onClick={() => {
                   setShowSubscribersPopup(true);
                 }}
               >
-                <Typography fontSize={1} fontWeight="bold">
+                <Typography fontSize={14} fontWeight="bold">
                   {profileInfo.subscribers.length} subscribers
                 </Typography>
               </Button>
 
               <Button
-                type="text"
+                variant="text"
                 onClick={() => {
                   setShowSubscribtionsPopup(true);
                 }}
               >
                 <Typography
-                  fontSize={1}
+                  fontSize={12}
                   fontWeight="bold"
                   className="user__subscriptions"
                 >
@@ -344,7 +426,13 @@ export default function User() {
                 <FiLink size={24} />
               </RoundButton>
               {!isSubscribed && currentUserInfo && (
-                <Button onClick={handleSubscribe}>Subscribe</Button>
+                <Button
+                  onClick={() => {
+                    handleSubscribe(profileInfo._id);
+                  }}
+                >
+                  Subscribe
+                </Button>
               )}
               {isSubscribed && currentUserInfo && (
                 <Button className="user__subscribed-btn" color="secondary">
@@ -361,7 +449,7 @@ export default function User() {
                   setShowCreated(true);
                 }}
               >
-                <Typography fontSize={1.2} fontWeight="bold">
+                <Typography fontSize={16} fontWeight="bold">
                   Created
                 </Typography>
               </ButtonSection>
@@ -371,7 +459,7 @@ export default function User() {
                   setShowCreated(false);
                 }}
               >
-                <Typography fontSize={1.2} fontWeight="bold">
+                <Typography fontSize={16} fontWeight="bold">
                   Saved
                 </Typography>
               </ButtonSection>
@@ -401,6 +489,19 @@ export default function User() {
             }}
           />
         )}
+        {showEditPin && (
+          <EditPinPopup
+            pinId={editedPinId}
+            title={"Edit pin"}
+            onClose={() => {
+              setShowEditPin(false);
+            }}
+            onDelete={() => {
+              handleDeletePin(editedPinId);
+            }}
+            onUpdate={handleUpdatePin}
+          />
+        )}
         {showSubscribersPopup && (
           <UsersPopup
             userIds={profileInfo.subscribers}
@@ -408,6 +509,7 @@ export default function User() {
             onClose={() => {
               setShowSubscribersPopup(false);
             }}
+            onSubscribe={handleSubscribe}
           />
         )}
         {showSubscribtionsPopup && (
@@ -417,6 +519,7 @@ export default function User() {
             onClose={() => {
               setShowSubscribtionsPopup(false);
             }}
+            onSubscribe={handleSubscribe}
           />
         )}
         {showCreateBoard && (
@@ -434,30 +537,30 @@ export default function User() {
             style={{ background: `url(${avatar}) center center` }}
           ></RoundButton>
           <Typography fontWeight="bold">{profileInfo.username}</Typography>
-          <Typography fontSize={1}>
+          <Typography fontSize={14}>
             {`@${profileInfo.displayId} ${profileInfo.description ?? ""}`}
           </Typography>
           <div style={{ marginTop: "1rem" }}>
             <Flexbox>
               <Button
-                type="text"
+                variant="text"
                 onClick={() => {
                   setShowSubscribersPopup(true);
                 }}
               >
-                <Typography fontSize={1} fontWeight="bold">
+                <Typography fontSize={16} fontWeight="bold">
                   {profileInfo.subscribers.length} subscribers
                 </Typography>
               </Button>
 
               <Button
-                type="text"
+                variant="text"
                 onClick={() => {
                   setShowSubscribtionsPopup(true);
                 }}
               >
                 <Typography
-                  fontSize={1}
+                  fontSize={16}
                   fontWeight="bold"
                   className="user__subscriptions"
                 >
@@ -482,7 +585,7 @@ export default function User() {
                   setShowCreated(true);
                 }}
               >
-                <Typography fontSize={1.2} fontWeight="bold">
+                <Typography fontSize={16} fontWeight="bold">
                   Created
                 </Typography>
               </ButtonSection>
@@ -492,7 +595,7 @@ export default function User() {
                   setShowCreated(false);
                 }}
               >
-                <Typography fontSize={1.2} fontWeight="bold">
+                <Typography fontSize={16} fontWeight="bold">
                   Saved
                 </Typography>
               </ButtonSection>

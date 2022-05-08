@@ -105,14 +105,14 @@ function CommentContent({ content, username, age }: CommentContentDto) {
     <div className="comment__content">
       <Flexbox flexDirection="column" alignItems="flex-start">
         <Flexbox>
-          <Typography fontSize={0.8} fontWeight="bold">
+          <Typography fontSize={10} fontWeight="bold">
             {username}
           </Typography>
-          <Typography fontSize={0.8} className="comment__date">
+          <Typography fontSize={10} className="comment__date">
             {age}
           </Typography>
         </Flexbox>
-        <Typography fontSize={0.8}>{content}</Typography>
+        <Typography fontSize={10}>{content}</Typography>
       </Flexbox>
     </div>
   );
@@ -167,12 +167,12 @@ function CommentActions({
                   onDelete();
                 }}
               >
-                <Typography fontSize={0.8} fontWeight="bold">
+                <Typography fontSize={10} fontWeight="bold">
                   Delete
                 </Typography>
               </Box>
             )}
-            <Typography fontSize={0.8} fontWeight="bold">
+            <Typography fontSize={10} fontWeight="bold">
               Share
             </Typography>
           </Dropdown>
@@ -185,7 +185,7 @@ function CommentActions({
             color={useful ? red : darkGray}
             style={{ marginRight: "0.2rem" }}
           />
-          <Typography fontSize={0.8}>{`Useful ${usefulCount}`}</Typography>
+          <Typography fontSize={10}>{`Useful ${usefulCount}`}</Typography>
         </Flexbox>
       </button>
     </Flexbox>

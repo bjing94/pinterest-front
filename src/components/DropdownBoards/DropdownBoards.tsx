@@ -35,7 +35,7 @@ function DropdownFooter({ onClick }: FooterProps) {
       <RoundButton className="create-board__btn" size={32}>
         <BsPlus size={32} />
       </RoundButton>
-      <Typography fontSize={1}>Create board</Typography>
+      <Typography fontSize={12}>Create board</Typography>
     </Flexbox>
   );
 }
@@ -73,7 +73,7 @@ function DropdownItem({ boardData, onClick }: DropdownItemProps) {
   }, []);
 
   return (
-    <div className="board-dropdown__item">
+    <li className="board-dropdown__item">
       <Flexbox style={{ height: "100%" }} alignItems="center">
         <img className="board-dropdown__item__img" src={coverImg} />
         <Typography
@@ -91,7 +91,7 @@ function DropdownItem({ boardData, onClick }: DropdownItemProps) {
           </Button>
         </Flexbox>
       </div>
-    </div>
+    </li>
   );
 }
 
@@ -161,7 +161,7 @@ function DropdownList({ boards, onClickFooter, onSelect }: DropdownListProps) {
               margin="1rem 0rem 0rem 0rem"
               className="board-dropdown__item-container"
             >
-              <Typography fontSize={0.8} textAlign="start">
+              <Typography fontSize={10} textAlign="start">
                 All boards
               </Typography>
               <Box margin="0rem 1rem 0rem 0rem">{dropdownItems}</Box>
@@ -193,7 +193,7 @@ export default function DropdownBoards({
   showDropdown,
   onClickArrow,
   style,
-  className,
+  className = "",
   arrowStyle,
   textColor = "primary",
 }: DropdownProps) {
@@ -236,9 +236,14 @@ export default function DropdownBoards({
 
   return (
     <div style={{ width: "100%", position: "relative" }}>
-      <div className="board-dropdown" style={style}>
+      <div className={`board-dropdown ${className}`} style={style}>
         <Flexbox fluid justifyContent="flex-end">
-          <Typography fontSize={1.2} color={textColor} textAlign="end">
+          <Typography
+            className="board-dropdown__selection"
+            fontSize={1.2}
+            color={textColor}
+            textAlign="end"
+          >
             {title}
           </Typography>
           <RoundButton

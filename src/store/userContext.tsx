@@ -6,6 +6,7 @@ interface UserContextInteface {
   _id: string;
   displayId: string;
   setTextPopup: (msg: string) => void;
+  updateUserInfo: () => void;
   userBoards: BoardData[];
   currentSavedPins: string[];
 }
@@ -14,6 +15,7 @@ const UserContext = React.createContext<UserContextInteface>({
   _id: "",
   displayId: "",
   setTextPopup: (msg: string) => {},
+  updateUserInfo: () => {},
   userBoards: [],
   currentSavedPins: [],
 });

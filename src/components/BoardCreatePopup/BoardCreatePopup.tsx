@@ -68,11 +68,11 @@ export default function BoardCreatePopup({
       <div className="create-board-popup__container" style={{ width: "400px" }}>
         <Flexbox flexDirection="column" fluid>
           {errorText && (
-            <Typography fontSize={1} color="error">
+            <Typography fontSize={12} color="error">
               {errorText}
             </Typography>
           )}
-          <Typography fontSize={1.75} fontWeight="bold">
+          <Typography fontSize={18} fontWeight="bold">
             Создание доски
           </Typography>
           <Box margin="45px 0 0 0" width="100%">
