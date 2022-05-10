@@ -105,14 +105,14 @@ function CommentContent({ content, username, age }: CommentContentDto) {
     <div className="comment__content">
       <Flexbox flexDirection="column" alignItems="flex-start">
         <Flexbox>
-          <Typography fontSize={10} fontWeight="bold">
+          <Typography fontSize={12} fontWeight="bold">
             {username}
           </Typography>
-          <Typography fontSize={10} className="comment__date">
+          <Typography fontSize={12} className="comment__date">
             {age}
           </Typography>
         </Flexbox>
-        <Typography fontSize={10}>{content}</Typography>
+        <Typography fontSize={12}>{content}</Typography>
       </Flexbox>
     </div>
   );
@@ -167,12 +167,12 @@ function CommentActions({
                   onDelete();
                 }}
               >
-                <Typography fontSize={10} fontWeight="bold">
+                <Typography fontSize={12} fontWeight="bold">
                   Delete
                 </Typography>
               </Box>
             )}
-            <Typography fontSize={10} fontWeight="bold">
+            <Typography fontSize={12} fontWeight="bold">
               Share
             </Typography>
           </Dropdown>
@@ -183,9 +183,9 @@ function CommentActions({
           <AiFillLike
             size={18}
             color={useful ? red : darkGray}
-            style={{ marginRight: "0.2rem" }}
+            style={{ marginRight: "5px" }}
           />
-          <Typography fontSize={10}>{`Useful ${usefulCount}`}</Typography>
+          <Typography fontSize={12}>{`Useful ${usefulCount}`}</Typography>
         </Flexbox>
       </button>
     </Flexbox>
@@ -313,13 +313,13 @@ export default function CommentSection({
           comment={comment}
           show={showComments}
           onClickLikeButton={() => {
-            console.log("Log in!");
+            onLike(comment._id);
           }}
           onClickUsefulButton={() => {
-            console.log("Log in!");
+            onUseful(comment._id);
           }}
           onDelete={() => {
-            console.log("Log in!");
+            onDelete(comment._id);
           }}
           isAuthor={false}
           key={`comment-${comment._id}`}
@@ -356,7 +356,7 @@ export default function CommentSection({
       className="comment-section"
     >
       <Flexbox style={{ marginTop: "4rem" }}>
-        <Typography fontSize={1.2} fontWeight="bold">
+        <Typography fontSize={18} fontWeight="bold">
           Comments
         </Typography>
         <RoundButton

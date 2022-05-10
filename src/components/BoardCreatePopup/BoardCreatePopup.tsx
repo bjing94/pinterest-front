@@ -73,7 +73,7 @@ export default function BoardCreatePopup({
             </Typography>
           )}
           <Typography fontSize={18} fontWeight="bold">
-            Создание доски
+            Create board
           </Typography>
           <Box margin="45px 0 0 0" width="100%">
             <Input placeholder="имя доски" ref={titleRef} />
@@ -82,7 +82,7 @@ export default function BoardCreatePopup({
           <Flexbox fluid justifyContent="flex-end">
             <Box margin="30px 0 0 0">
               <Button className="board-create__btn" onClick={handleCreateBoard}>
-                Создать
+                Create
               </Button>
             </Box>
           </Flexbox>

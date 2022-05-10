@@ -1,10 +1,15 @@
 import { AxiosResponse } from "axios";
 import React, { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
+import { FiLink } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import Box from "../../../../components/Box/Box";
 import Flexbox from "../../../../components/Flexbox/Flexbox";
 import RoundButton from "../../../../components/RoundButton/RoundButton";
 import Typography from "../../../../components/Typgoraphy/Typography";
+import convertAgeToString from "../../../../helpers/AgeToString";
+import copyCurrentUrl from "../../../../helpers/copyCurrentUrl";
+import copyToClipboard from "../../../../helpers/copyCurrentUrl";
 import { getBoard } from "../../../../services/BoardService";
 import { getStaticImage } from "../../../../services/FileService";
 import { getPin } from "../../../../services/PinService";
@@ -19,6 +24,7 @@ import "./UserBoardCard.scss";
 interface UserBoardCardProps {
   id: string;
   onEdit: () => void;
+  isOwner: boolean;
 }
 
 const getSrcFromPins = async (pinIds: string[]) => {
@@ -55,63 +61,46 @@ const getSrcFromPins = async (pinIds: string[]) => {
   return correctSrcs;
 };
 
-const getTimeSpent = (milliseconds: number) => {
-  const toMinutes = 1 / (1000 * 60);
-  const toHours = 1 / (1000 * 60 * 60);
-  const toDays = 1 / (1000 * 60 * 60 * 24);
-  const toMonths = 1 / (1000 * 60 * 60 * 24 * 7);
-  const toYears = 1 / (1000 * 60 * 60 * 24 * 7 * 365);
-  if (Math.floor(milliseconds * toMinutes) < 60) {
-    return `${Math.floor(milliseconds * toMinutes)} minutes`;
-  }
-  if (Math.floor(milliseconds * toHours) < 24) {
-    return `${Math.floor(milliseconds * toHours)} hours`;
-  }
-
-  if (Math.floor(milliseconds * toDays) < 7) {
-    return `${Math.floor(milliseconds * toDays)} days`;
-  }
-
-  if (Math.floor(milliseconds * toMonths) < 12) {
-    return `${Math.floor(milliseconds * toMonths)} months`;
-  }
-
-  return `${Math.floor(milliseconds * toYears)} years`;
-};
-
-export default function UserBoardCard({ id, onEdit }: UserBoardCardProps) {
+export default function UserBoardCard({
+  id,
+  onEdit,
+  isOwner,
+}: UserBoardCardProps) {
   const [coverImages, setCoverImages] = useState<string[]>([]);
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
   const [age, setAge] = useState<string>("");
 
-  const [showOverlay, setShowOverlay] = useState(false);
+  const handleGetBoard = async () => {
+    const board = await getBoard(id);
+    if (board) {
+      if (board.status == 200) {
+        const boardData = board.data as BoardData;
+        const imgSrcs = await getSrcFromPins(boardData.pins);
+        setCoverImages(imgSrcs);
+        setAmount(boardData.pins.length);
+        setTitle(boardData.title);
+        setAge(
+          convertAgeToString(
+            new Date(Date.parse(boardData.createdAt)),
+            new Date()
+          )
+        );
+      } else {
+        const errorData = board.data as ErrorData;
+        console.log(errorData.message);
+      }
+    } else {
+      console.log("ERROR!");
+    }
+  };
 
   useEffect(() => {
-    const handleGetBoard = async () => {
-      const board = await getBoard(id);
-      if (board) {
-        if (board.status == 200) {
-          const boardData = board.data as BoardData;
-          const imgSrcs = await getSrcFromPins(boardData.pins);
-          setCoverImages(imgSrcs);
-          setAmount(boardData.pins.length);
-          setTitle(boardData.title);
-          setAge(getTimeSpent(Date.now() - Date.parse(boardData.createdAt)));
-        } else {
-          const errorData = board.data as ErrorData;
-          console.log(errorData.message);
-        }
-      } else {
-        console.log("ERROR!");
-      }
-    };
-
     handleGetBoard();
   }, []);
 
   if (!title) {
-    return <div> Something went wrong!</div>;
+    return null;
   }
   return (
     <Flexbox
@@ -122,51 +111,69 @@ export default function UserBoardCard({ id, onEdit }: UserBoardCardProps) {
       <Flexbox className="user-board__images">
         <Link to={`/board/${id}`}>
           <div className="user-board__overlay">
+            {isOwner && (
+              <Box margin="0px 10px 0px 0px">
+                <RoundButton
+                  type="action"
+                  size={32}
+                  onClick={(event: any) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onEdit();
+                  }}
+                >
+                  <FaEdit size={24} />
+                </RoundButton>
+              </Box>
+            )}
+
             <RoundButton
               type="action"
               size={32}
-              onClick={(event: any) => {
-                event.preventDefault();
-                event.stopPropagation();
-                onEdit();
+              onClick={(e: Event) => {
+                e.preventDefault();
+                copyCurrentUrl();
               }}
             >
-              <FaEdit size={24} />
+              <FiLink size={24} />
             </RoundButton>
           </div>
         </Link>
-
-        <img
-          className="user-board__main-img"
-          src={coverImages[0] ?? ""}
-          style={{ background: `${coverImages[0] ? "none" : "gray"}` }}
-        />
+        <div className="user-board__main-img">
+          <img
+            src={coverImages[0] ?? ""}
+            style={{ background: `${coverImages[0] ? "none" : "gray"}` }}
+          />
+        </div>
         <Flexbox
           style={{ width: "100%", height: "100%" }}
           flexDirection="column"
         >
-          <img
-            className="user-board__top-img"
-            src={coverImages[1] ?? ""}
-            style={{ background: `${coverImages[1] ? "none" : "gray"}` }}
-          />
-          <img
-            className="user-board__bottom-img"
-            src={coverImages[2] ?? ""}
-            style={{ background: `${coverImages[2] ? "none" : "gray"}` }}
-          />
+          <div className="user-board__top-img">
+            <img
+              src={coverImages[1] ?? ""}
+              style={{ background: `${coverImages[1] ? "none" : "gray"}` }}
+            />
+          </div>
+          <div className="user-board__bottom-img">
+            <img
+              className="user-board__bottom-img"
+              src={coverImages[2] ?? ""}
+              style={{ background: `${coverImages[2] ? "none" : "gray"}` }}
+            />
+          </div>
         </Flexbox>
       </Flexbox>
       <div style={{ marginLeft: "10px" }}>
-        <Typography fontSize={12} fontWeight="bold" textAlign="start">
+        <Typography fontSize={16} fontWeight="bold" textAlign="start">
           {title}
         </Typography>
         <Flexbox>
-          <Typography fontSize={10} textAlign="start">
+          <Typography fontSize={12} textAlign="start">
             {amount} pins
           </Typography>
         </Flexbox>
-        <Typography fontSize={10} textAlign="start" className="user-board__age">
+        <Typography fontSize={12} textAlign="start" className="user-board__age">
           {age}
         </Typography>
       </div>

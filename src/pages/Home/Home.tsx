@@ -21,9 +21,9 @@ const breakpointColumnsObj = {
   1820: 6, // 1800 or less
   1600: 5,
   1400: 4,
-  1100: 3,
-  900: 2,
-  600: 1,
+  930: 3,
+  710: 2,
+  550: 1,
 };
 
 export default function Home() {

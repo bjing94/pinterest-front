@@ -7,7 +7,7 @@ export interface UpdateUserDto {
 
   email?: string;
 
-  passwordHash?: string;
+  newPassword?: string;
 
   createdPins?: string[];
 

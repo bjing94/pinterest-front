@@ -2,7 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { Col, Grid, Row } from "react-flexbox-grid";
 import { AiFillBell, AiFillMessage } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
+import { FiLogOut } from "react-icons/fi";
+import { IoIosLogOut } from "react-icons/io";
 import { Link, useLocation } from "react-router-dom";
+import { logout } from "../../services/AuthService";
 import UserContext from "../../store/userContext";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
@@ -16,9 +19,14 @@ import "./TopBar.scss";
 interface TopBarProps {
   onClickLogin?: any;
   onClickRegister?: any;
+  onClickLogout?: any;
 }
 
-export default function TopBar({ onClickLogin, onClickRegister }: TopBarProps) {
+export default function TopBar({
+  onClickLogin,
+  onClickRegister,
+  onClickLogout,
+}: TopBarProps) {
   const location = useLocation();
   const darkGray = " #767676";
   const currUserInfo = useContext(UserContext);
@@ -52,11 +60,8 @@ export default function TopBar({ onClickLogin, onClickRegister }: TopBarProps) {
             <Col xs={true} style={{ flexGrow: 0 }}>
               {isAuth ? (
                 <Flexbox>
-                  <RoundButton size={32}>
-                    <AiFillBell size={24} fill={darkGray} />
-                  </RoundButton>
-                  <RoundButton size={32}>
-                    <AiFillMessage size={24} fill={darkGray} />
+                  <RoundButton size={32} onClick={onClickLogout}>
+                    <IoIosLogOut size={24} fill={darkGray} />
                   </RoundButton>
                   <Link to={`/user/${displayId}`}>
                     <RoundButton size={32}>

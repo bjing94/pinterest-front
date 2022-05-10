@@ -6,7 +6,7 @@ import Pin from "./pages/Pin/Pin";
 import PinBuilder from "./pages/PinBuilder/PinBuilder";
 import AuthPopup from "./components/AuthPopup/AuthPopup";
 import User from "./pages/User";
-import { checkLogin, getCurrentUser } from "./services/AuthService";
+import { checkLogin, getCurrentUser, logout } from "./services/AuthService";
 
 import "./App.scss";
 import { UserProvider } from "./store/userContext";
@@ -26,6 +26,7 @@ function App() {
 
   const getAuthUserInfo = async () => {
     const userResponse = await getCurrentUser();
+    console.log("Current user response: ", userResponse);
     if (!userResponse || userResponse.status !== 200) return;
     const user = userResponse.data as UserData;
     setCurrentUser(user);
@@ -53,11 +54,17 @@ function App() {
     setTextPopupTimer(timer);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    window.location.reload();
+  };
+
   useEffect(() => {
     checkIsAuth();
     getAuthUserInfo();
+    console.log("checking auth");
   }, []);
-
+  console.log("currentUser?._id", currentUser?._id);
   return (
     <UserProvider
       value={{
@@ -78,6 +85,7 @@ function App() {
           onClickRegister={() => {
             setShowRegisterPopup(true);
           }}
+          onClickLogout={handleLogout}
         />
         {textPopupMsg && <TextPopup>{textPopupMsg}</TextPopup>}
         {showAuthPopup && (
@@ -85,18 +93,12 @@ function App() {
             onClose={() => {
               setShowAuthPopup(false);
             }}
-            onSubmit={() => {
-              setIsAuth(true);
-            }}
           />
         )}
         {showRegisterPopup && (
           <AuthPopup
             onClose={() => {
               setShowRegisterPopup(false);
-            }}
-            onSubmit={() => {
-              getAuthUserInfo();
             }}
             registerMode={true}
           />

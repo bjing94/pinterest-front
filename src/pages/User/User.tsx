@@ -10,7 +10,12 @@ import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import Typography from "../../components/Typgoraphy/Typography";
 import { CreateUserDto } from "../../services/dto/create-pin.dto";
-import { findUser, getUser, subscribe } from "../../services/UserService";
+import {
+  findUser,
+  getUser,
+  subscribe,
+  updateUser,
+} from "../../services/UserService";
 import {
   BoardData,
   ErrorData,
@@ -38,6 +43,7 @@ import { deletePin, updatePin } from "../../services/PinService";
 import EditPinPopup from "./components/EditPinPopup/EditPinPopup";
 import { UpdatePinDto } from "../../services/dto/update-pin.dto";
 import ErrorPage from "../ErrorPages/ErrorPage";
+import EditUserPopup from "./components/EditUserPopup/EditUserPopup";
 
 const breakpointColumnsObj = {
   default: 7,
@@ -55,6 +61,7 @@ export default function User() {
     setTextPopup,
     userBoards,
     _id: currentUserId,
+    isAuth,
   } = useContext(UserContext);
 
   const [profileInfo, setProfileInfo] = useState<UserData | undefined>();
@@ -81,6 +88,7 @@ export default function User() {
 
   const [showEditPin, setShowEditPin] = useState(false);
   const [editedPinId, setEditedPinId] = useState("");
+  const [showEditUser, setShowEditUser] = useState(false);
 
   const checkSubscribed = async () => {
     if (!profileInfo) {
@@ -244,10 +252,8 @@ export default function User() {
   };
 
   const getProfileInfo = async () => {
-    console.log("Searching for user:", displayId);
     if (displayId) {
       const response = await findUser({ displayId: displayId });
-      console.log(response);
 
       if (response) {
         if (response.status == 200) {
@@ -270,7 +276,9 @@ export default function User() {
   useEffect(() => {
     getProfileInfo();
     getCurrentUserInfo();
-  }, [currentUserId]);
+    console.log(currentUserId);
+    console.log(isAuth);
+  }, []);
 
   useEffect(() => {}, [profileInfo, currentUserInfo]);
 
@@ -287,7 +295,7 @@ export default function User() {
   }
 
   const isOwner = currentUserId === profileInfo._id;
-  console.log(currentUserId, profileInfo._id);
+
   const pinElements = profileInfo.createdPins.map((id) => {
     const isSaved = !!boardsToPins.find((data) => {
       return data.pins.includes(id);
@@ -335,11 +343,11 @@ export default function User() {
             setShowEditBoard(true);
             setEditedBoardId(boardId);
           }}
+          isOwner={currentUserId === profileInfo._id}
         />
       </Flexbox>
     );
   });
-  console.log("Subbed:", isSubscribed);
 
   if (!isOwner) {
     return (
@@ -399,7 +407,7 @@ export default function User() {
                   setShowSubscribersPopup(true);
                 }}
               >
-                <Typography fontSize={14} fontWeight="bold">
+                <Typography fontSize={16} fontWeight="bold">
                   {profileInfo.subscribers.length} subscribers
                 </Typography>
               </Button>
@@ -411,7 +419,7 @@ export default function User() {
                 }}
               >
                 <Typography
-                  fontSize={12}
+                  fontSize={16}
                   fontWeight="bold"
                   className="user__subscriptions"
                 >
@@ -480,6 +488,18 @@ export default function User() {
   } else {
     return (
       <div>
+        {showEditUser && (
+          <EditUserPopup
+            userData={profileInfo}
+            title={"Edit profile"}
+            onClose={() => {
+              setShowEditUser(false);
+            }}
+            onUpdate={(dto) => {
+              updateUser(profileInfo._id, dto);
+            }}
+          />
+        )}
         {showEditBoard && (
           <EditBoardPopup
             boardId={editedBoardId}
@@ -574,7 +594,13 @@ export default function User() {
               <RoundButton size={48} onClick={handleCopyUserLink}>
                 <FiLink size={24} />
               </RoundButton>
-              <Button>Edit profile</Button>
+              <Button
+                onClick={() => {
+                  setShowEditUser(true);
+                }}
+              >
+                Edit profile
+              </Button>
             </Flexbox>
           </Box>
           <Box margin="40px 0 0 0">

@@ -13,19 +13,25 @@ const ResponsiveImage = React.forwardRef<
   HTMLImageElement,
   ResponsiveImageProps
 >(({ src, overlayContent, maxHeight = "none", minHeight = "none" }, ref) => {
-  const [imgHeight, setImgHeight] = useState(0);
-
-  useEffect(() => {}, [src]);
-  console.log(maxHeight);
-
   return (
     <div
-      className="responsive-image__container"
+      className="responsive-image"
       style={{ maxHeight: maxHeight, minHeight }}
     >
-      <img src={src} ref={ref} />
+      <div
+        className="responsive-image__container"
+        style={{ maxHeight: maxHeight, minHeight }}
+      >
+        <img style={{ minHeight }} src={src} ref={ref} />
+      </div>
+
       {overlayContent && (
-        <div className="responsive-image__overlay">{overlayContent}</div>
+        <div
+          className="responsive-image__overlay"
+          style={{ maxHeight: maxHeight, minHeight }}
+        >
+          {overlayContent}
+        </div>
       )}
     </div>
   );

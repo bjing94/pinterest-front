@@ -246,7 +246,12 @@ export default function Pin() {
   };
 
   const handleCreateComment = async (content: string) => {
-    if (!id || !currentUserInfo) {
+    if (!currentUserInfo) {
+      setTextPopup("Please log in");
+      return;
+    }
+
+    if (!id) {
       return;
     }
     const { _id: currentUserId } = currentUserInfo;
@@ -305,7 +310,12 @@ export default function Pin() {
   };
 
   const handleLikeComment = async (commentId: string) => {
-    if (!id || !currentUserInfo) {
+    if (!currentUserInfo) {
+      setTextPopup("Please log in");
+      return;
+    }
+
+    if (!id) {
       return;
     }
     const { _id: currentUserId } = currentUserInfo;
@@ -328,7 +338,12 @@ export default function Pin() {
   };
 
   const handleUsefulComment = async (commentId: string) => {
-    if (!id || !currentUserInfo) {
+    if (!currentUserInfo) {
+      setTextPopup("Please log in");
+      return;
+    }
+
+    if (!id) {
       return;
     }
     const { _id: currentUserId } = currentUserInfo;
@@ -409,8 +424,8 @@ export default function Pin() {
           />
         )}
         <Toolbar />
-        <Card style={{ width: "1016px", padding: "2rem" }}>
-          <Flexbox alignItems="flex-start">
+        <Card className="pin__card">
+          <Flexbox alignItems="flex-start" className="pin__content">
             <div className="pin__image-container">
               <ResponsiveImage src={imgSrc} />
             </div>
@@ -418,14 +433,9 @@ export default function Pin() {
               flexDirection="column"
               justifyContent="flex-start"
               alignItems="flex-start"
-              style={{
-                flexBasis: "50%",
-                marginLeft: "3rem",
-                width: "100%",
-                marginTop: "2rem",
-              }}
+              className="pin__info"
             >
-              <Flexbox justifyContent="space-between" style={{ width: "100%" }}>
+              <Flexbox justifyContent="space-between" fluid>
                 <Flexbox>
                   {showOptionsDropdown && (
                     <Dropdown
@@ -465,17 +475,18 @@ export default function Pin() {
                 <Typography fontSize={24} fontWeight="bold" textAlign="start">
                   {title}
                 </Typography>
-                <Typography fontSize={12} textAlign="start">
+                <Typography fontSize={14} textAlign="start">
                   {description}
                 </Typography>
               </div>
-              <div style={{ marginTop: "1rem" }} className="pin__profile-info">
+              <div className="pin__profile-info">
                 <CommunityInfo
                   isSubscribed={false}
                   username={authorInfo?.username ?? ""}
                   subscribersCount={authorInfo?.subscribers.length ?? 0}
                   className="pin__profile-info"
                   avatarId={authorInfo.avatarSrc}
+                  onClickSubscribe={handleSubscribe}
                   displayId={authorInfo.displayId}
                 />
               </div>

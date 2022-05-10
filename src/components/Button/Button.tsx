@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from "react";
+import React, { HTMLAttributes, HTMLProps } from "react";
 import { BaseStyle } from "../../types/types";
 
 import "./Button.scss";
@@ -21,15 +21,20 @@ export default function Button({
   style,
   variant = "filled",
   type = "button",
-}: ButtonProps) {
+  ...rest
+}: ButtonProps & HTMLProps<HTMLButtonElement>) {
   return (
     <button
       className={`btn ${className} ${
         active ? "" : "inactive"
       } ${color} ${variant}`}
-      onClick={onClick}
+      onClick={() => {
+        if (active) {
+          onClick();
+        }
+      }}
       style={style}
-      type={type}
+      {...rest}
     >
       {children}
     </button>

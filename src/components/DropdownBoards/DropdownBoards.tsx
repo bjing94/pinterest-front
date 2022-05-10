@@ -35,7 +35,7 @@ function DropdownFooter({ onClick }: FooterProps) {
       <RoundButton className="create-board__btn" size={32}>
         <BsPlus size={32} />
       </RoundButton>
-      <Typography fontSize={12}>Create board</Typography>
+      <Typography fontSize={16}>Create board</Typography>
     </Flexbox>
   );
 }
@@ -77,7 +77,7 @@ function DropdownItem({ boardData, onClick }: DropdownItemProps) {
       <Flexbox style={{ height: "100%" }} alignItems="center">
         <img className="board-dropdown__item__img" src={coverImg} />
         <Typography
-          fontSize={1.2}
+          fontSize={16}
           fontWeight="bold"
           className="board-dropdown__item__name"
         >
@@ -161,7 +161,7 @@ function DropdownList({ boards, onClickFooter, onSelect }: DropdownListProps) {
               margin="1rem 0rem 0rem 0rem"
               className="board-dropdown__item-container"
             >
-              <Typography fontSize={10} textAlign="start">
+              <Typography fontSize={12} textAlign="start">
                 All boards
               </Typography>
               <Box margin="0rem 1rem 0rem 0rem">{dropdownItems}</Box>
@@ -240,7 +240,7 @@ export default function DropdownBoards({
         <Flexbox fluid justifyContent="flex-end">
           <Typography
             className="board-dropdown__selection"
-            fontSize={1.2}
+            fontSize={16}
             color={textColor}
             textAlign="end"
           >

@@ -50,6 +50,17 @@ export async function register(
     );
 }
 
+export async function logout() {
+  return axiosInstance
+    .post(`auth/logout`)
+    .then((response: AxiosResponse<UserData>) => {
+      return response;
+    })
+    .catch((error: AxiosError<ErrorData>) => {
+      return error.response;
+    });
+}
+
 export async function getCurrentUser(): Promise<
   AxiosResponse<UserData | ErrorData> | undefined
 > {

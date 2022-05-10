@@ -12,7 +12,7 @@ import "./AuthPopup.scss";
 
 interface AuthPopupProps {
   onClose: any;
-  onSubmit: any;
+  onSubmit?: any;
   registerMode?: boolean;
 }
 
@@ -81,6 +81,7 @@ export default function AuthPopup({
       const res = await login({ email: email, password: password });
       if (res?.status == 200) {
         onClose();
+        window.location.reload();
       } else {
         setError(res?.data.message ?? "");
       }
@@ -88,8 +89,13 @@ export default function AuthPopup({
   };
 
   return (
-    <div className="auth-popup__background">
-      <div className="auth-popup__container">
+    <div className="auth-popup__background" onClick={onClose}>
+      <div
+        className="auth-popup__container"
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
+      >
         <form
           onSubmit={(event) => {
             event.preventDefault();

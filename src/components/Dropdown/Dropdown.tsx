@@ -27,9 +27,9 @@ export default function Dropdown({
   if (children) {
     childElements = children.map((child: any) => {
       return (
-        <li className={`dropdown__item`} onClick={onClickItem}>
+        <div className={`dropdown__item`} onClick={onClickItem}>
           {child}
-        </li>
+        </div>
       );
     });
   }

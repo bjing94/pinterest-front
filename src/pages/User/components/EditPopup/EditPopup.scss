@@ -1,4 +1,4 @@
-.users-popup {
+.edit-popup {
   &__container {
     min-width: 0;
     height: 600px;
@@ -23,5 +23,11 @@
     width: 100%;
     overflow-y: scroll;
     flex-grow: 1;
+    padding: 10px;
+  }
+
+  &__bottom {
+    padding-top: 10px;
+    width: 100%;
   }
 }

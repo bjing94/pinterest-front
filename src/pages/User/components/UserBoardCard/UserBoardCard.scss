@@ -6,12 +6,22 @@
     width: 252px;
     height: 450px;
   }
+
   &__main-img,
   &__top-img,
   &__bottom-img {
+    overflow: hidden;
     width: 100%;
     height: 100%;
+
+    & > img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
   }
+
   &__main-img {
     border-radius: 1rem 0rem 0rem 1rem;
     border-right: 2px solid white;

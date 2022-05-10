@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Masonry from "react-masonry-css";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Avatar from "../../components/Avatar/Avatar";
 import Box from "../../components/Box/Box";
 import Button from "../../components/Button/Button";
@@ -8,24 +8,24 @@ import Flexbox from "../../components/Flexbox/Flexbox";
 import PinCard from "../../components/PinCard/PinCard";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import Typography from "../../components/Typgoraphy/Typography";
-import { getBoard } from "../../services/BoardService";
+import copyCurrentUrl from "../../helpers/copyCurrentUrl";
+import { getCurrentUser } from "../../services/AuthService";
+import { getBoard, updateBoard } from "../../services/BoardService";
 import { BoardData, UserData } from "../../services/responses/responses";
-import { getUser } from "../../services/UserService";
+import { getUser, updateUser } from "../../services/UserService";
 import UserContext from "../../store/userContext";
 import LoadingPage from "../LoadingPage/LoadingPage";
 
 import "./BoardPage.scss";
-
-interface BoardPageProps {}
 
 const breakpointColumnsObj = {
   default: 7,
   1820: 6, // 1800 or less
   1600: 5,
   1400: 4,
-  1100: 3,
-  900: 2,
-  600: 1,
+  930: 3,
+  710: 2,
+  550: 1,
 };
 
 export default function BoardPage() {
@@ -36,19 +36,46 @@ export default function BoardPage() {
 
   // Board info
   const [boardData, setBoardData] = useState<BoardData | null>(null);
-  const [avatarId, setAvatarId] = useState<string>("");
   const [authorInfo, setAuthorInfo] = useState<UserData | null>(null);
+  const [boardId, setBoardId] = useState<string>();
+  const [showCreateBoard, setShowCreateBoard] = useState(false);
 
-  const hadleCopyBoardLink = async () => {
-    const url = window.location.origin + "/board/" + id;
-    navigator.clipboard
-      .writeText(url)
-      .then(() => {
-        setTextPopup("Copied to clipboard.");
-      })
-      .catch(() => {
-        console.log("Didn't copy!");
+  const handleSavePin = async (id: string) => {
+    if (!id) {
+      return;
+    }
+
+    const response = await getCurrentUser();
+    if (response && response.status == 200) {
+      if (!boardId) {
+        // save to profile
+        const userInfo = response.data as UserData;
+        userInfo.savedPins.push(id);
+        const updateResponse = await updateUser(userInfo._id, userInfo);
+        if (updateResponse && updateResponse.status == 200) {
+          console.log("Saved to profile: ", updateResponse.data);
+        }
+        return;
+      }
+
+      const boardResponse = await getBoard(boardId);
+      if (!boardResponse || boardResponse.status !== 200) {
+        console.log("Error finding board!");
+        return;
+      }
+      const newBoard = boardResponse.data as BoardData;
+      newBoard.pins.push(id);
+
+      const updatedBoardResponse = await updateBoard(boardId, {
+        pins: newBoard.pins,
+        title: newBoard.title,
       });
+      if (!updatedBoardResponse || updatedBoardResponse.status !== 200) {
+        console.log("Error updating board!");
+        return;
+      }
+      console.log(updatedBoardResponse);
+    }
   };
 
   const getBoardInfo = async () => {
@@ -73,6 +100,7 @@ export default function BoardPage() {
   useEffect(() => {
     getBoardInfo();
   }, []);
+
   if (!boardData || !authorInfo) {
     return <LoadingPage />;
   }
@@ -93,13 +121,13 @@ export default function BoardPage() {
           isSaved={isSaved}
           boards={[]}
           onSavePin={(pinId) => {
-            //    handleSavePin(pinId);
+            handleSavePin(pinId);
           }}
           onSetBoardId={(boardId) => {
-            //    setBoardId(boardId);
+            setBoardId(boardId);
           }}
           onShowCreateBoard={() => {
-            //    setShowCreateBoard(!showCreateBoard);
+            setShowCreateBoard(!showCreateBoard);
           }}
           showInfo
         />
@@ -111,23 +139,32 @@ export default function BoardPage() {
     <div className="board-page__container">
       <Toolbar />
       <Flexbox flexDirection="column" fluid>
-        <Typography fontSize={3} fontWeight="bold">
+        <Typography fontSize={32} fontWeight="bold">
           {boardData.title}
         </Typography>
-        <Avatar imgId={authorInfo.avatarSrc} size={48} />
+        <Link to={`/user/${authorInfo.displayId}`}>
+          <Avatar imgId={authorInfo.avatarSrc} size={48} />
+        </Link>
         <Box margin="10px 0px 0px 0px">
-          <Typography fontSize={12} fontWeight="bold">
+          <Typography fontSize={16} fontWeight="bold">
             {authorInfo.username}
           </Typography>
         </Box>
         <Box margin="10px 0px 0px 0px">
           <Typography
-            fontSize={12}
+            fontSize={14}
             fontWeight="bold"
           >{`${authorInfo.subscribers.length} subscribers`}</Typography>
         </Box>
         <Box margin="10px 0px 0px 0px">
-          <Button onClick={hadleCopyBoardLink}>Share</Button>
+          <Button
+            onClick={() => {
+              copyCurrentUrl();
+              setTextPopup("Copied to clipboard");
+            }}
+          >
+            Share
+          </Button>
         </Box>
         <Masonry
           breakpointCols={breakpointColumnsObj}

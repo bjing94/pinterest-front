@@ -20,6 +20,7 @@ import { UpdateBoardDto } from "../../../../services/dto/update-board.dto";
 import { BoardData, UserData } from "../../../../services/responses/responses";
 import { getUser } from "../../../../services/UserService";
 import UserContext from "../../../../store/userContext";
+import EditPopup from "../EditPopup/EditPopup";
 
 import "./EditBoardPopup.scss";
 
@@ -69,47 +70,34 @@ export default function EditBoardPopup({
   useEffect(() => {
     getBoardInfo();
   }, []);
-
-  return (
-    <div className="edit-board-popup__background" onClick={onClose}>
-      <Box
-        margin="100px 0px 0px 0px"
-        onClick={(event: Event) => {
-          event.stopPropagation();
+  const mainContent = (
+    <>
+      <Input
+        value={titleValue}
+        onInput={(event: any) => {
+          setTitleValue(event.currentTarget.value);
         }}
-      >
-        <Card className="edit-board-popup__container">
-          <Flexbox flexDirection="column" style={{ height: "100%" }}>
-            <Box margin="0px 0px 20px 0px" width="400px">
-              <Flexbox fluid justifyContent="center" alignItems="center">
-                <Typography fontSize={14} fontWeight="bold">
-                  {title}
-                </Typography>
-                <RoundButton size={32} onClick={onClose}>
-                  <AiOutlineClose size={24} />
-                </RoundButton>
-              </Flexbox>
-            </Box>
-            <div className="edit-board-popup__list">
-              <Input
-                value={titleValue}
-                onInput={(event: any) => {
-                  setTitleValue(event.currentTarget.value);
-                }}
-                label="Title"
-              />
-              <Box margin="10px 0px 0px 0px">
-                <Button onClick={handleDeleteBoard}>Delete board</Button>
-              </Box>
-            </div>
-            <div className="edit-board-popup__bottom">
-              <Flexbox fluid justifyContent="flex-end">
-                <Button onClick={handleUpdateBoard}>Done</Button>
-              </Flexbox>
-            </div>
-          </Flexbox>
-        </Card>
+        label="Title"
+      />
+      <Box margin="10px 0px 0px 0px">
+        <Button onClick={handleDeleteBoard}>Delete board</Button>
       </Box>
-    </div>
+    </>
+  );
+
+  const bottomContent = (
+    <>
+      <Flexbox fluid justifyContent="flex-end">
+        <Button onClick={handleUpdateBoard}>Done</Button>
+      </Flexbox>
+    </>
+  );
+  return (
+    <EditPopup
+      title={title}
+      onClose={onClose}
+      mainContent={mainContent}
+      bottomContent={bottomContent}
+    />
   );
 }

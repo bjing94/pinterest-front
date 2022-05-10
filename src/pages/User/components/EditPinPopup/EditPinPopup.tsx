@@ -16,6 +16,7 @@ import Dropdown from "../../../../components/Dropdown";
 import InputSearch from "../../../../components/InputSearch/InputSearch";
 
 import "./EditPinPopup.scss";
+import EditPopup from "../EditPopup/EditPopup";
 
 interface EditPinPopupProps {
   pinId: string;
@@ -87,7 +88,7 @@ function BoardsSelectionProperty({
           className="edit-pin-popup__selection"
         >
           <Flexbox fluid justifyContent="space-between">
-            <Typography fontSize={12} fontWeight="bold">
+            <Typography fontSize={16} fontWeight="bold">
               {value}
             </Typography>
 
@@ -225,89 +226,82 @@ export default function EditPinPopup({
         })?.title || "";
 
   if (!pinData) return <div>whoops</div>;
-
-  return (
-    <div className="edit-pin-popup__background" onClick={onClose}>
-      <Box
-        margin="100px 0px 0px 0px"
-        onClick={(event: Event) => {
-          event.stopPropagation();
-        }}
-      >
-        <Card className="edit-pin-popup__container">
-          <Flexbox flexDirection="column" style={{ height: "100%" }}>
-            <div className="edit-pin-popup__list">
-              <Flexbox>
-                <Box width="583px" margin="0px 16px 0px 16px">
-                  <Flexbox flexDirection="column">
-                    <BoardsSelectionProperty
-                      label="Board"
-                      value={savedOnBoardName}
-                      onSelect={(boardId) => {
-                        setSelectedBoardId(boardId);
-                      }}
-                      boards={userBoards}
-                      onCreate={handleCreateTemporaryBoard}
-                    />
-                    <TextProperty
-                      label="Title"
-                      value={titleValue}
-                      onInput={(event: any) => {
-                        setTitleValue(event.target.value);
-                      }}
-                    />
-                    <TextProperty
-                      label="Description"
-                      value={contentValue}
-                      onInput={(event: any) => {
-                        setContentValue(event.target.value);
-                      }}
-                    />
-                  </Flexbox>
-                </Box>
-                <Box width="200px" margin="0px 16px 0px 16px">
-                  <ResponsiveImage src={imgSrc} />
-                </Box>
-              </Flexbox>
-            </div>
-            <div className="edit-pin-popup__bottom">
-              <Flexbox fluid justifyContent="space-between">
-                <Button
-                  onClick={() => {
-                    onDelete();
-                    onClose();
-                  }}
-                >
-                  Delete
-                </Button>
-                <Flexbox>
-                  <Box margin="0px 10px 0px 0px">
-                    <Button onClick={onClose}>Cancel</Button>
-                  </Box>
-                  <Button
-                    onClick={() => {
-                      console.log(
-                        oldBoardId,
-                        selectedBoardId,
-                        temporaryBoardTitle
-                      );
-                      onUpdate(
-                        { title: titleValue, content: contentValue },
-                        oldBoardId,
-                        selectedBoardId,
-                        temporaryBoardTitle
-                      );
-                      onClose();
-                    }}
-                  >
-                    Done
-                  </Button>
-                </Flexbox>
-              </Flexbox>
-            </div>
+  const mainContent = (
+    <>
+      <Flexbox>
+        <Box width="583px" margin="0px 16px 0px 16px">
+          <Flexbox flexDirection="column">
+            <BoardsSelectionProperty
+              label="Board"
+              value={savedOnBoardName}
+              onSelect={(boardId) => {
+                setSelectedBoardId(boardId);
+              }}
+              boards={userBoards}
+              onCreate={handleCreateTemporaryBoard}
+            />
+            <TextProperty
+              label="Title"
+              value={titleValue}
+              onInput={(event: any) => {
+                setTitleValue(event.target.value);
+              }}
+            />
+            <TextProperty
+              label="Description"
+              value={contentValue}
+              onInput={(event: any) => {
+                setContentValue(event.target.value);
+              }}
+            />
           </Flexbox>
-        </Card>
-      </Box>
-    </div>
+        </Box>
+        <Box width="200px" margin="0px 16px 0px 16px">
+          <ResponsiveImage src={imgSrc} />
+        </Box>
+      </Flexbox>
+    </>
+  );
+
+  const bottomContent = (
+    <>
+      <Flexbox fluid justifyContent="space-between">
+        <Button
+          onClick={() => {
+            onDelete();
+            onClose();
+          }}
+        >
+          Delete
+        </Button>
+        <Flexbox>
+          <Box margin="0px 10px 0px 0px">
+            <Button onClick={onClose}>Cancel</Button>
+          </Box>
+          <Button
+            onClick={() => {
+              console.log(oldBoardId, selectedBoardId, temporaryBoardTitle);
+              onUpdate(
+                { title: titleValue, content: contentValue },
+                oldBoardId,
+                selectedBoardId,
+                temporaryBoardTitle
+              );
+              onClose();
+            }}
+          >
+            Done
+          </Button>
+        </Flexbox>
+      </Flexbox>
+    </>
+  );
+  return (
+    <EditPopup
+      title={title}
+      onClose={onClose}
+      mainContent={mainContent}
+      bottomContent={bottomContent}
+    />
   );
 }

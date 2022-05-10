@@ -17,13 +17,22 @@ const Input = React.forwardRef<
   InputProps & React.InputHTMLAttributes<HTMLInputElement>
 >(
   (
-    { placeholder, fontSize = 14, className = "", value, onInput, label, type },
+    {
+      placeholder,
+      fontSize = 14,
+      className = "",
+      value,
+      onInput,
+      label,
+      type,
+      ...rest
+    },
     ref
   ) => {
     return (
       <>
         <Box margin="0px 0px 5px 0px">
-          <label htmlFor="rounded-input">{label}</label>
+          <label htmlFor={rest.id}>{label}</label>
         </Box>
         <input
           ref={ref}
@@ -34,6 +43,7 @@ const Input = React.forwardRef<
           onInput={onInput}
           type={type}
           id="rounded-input"
+          {...rest}
         />
       </>
     );

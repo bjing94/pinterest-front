@@ -58,6 +58,7 @@ export default function UsersPopup({
 
   const userElements = users.map((user) => {
     const isSubscribed = user.subscribers.includes(currentUserId);
+    const isYou = user._id === currentUserId;
     return (
       <Flexbox fluid>
         <Box margin="0px 10px 0px 0px">
@@ -68,8 +69,23 @@ export default function UsersPopup({
             {user.username}
           </Typography>
         </Box>
-        {!isSubscribed && <Button onClick={onSubscribe}>Subscribe</Button>}
-        {isSubscribed && <Button color="secondary">Subscribed</Button>}
+        {isYou && (
+          <Button color="secondary" active={false}>
+            This is you
+          </Button>
+        )}
+        {!isSubscribed && !isYou && (
+          <Button
+            onClick={() => {
+              onSubscribe(user._id);
+            }}
+          >
+            Subscribe
+          </Button>
+        )}
+        {isSubscribed && !isYou && (
+          <Button color="secondary">Subscribed</Button>
+        )}
       </Flexbox>
     );
   });

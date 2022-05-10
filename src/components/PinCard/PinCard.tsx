@@ -130,7 +130,7 @@ export default function PinCard({
 
           <Button
             className={`pin__save-btn`}
-            onClick={(e: Event) => {
+            onClick={(e: any) => {
               e.preventDefault();
               onSavePin(pinId);
             }}
@@ -204,6 +204,7 @@ export default function PinCard({
           src={imgSrc}
           overlayContent={overlayContent}
           maxHeight="500px"
+          minHeight="120px"
         />
       </Link>
       {showInfo && (
