@@ -2,17 +2,17 @@ import { AxiosResponse } from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaCross, FaWindowClose } from "react-icons/fa";
-import Avatar from "../../../../components/Avatar/Avatar";
-import Box from "../../../../components/Box/Box";
-import Button from "../../../../components/Button/Button";
-import Card from "../../../../components/Card/Card";
-import Flexbox from "../../../../components/Flexbox/Flexbox";
-import RoundButton from "../../../../components/RoundButton/RoundButton";
-import Toolbar from "../../../../components/Toolbar/Toolbar";
-import Typography from "../../../../components/Typgoraphy/Typography";
-import { UserData } from "../../../../services/responses/responses";
-import { getUser } from "../../../../services/UserService";
-import UserContext from "../../../../store/userContext";
+import Avatar from "../Avatar/Avatar";
+import Box from "../Box/Box";
+import Button from "../Button/Button";
+import Card from "../Card/Card";
+import Flexbox from "../Flexbox/Flexbox";
+import RoundButton from "../RoundButton/RoundButton";
+import Toolbar from "../Toolbar/Toolbar";
+import Typography from "../Typgoraphy/Typography";
+import { UserData } from "../../services/responses/responses";
+import { getUser } from "../../services/UserService";
+import UserContext from "../../store/userContext";
 
 import "./UsersPopup.scss";
 
@@ -29,7 +29,7 @@ export default function UsersPopup({
   onClose,
   onSubscribe,
 }: UsersPopupProps) {
-  const { _id: currentUserId } = useContext(UserContext);
+  const { _id: currentUserId, isAuth } = useContext(UserContext);
 
   const [amountLoaded, setAmountLoaded] = useState(20);
   const [users, setUsers] = useState<UserData[]>([]);
@@ -74,7 +74,7 @@ export default function UsersPopup({
             This is you
           </Button>
         )}
-        {!isSubscribed && !isYou && (
+        {!isSubscribed && !isYou && isAuth && (
           <Button
             onClick={() => {
               onSubscribe(user._id);
@@ -83,7 +83,7 @@ export default function UsersPopup({
             Subscribe
           </Button>
         )}
-        {isSubscribed && !isYou && (
+        {isSubscribed && !isYou && isAuth && (
           <Button color="secondary">Subscribed</Button>
         )}
       </Flexbox>

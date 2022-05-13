@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import Box from "../../../../components/Box/Box";
-import Button from "../../../../components/Button/Button";
-import Card from "../../../../components/Card/Card";
-import Flexbox from "../../../../components/Flexbox/Flexbox";
-import Input from "../../../../components/Input";
-import Typography from "../../../../components/Typgoraphy/Typography";
-import { getPin } from "../../../../services/PinService";
-import { UpdatePinDto } from "../../../../services/dto/update-pin.dto";
-import { BoardData, PinData } from "../../../../services/responses/responses";
-import UserContext from "../../../../store/userContext";
-import ResponsiveImage from "../../../../components/ResponsiveImage/ResponsiveImage";
-import { getStaticImage } from "../../../../services/FileService";
+import Box from "../Box/Box";
+import Button from "../Button/Button";
+import Card from "../Card/Card";
+import Flexbox from "../Flexbox/Flexbox";
+import Input from "../Input";
+import Typography from "../Typgoraphy/Typography";
+import { getPin } from "../../services/PinService";
+import { UpdatePinDto } from "../../services/dto/update-pin.dto";
+import { BoardData, PinData } from "../../services/responses/responses";
+import UserContext from "../../store/userContext";
+import ResponsiveImage from "../ResponsiveImage/ResponsiveImage";
+import { getStaticImage } from "../../services/FileService";
 import { FiArrowDown } from "react-icons/fi";
-import Dropdown from "../../../../components/Dropdown";
-import InputSearch from "../../../../components/InputSearch/InputSearch";
+import Dropdown from "../Dropdown";
+import InputSearch from "../InputSearch/InputSearch";
 
 import "./EditPinPopup.scss";
 import EditPopup from "../EditPopup/EditPopup";
@@ -29,6 +29,7 @@ interface EditPinPopupProps {
     newBoardId: string,
     createBoardTitle?: string
   ) => void;
+  isSaver?: boolean;
 }
 
 interface BoardsSelectionPropertyProps {
@@ -176,6 +177,7 @@ export default function EditPinPopup({
   onClose,
   onDelete,
   onUpdate,
+  isSaver = false,
 }: EditPinPopupProps) {
   const { userBoards } = useContext(UserContext);
 
@@ -228,9 +230,9 @@ export default function EditPinPopup({
   if (!pinData) return <div>whoops</div>;
   const mainContent = (
     <>
-      <Flexbox>
+      <Flexbox alignItems="flex-start">
         <Box width="583px" margin="0px 16px 0px 16px">
-          <Flexbox flexDirection="column">
+          <Flexbox flexDirection="column" alignItems="flex-start">
             <BoardsSelectionProperty
               label="Board"
               value={savedOnBoardName}
@@ -240,24 +242,29 @@ export default function EditPinPopup({
               boards={userBoards}
               onCreate={handleCreateTemporaryBoard}
             />
-            <TextProperty
-              label="Title"
-              value={titleValue}
-              onInput={(event: any) => {
-                setTitleValue(event.target.value);
-              }}
-            />
-            <TextProperty
-              label="Description"
-              value={contentValue}
-              onInput={(event: any) => {
-                setContentValue(event.target.value);
-              }}
-            />
+            {!isSaver && (
+              <>
+                {" "}
+                <TextProperty
+                  label="Title"
+                  value={titleValue}
+                  onInput={(event: any) => {
+                    setTitleValue(event.target.value);
+                  }}
+                />
+                <TextProperty
+                  label="Description"
+                  value={contentValue}
+                  onInput={(event: any) => {
+                    setContentValue(event.target.value);
+                  }}
+                />
+              </>
+            )}
           </Flexbox>
         </Box>
         <Box width="200px" margin="0px 16px 0px 16px">
-          <ResponsiveImage src={imgSrc} />
+          <ResponsiveImage src={imgSrc} maxHeight="500px" />
         </Box>
       </Flexbox>
     </>

@@ -1,10 +1,10 @@
 import React from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import Box from "../../../../components/Box/Box";
-import Card from "../../../../components/Card/Card";
-import Flexbox from "../../../../components/Flexbox/Flexbox";
-import RoundButton from "../../../../components/RoundButton/RoundButton";
-import Typography from "../../../../components/Typgoraphy/Typography";
+import Box from "../Box/Box";
+import Card from "../Card/Card";
+import Flexbox from "../Flexbox/Flexbox";
+import RoundButton from "../RoundButton/RoundButton";
+import Typography from "../Typgoraphy/Typography";
 
 import "./EditPopup.scss";
 

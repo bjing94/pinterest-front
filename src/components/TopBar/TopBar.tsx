@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useRef } from "react";
 import { Col, Grid, Row } from "react-flexbox-grid";
-import { AiFillBell, AiFillMessage } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
-import { FiLogOut } from "react-icons/fi";
 import { IoIosLogOut } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 import { Link, useLocation } from "react-router-dom";
-import { logout } from "../../services/AuthService";
 import UserContext from "../../store/userContext";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
@@ -27,10 +25,21 @@ export default function TopBar({
   onClickRegister,
   onClickLogout,
 }: TopBarProps) {
+  const navigate = useNavigate();
   const location = useLocation();
   const darkGray = " #767676";
   const currUserInfo = useContext(UserContext);
+  const searchRef = useRef<HTMLInputElement>(null);
   const { isAuth, displayId } = currUserInfo;
+
+  const handleSearch = async () => {
+    if (!searchRef.current || searchRef.current.value.length === 0) return;
+
+    console.log("searching");
+
+    const value = searchRef.current.value;
+    navigate(`/search/?q=${value}&random=false`);
+  };
 
   return (
     <div className="top-bar ">
@@ -55,7 +64,16 @@ export default function TopBar({
               </Flexbox>
             </Col>
             <Col xs={true} style={{ flexGrow: 1 }}>
-              <InputSearch placeholder="Search" />
+              <InputSearch
+                placeholder="Search"
+                ref={searchRef}
+                onKeyPress={(ev) => {
+                  if (ev.key === "Enter") {
+                    ev.preventDefault();
+                    handleSearch();
+                  }
+                }}
+              />
             </Col>
             <Col xs={true} style={{ flexGrow: 0 }}>
               {isAuth ? (

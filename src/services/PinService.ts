@@ -68,3 +68,16 @@ export async function deletePin(
       return err.response;
     });
 }
+
+export async function findPins(
+  query: string
+): Promise<AxiosResponse<PinData[] | ErrorData> | undefined> {
+  return axiosInstance
+    .get(`search/pins/${query}`)
+    .then((response: AxiosResponse<PinData[]>) => {
+      return response;
+    })
+    .catch((err: AxiosError) => {
+      return err.response;
+    });
+}

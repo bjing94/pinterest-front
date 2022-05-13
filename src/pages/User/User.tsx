@@ -36,11 +36,11 @@ import BoardCreatePopup from "../../components/BoardCreatePopup";
 import Box from "../../components/Box/Box";
 
 import "./User.scss";
-import UsersPopup from "./components/UsersPopup/UsersPopup";
+import UsersPopup from "../../components/UsersPopup/UsersPopup";
 import UserContext from "../../store/userContext";
-import EditBoardPopup from "./components/EditBoardPopup/EditBoardPopup";
+import EditBoardPopup from "../../components/EditBoardPopup/EditBoardPopup";
 import { deletePin, updatePin } from "../../services/PinService";
-import EditPinPopup from "./components/EditPinPopup/EditPinPopup";
+import EditPinPopup from "../../components/EditPinPopup/EditPinPopup";
 import { UpdatePinDto } from "../../services/dto/update-pin.dto";
 import ErrorPage from "../ErrorPages/ErrorPage";
 import EditUserPopup from "./components/EditUserPopup/EditUserPopup";

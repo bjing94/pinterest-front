@@ -14,6 +14,7 @@ import { BoardData, UserData } from "./services/responses/responses";
 import TextPopup from "./components/TextPopup";
 import { getBoards } from "./services/BoardService";
 import BoardPage from "./pages/BoardPage/BoardPage";
+import Search from "./pages/Search";
 
 function App() {
   const [showAuthPopup, setShowAuthPopup] = useState(false);
@@ -109,6 +110,7 @@ function App() {
           <Route path="/pin/:id" element={<Pin />} />
           <Route path="/user/:id" element={<User />} />
           <Route path="/board/:id" element={<BoardPage />} />
+          <Route path="/search/" element={<Search />} />
         </Routes>
       </div>
     </UserProvider>

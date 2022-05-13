@@ -5,7 +5,7 @@ import Flexbox from "../../../../components/Flexbox/Flexbox";
 import Input from "../../../../components/Input";
 import { UpdateUserDto } from "../../../../services/dto/update-user.dto";
 import { UserData } from "../../../../services/responses/responses";
-import EditPopup from "../EditPopup/EditPopup";
+import EditPopup from "../../../../components/EditPopup/EditPopup";
 
 interface TextPropertyProps {
   label: string;

@@ -2,25 +2,19 @@ import { AxiosResponse } from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaCross, FaWindowClose } from "react-icons/fa";
-import Avatar from "../../../../components/Avatar/Avatar";
-import Box from "../../../../components/Box/Box";
-import Button from "../../../../components/Button/Button";
-import Card from "../../../../components/Card/Card";
-import Flexbox from "../../../../components/Flexbox/Flexbox";
-import Input from "../../../../components/Input";
-import RoundButton from "../../../../components/RoundButton/RoundButton";
-import Toolbar from "../../../../components/Toolbar/Toolbar";
-import Typography from "../../../../components/Typgoraphy/Typography";
 import {
-  deleteBoard,
   getBoard,
   updateBoard,
-} from "../../../../services/BoardService";
-import { UpdateBoardDto } from "../../../../services/dto/update-board.dto";
-import { BoardData, UserData } from "../../../../services/responses/responses";
-import { getUser } from "../../../../services/UserService";
-import UserContext from "../../../../store/userContext";
+  deleteBoard,
+} from "../../services/BoardService";
 import EditPopup from "../EditPopup/EditPopup";
+import { UpdateBoardDto } from "../../services/dto/update-board.dto";
+import { BoardData } from "../../services/responses/responses";
+import UserContext from "../../store/userContext";
+import Box from "../Box/Box";
+import Button from "../Button/Button";
+import Flexbox from "../Flexbox/Flexbox";
+import Input from "../Input";
 
 import "./EditBoardPopup.scss";
 
