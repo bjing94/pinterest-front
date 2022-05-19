@@ -88,7 +88,6 @@ export default function UserBoardCard({
         );
       } else {
         const errorData = board.data as ErrorData;
-        console.log(errorData.message);
       }
     } else {
       console.log("ERROR!");

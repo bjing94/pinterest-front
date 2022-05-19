@@ -11,7 +11,6 @@ export async function getRandomPins(): Promise<PinData[] | null> {
       return response.data;
     })
     .catch((err: AxiosError) => {
-      console.log(err.response?.data.message);
       return null;
     });
 }

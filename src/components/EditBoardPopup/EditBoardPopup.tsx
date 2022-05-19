@@ -54,7 +54,6 @@ export default function EditBoardPopup({
 
   const handleDeleteBoard = async () => {
     const response = await deleteBoard(boardId);
-    console.log(response);
     if (response?.status === 200) {
       setTextPopup("Board deleted!");
       onClose();

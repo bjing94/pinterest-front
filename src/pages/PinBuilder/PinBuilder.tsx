@@ -109,7 +109,6 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
       return;
     }
 
-    console.log("Pin: ", pinResponse);
     setIsLoading(false);
     setTextPopup("Pin created");
   };
@@ -234,7 +233,6 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
                 setShowCreateBoard(true);
               }}
               onSelect={(boardId: string) => {
-                console.log("Board id", boardId);
                 setBoardId(boardId);
                 setShowBoardsDropdown(!showBoardsDropdown);
               }}

@@ -230,7 +230,6 @@ export default function User() {
         console.log("Error updating board!");
         return;
       }
-      console.log(updatedBoardResponse);
     }
   };
 
@@ -276,8 +275,6 @@ export default function User() {
   useEffect(() => {
     getProfileInfo();
     getCurrentUserInfo();
-    console.log(currentUserId);
-    console.log(isAuth);
   }, []);
 
   useEffect(() => {}, [profileInfo, currentUserInfo]);

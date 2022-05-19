@@ -53,7 +53,6 @@ export default function BoardPage() {
 
   const handleDeletePinFromBoard = async () => {
     if (!id || !editedPinId) {
-      console.log("board", id, "pin", editedPinId);
       return;
     }
 
@@ -146,7 +145,6 @@ export default function BoardPage() {
         userInfo.savedPins.push(id);
         const updateResponse = await updateUser(userInfo._id, userInfo);
         if (updateResponse && updateResponse.status == 200) {
-          console.log("Saved to profile: ", updateResponse.data);
         }
         return;
       }
@@ -167,7 +165,6 @@ export default function BoardPage() {
         console.log("Error updating board!");
         return;
       }
-      console.log(updatedBoardResponse);
     }
   };
 
@@ -180,10 +177,8 @@ export default function BoardPage() {
 
     const boardData = boardResponse.data as BoardData;
     setBoardData(boardData);
-    console.log(boardData);
 
     const userResponse = await getUser(boardData.userId);
-    console.log(userResponse);
     if (!userResponse || userResponse.status !== 200) return;
 
     const userData = userResponse.data as UserData;

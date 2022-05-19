@@ -287,7 +287,6 @@ export default function EditPinPopup({
           </Box>
           <Button
             onClick={() => {
-              console.log(oldBoardId, selectedBoardId, temporaryBoardTitle);
               onUpdate(
                 { title: titleValue, content: contentValue },
                 oldBoardId,

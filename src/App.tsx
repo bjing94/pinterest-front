@@ -27,15 +27,12 @@ function App() {
 
   const getAuthUserInfo = async () => {
     const userResponse = await getCurrentUser();
-    console.log("Current user response: ", userResponse);
     if (!userResponse || userResponse.status !== 200) return;
     const user = userResponse.data as UserData;
     setCurrentUser(user);
 
     const boards = await getBoards(user.boards);
     setCurrentBoards(boards);
-
-    console.log("User", user);
   };
 
   const checkIsAuth = async () => {
@@ -65,7 +62,6 @@ function App() {
     getAuthUserInfo();
     console.log("checking auth");
   }, []);
-  console.log("currentUser?._id", currentUser?._id);
   return (
     <UserProvider
       value={{

@@ -37,9 +37,7 @@ export default function Search() {
 
   const handleSearchPins = async () => {
     const queryString = window.location.search;
-    console.log(queryString);
     const response = await findPins(queryString);
-    console.log(response);
   };
 
   const handleSavePin = async (id: string) => {
@@ -55,7 +53,6 @@ export default function Search() {
         userInfo.savedPins.push(id);
         const updateResponse = await updateUser(userInfo._id, userInfo);
         if (updateResponse && updateResponse.status == 200) {
-          console.log("Saved to profile: ", updateResponse.data);
         }
         return;
       }
@@ -76,7 +73,6 @@ export default function Search() {
         console.log("Error updating board!");
         return;
       }
-      console.log(updatedBoardResponse);
     }
   };
 

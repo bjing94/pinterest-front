@@ -112,7 +112,6 @@ export default function Pin() {
         if (userResponse && userResponse.status == 200) {
           const userData = userResponse.data as UserData;
           setAuthorInfo(userData);
-          console.log("Author", authorInfo, "data: ", userData);
 
           const avatarSrc = await getStaticImage(userData.avatarSrc);
           if (avatarSrc) {
@@ -140,7 +139,6 @@ export default function Pin() {
     if (res) {
       if (res.status == 200) {
         const { _id } = res.data as UserData;
-        console.log(authorInfo, _id);
         if (authorInfo) {
           const subbed =
             authorInfo.subscribers.find((a) => {
@@ -157,12 +155,10 @@ export default function Pin() {
   const checkSaved = async () => {
     const userResponse = await getCurrentUser();
     if (!userResponse || userResponse.status !== 200 || !id) {
-      console.log(userResponse, id);
       return;
     }
     const userData = userResponse.data as UserData;
     const currentBoardsData = await getBoards(userData.boards);
-    console.log("Current boards: ", currentBoardsData);
 
     // check if saved in boards
     for (let i = 0; i < currentBoardsData.length; i++) {
@@ -279,7 +275,6 @@ export default function Pin() {
     }
     newPin.comments.push(commentData._id);
     const updatedResponse = await updatePin(id, newPin);
-    console.log(updatedResponse);
     getPinInfo();
   };
 
@@ -287,7 +282,6 @@ export default function Pin() {
     if (!id) {
       return;
     }
-    console.log("Deleting comment:", commentId);
     const commentResponse = await deleteComment(commentId);
     if (!commentResponse) {
       return;
@@ -320,7 +314,6 @@ export default function Pin() {
     }
     const { _id: currentUserId } = currentUserInfo;
 
-    console.log("Liking comment:", commentId);
     const commentResponse = await getComment(commentId);
     if (!commentResponse || commentResponse.status !== 200) {
       return;
@@ -348,7 +341,6 @@ export default function Pin() {
     }
     const { _id: currentUserId } = currentUserInfo;
 
-    console.log("Useful comment:", commentId);
     const commentResponse = await getComment(commentId);
     if (!commentResponse || commentResponse.status !== 200) {
       return;

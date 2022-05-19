@@ -23,7 +23,6 @@ export async function uploadFile(file: File): Promise<FildeData | null> {
       return response.data;
     })
     .catch((err: AxiosError) => {
-      console.log(err.response?.data.message);
       return null;
     });
 }
@@ -35,14 +34,12 @@ export async function getStaticImage(imgId: string): Promise<string | null> {
       return response.data;
     })
     .catch((err: AxiosError) => {
-      console.log(err.response?.data.message);
       return null;
     });
 
   if (!imgInfo) {
     return null;
   }
-  // console.log(imgInfo.url);
 
   return baseURL + `/${imgInfo.url}`;
 }
@@ -50,13 +47,4 @@ export async function getStaticImage(imgId: string): Promise<string | null> {
 export async function downloadStaticImage(imgId: string) {
   const link = axiosInstance.defaults.baseURL + "files/download/" + imgId;
   return link;
-  // return axiosInstance
-  //   .get(`files/download/${imgId}`)
-  //   .then((response: AxiosResponse<FildeData>) => {
-  //     return response;
-  //   })
-  //   .catch((err: AxiosError) => {
-  //     console.log(err.response?.data.message);
-  //     return null;
-  //   });
 }

@@ -47,7 +47,7 @@ export default function Home() {
         userInfo.savedPins.push(id);
         const updateResponse = await updateUser(userInfo._id, userInfo);
         if (updateResponse && updateResponse.status == 200) {
-          console.log("Saved to profile: ", updateResponse.data);
+          console.log("Saved to profile: ");
         }
         return;
       }
@@ -68,7 +68,6 @@ export default function Home() {
         console.log("Error updating board!");
         return;
       }
-      console.log(updatedBoardResponse);
     }
   };
 

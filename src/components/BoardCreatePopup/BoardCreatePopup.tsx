@@ -57,7 +57,6 @@ export default function BoardCreatePopup({
       return;
     } else {
       const board = newBoard.data as BoardData;
-      console.log(board);
       onClose();
     }
   };

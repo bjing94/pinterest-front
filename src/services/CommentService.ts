@@ -9,11 +9,9 @@ export async function createComment(
   return axiosInstance
     .post(`/comment/create`, dto)
     .then((response: AxiosResponse<CommentData>) => {
-      console.log(response);
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
-      console.log(error.response);
       return error.response;
     });
 }

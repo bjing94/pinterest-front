@@ -51,11 +51,9 @@ export async function updateUser(
   return axiosInstance
     .patch(`user/${userId}`, dto)
     .then((response: AxiosResponse<UserData>) => {
-      console.log(response);
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
-      console.log(error);
       return error.response;
     });
 }
