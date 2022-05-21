@@ -1,14 +1,8 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { response } from "express";
-import { axiosInstance, baseURL } from "./axiosInstance";
+import { axiosInstance, baseURL, frontURL } from "./axiosInstance";
 import { CreatePinDto, CreateUserDto } from "./dto/create-pin.dto";
-import {
-  BoardData,
-  ErrorData,
-  FildeData,
-  PinData,
-  UserData,
-} from "./responses/responses";
+import { FildeData } from "./responses/responses";
 
 export async function uploadFile(file: File): Promise<FildeData | null> {
   const bodyFormData = new FormData();
@@ -41,7 +35,8 @@ export async function getStaticImage(imgId: string): Promise<string | null> {
     return null;
   }
 
-  return baseURL + `/${imgInfo.url}`;
+  return frontURL + "/images" + `/${imgInfo.url}`; // 12-05-2022/img5.jpg
+  // it is rerouted by nginx to /var/www/ivan-dev/images/12-05-2022/img5.jpg
 }
 
 export async function downloadStaticImage(imgId: string) {
