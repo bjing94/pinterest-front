@@ -5,14 +5,17 @@ import { UpdatePinDto } from "./dto/update-pin.dto";
 import { ErrorData, PinData } from "./responses/responses";
 
 export async function getRandomPins(): Promise<PinData[] | null> {
-  return axiosInstance
+  const res = await axiosInstance
     .get(`search/pins?random=true`)
     .then((response: AxiosResponse<PinData[]>) => {
       return response.data;
     })
     .catch((err: AxiosError) => {
+      console.log(err.response);
       return null;
     });
+  console.log(axiosInstance.defaults);
+  return res;
 }
 
 export async function getPin(
@@ -24,6 +27,7 @@ export async function getPin(
       return response;
     })
     .catch((err: AxiosError) => {
+      console.log(err.response);
       return err.response;
     });
 }
@@ -37,6 +41,7 @@ export async function createPin(
       return response;
     })
     .catch((err: AxiosError) => {
+      console.log(err.response);
       return err.response;
     });
 }
@@ -51,6 +56,7 @@ export async function updatePin(
       return response;
     })
     .catch((err: AxiosError) => {
+      console.log(err.response);
       return err.response;
     });
 }
@@ -64,6 +70,7 @@ export async function deletePin(
       return response;
     })
     .catch((err: AxiosError) => {
+      console.log(err.response);
       return err.response;
     });
 }
@@ -77,6 +84,7 @@ export async function findPins(
       return response;
     })
     .catch((err: AxiosError) => {
+      console.log(err.response);
       return err.response;
     });
 }

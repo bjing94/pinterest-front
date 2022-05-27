@@ -59,12 +59,22 @@ export default function PinCard({
     if (pinId) {
       const pinResponse = await getPin(pinId);
       if (!pinResponse || pinResponse.status !== 200) {
+        setTextPopup(`error getting pins!`);
+        console.log(pinResponse);
         return;
       }
 
       const pinInfo = pinResponse.data as PinData;
       if (pinInfo) {
-        setUser(pinInfo.username);
+        const pinUser = await getUser(pinInfo.userId);
+
+        if (!pinUser || pinUser.status !== 200) {
+          console.log(pinUser);
+          return;
+        }
+
+        setUser((pinUser.data as UserData).username);
+
         setTitle(pinInfo.title);
 
         const link = await getStaticImage(pinInfo.imgId);
@@ -78,6 +88,9 @@ export default function PinCard({
           setAvatarId(userData.avatarSrc);
           setUserDisplayId(userData.displayId);
         }
+      } else {
+        setTextPopup(`wrong type of data!`);
+        console.log(pinResponse.data);
       }
     }
   };
@@ -107,7 +120,13 @@ export default function PinCard({
       style={{ height: "100%" }}
     >
       {isAuth && (
-        <Flexbox fluid justifyContent="space-between">
+        <Flexbox
+          fluid
+          justifyContent="space-between"
+          onClick={() => {
+            setTextPopup("Clicked!");
+          }}
+        >
           <DropdownBoards
             boardIds={boards}
             onClickCreateBoard={() => {
@@ -131,6 +150,7 @@ export default function PinCard({
           <Button
             className={`pin__save-btn`}
             onClick={(e: any) => {
+              e.stopPropagation();
               e.preventDefault();
               onSavePin(pinId);
             }}
@@ -189,9 +209,10 @@ export default function PinCard({
     avatarId !== undefined &&
     userDisplayId !== undefined;
   if (!isLoaded) {
+    console.log("not loaded:", { imgSrc, user, avatarId, userDisplayId });
     return <div></div>;
   }
-
+  console.log("loaded:", isLoaded, { imgSrc, user, avatarId, userDisplayId });
   return (
     <div
       className="user-pin-card__container"

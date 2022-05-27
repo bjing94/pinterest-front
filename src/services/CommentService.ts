@@ -12,6 +12,7 @@ export async function createComment(
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
+      console.log(error.response);
       return error.response;
     });
 }
@@ -26,6 +27,7 @@ export async function updateComment(
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
+      console.log(error.response);
       return error.response;
     });
 }
@@ -39,6 +41,7 @@ export async function getComment(
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
+      console.log(error.response);
       return error.response;
     });
 }
@@ -52,6 +55,7 @@ export async function deleteComment(
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
+      console.log(error.response);
       return error.response;
     });
 }

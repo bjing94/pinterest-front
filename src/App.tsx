@@ -23,6 +23,8 @@ function App() {
   const [currentUser, setCurrentUser] = useState<UserData | null>();
   const [textPopupMsg, setTextPopupMsg] = useState<string>("");
   const [textPopupTimer, setTextPopupTimer] = useState<number>();
+  const [errorPopupMsg, setErrorPopupMsg] = useState<string>("");
+  const [errorPopupTimer, setErrorPopupTimer] = useState<number>();
   const [currentBoards, setCurrentBoards] = useState<BoardData[] | null>(null);
 
   const getAuthUserInfo = async () => {
@@ -52,6 +54,18 @@ function App() {
     setTextPopupTimer(timer);
   };
 
+  const handleSetErrorPopup = async (msg: string) => {
+    if (errorPopupTimer) {
+      clearTimeout(errorPopupTimer);
+    }
+    setErrorPopupMsg(msg);
+    const timer: number = window.setTimeout(() => {
+      setTextPopupMsg("");
+    }, 2000);
+
+    setErrorPopupTimer(timer);
+  };
+
   const handleLogout = async () => {
     await logout();
     window.location.reload();
@@ -69,6 +83,7 @@ function App() {
         _id: currentUser?._id || "",
         displayId: currentUser?.displayId || "",
         setTextPopup: handleSetTextPopup,
+        setErrorPopup: handleSetErrorPopup,
         updateUserInfo: getAuthUserInfo,
         userBoards: currentBoards || [],
         currentSavedPins: currentUser?.savedPins || [],
@@ -85,6 +100,7 @@ function App() {
           onClickLogout={handleLogout}
         />
         {textPopupMsg && <TextPopup>{textPopupMsg}</TextPopup>}
+        {errorPopupMsg && <TextPopup type="error">{errorPopupMsg}</TextPopup>}
         {showAuthPopup && (
           <AuthPopup
             onClose={() => {
@@ -106,7 +122,7 @@ function App() {
           <Route path="/pin/:id" element={<Pin />} />
           <Route path="/user/:id" element={<User />} />
           <Route path="/board/:id" element={<BoardPage />} />
-          <Route path="/search/" element={<Search />} />
+          <Route path="/search" element={<Search />} />
         </Routes>
       </div>
     </UserProvider>

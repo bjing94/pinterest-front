@@ -1,17 +1,15 @@
 export interface CreatePinDto {
   title: string;
 
-  username: string;
-
   userId: string;
+
+  boardId: string;
 
   imgId: string;
 
   content: string;
 
   comments?: string[];
-
-  boardId: string;
 }
 
 export interface CreateUserDto {

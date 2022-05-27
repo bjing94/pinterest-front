@@ -30,6 +30,8 @@ import {
   createBoard,
   getBoard,
   getBoards,
+  savePinToBoard,
+  savePinToProfile,
   updateBoard,
 } from "../../services/BoardService";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
@@ -57,8 +59,10 @@ const breakpointColumnsObj = {
 
 export default function User() {
   const { id: displayId } = useParams();
+
   const {
     setTextPopup,
+    setErrorPopup,
     userBoards,
     _id: currentUserId,
     isAuth,
@@ -214,23 +218,28 @@ export default function User() {
 
     const response = await getCurrentUser();
     if (response && response.status == 200) {
-      const boardResponse = await getBoard(boardId);
-      if (!boardResponse || boardResponse.status !== 200) {
-        console.log("Error finding board!");
+      if (!boardId) {
+        const userInfo = response.data as UserData;
+        savePinToProfile(pindId, userInfo)
+          .then(() => {
+            setTextPopup("Pin saved to profile!");
+          })
+          .catch((err: string) => {
+            setErrorPopup(err);
+          });
         return;
       }
-      const newBoard = boardResponse.data as BoardData;
-      newBoard.pins.push(pindId);
 
-      const updatedBoardResponse = await updateBoard(boardId, {
-        pins: newBoard.pins,
-        title: newBoard.title,
-      });
-      if (!updatedBoardResponse || updatedBoardResponse.status !== 200) {
-        console.log("Error updating board!");
-        return;
-      }
+      savePinToBoard(pindId, boardId)
+        .then(() => {
+          setTextPopup("Pin saved to board!");
+        })
+        .catch((err) => {
+          setErrorPopup(err);
+        });
     }
+
+    return;
   };
 
   const getCurrentUserInfo = async () => {
@@ -261,7 +270,7 @@ export default function User() {
           await checkSubscribed();
 
           const staticSrc = await getStaticImage(user.avatarSrc);
-          setAvatar(staticSrc ?? "");
+          setAvatar(staticSrc ?? "https://via.placeholder.com/128.jpg");
           setIsLoading(false);
         } else {
           setIsLoading(false);

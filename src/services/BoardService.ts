@@ -2,7 +2,8 @@ import { AxiosError, AxiosResponse } from "axios";
 import { axiosInstance } from "./axiosInstance";
 import { CreateBoardDto } from "./dto/create-board.dto";
 import { UpdateBoardDto } from "./dto/update-board.dto";
-import { BoardData, ErrorData } from "./responses/responses";
+import { BoardData, ErrorData, UserData } from "./responses/responses";
+import { updateUser } from "./UserService";
 
 export async function getBoard(
   id: string
@@ -13,6 +14,7 @@ export async function getBoard(
       return response;
     })
     .catch((err: AxiosError<ErrorData>) => {
+      console.log(err.response);
       return err.response;
     });
 }
@@ -44,6 +46,7 @@ export async function createBoard(dto: CreateBoardDto) {
       return response;
     })
     .catch((err: AxiosError<ErrorData>) => {
+      console.log(err.response);
       return err.response;
     });
 }
@@ -55,6 +58,7 @@ export async function updateBoard(id: string, dto: UpdateBoardDto) {
       return response;
     })
     .catch((err: AxiosError<ErrorData>) => {
+      console.log(err.response);
       return err.response;
     });
 }
@@ -66,6 +70,37 @@ export async function deleteBoard(id: string) {
       return response;
     })
     .catch((err: AxiosError<ErrorData>) => {
+      console.log(err.response);
       return err.response;
     });
+}
+
+export async function savePinToBoard(pinId: string, boardId: string) {
+  if (!pinId) {
+    return;
+  }
+
+  const boardResponse = await getBoard(boardId);
+  if (!boardResponse || boardResponse.status !== 200) {
+    throw new Error("Error finding board!");
+  }
+  const newBoard = boardResponse.data as BoardData;
+  newBoard.pins.push(pinId);
+
+  const updatedBoardResponse = await updateBoard(boardId, {
+    pins: newBoard.pins,
+    title: newBoard.title,
+  });
+  if (!updatedBoardResponse || updatedBoardResponse.status !== 200) {
+    throw new Error("Error updating board!");
+  }
+}
+
+export async function savePinToProfile(pinId: string, user: UserData) {
+  user.savedPins.push(pinId);
+  const updateResponse = await updateUser(user._id, user);
+  if (!updateResponse || updateResponse.status !== 200) {
+    throw new Error("Error saving pin!");
+  }
+  return;
 }

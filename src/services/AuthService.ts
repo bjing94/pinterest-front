@@ -6,36 +6,21 @@ import { ErrorData, UserData } from "./responses/responses";
 export async function login(dto: {
   email: string;
   password: string;
-}): Promise<
-  | AxiosResponse<
-      | { message: string }
-      | { statusCode: number; message: string; error: string }
-    >
-  | undefined
-> {
+}): Promise<AxiosResponse<{ message: string } | ErrorData> | undefined> {
   return axiosInstance
     .post(`auth/login`, dto)
     .then((response: AxiosResponse<{ message: string }>) => {
       return response;
     })
-    .catch(
-      (
-        err: AxiosError<{ statusCode: number; message: string; error: string }>
-      ) => {
-        return err.response;
-      }
-    );
+    .catch((err: AxiosError<ErrorData>) => {
+      console.log(err.response);
+      return err.response;
+    });
 }
 
 export async function register(
   dto: CreateUserDto
-): Promise<
-  | AxiosResponse<
-      | { message: string }
-      | { statusCode: number; message: string; error: string }
-    >
-  | undefined
-> {
+): Promise<AxiosResponse<{ message: string } | ErrorData> | undefined> {
   return axiosInstance
     .post(`auth/register`, dto)
     .then((response: AxiosResponse<{ message: string }>) => {
@@ -45,6 +30,7 @@ export async function register(
       (
         err: AxiosError<{ statusCode: number; message: string; error: string }>
       ) => {
+        console.log(err.response);
         return err.response;
       }
     );
@@ -57,6 +43,7 @@ export async function logout() {
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
+      console.log(error.response);
       return error.response;
     });
 }
@@ -70,6 +57,7 @@ export async function getCurrentUser(): Promise<
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
+      console.log(error.response);
       return error.response;
     });
 }

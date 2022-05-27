@@ -28,9 +28,9 @@ export default function Button({
       className={`btn ${className} ${
         active ? "" : "inactive"
       } ${color} ${variant}`}
-      onClick={() => {
+      onClick={(event) => {
         if (active) {
-          onClick();
+          onClick(event);
         }
       }}
       style={style}

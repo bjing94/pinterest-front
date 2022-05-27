@@ -12,7 +12,12 @@ import Typography from "../../components/Typgoraphy/Typography";
 import UsersPopup from "../../components/UsersPopup/UsersPopup";
 import copyCurrentUrl from "../../helpers/copyCurrentUrl";
 import { checkLogin, getCurrentUser } from "../../services/AuthService";
-import { getBoard, updateBoard } from "../../services/BoardService";
+import {
+  getBoard,
+  savePinToBoard,
+  savePinToProfile,
+  updateBoard,
+} from "../../services/BoardService";
 import { UpdatePinDto } from "../../services/dto/update-pin.dto";
 import { BoardData, UserData } from "../../services/responses/responses";
 import { getUser, subscribe, updateUser } from "../../services/UserService";
@@ -38,6 +43,7 @@ export default function BoardPage() {
     userBoards,
     currentSavedPins,
     setTextPopup,
+    setErrorPopup,
     _id: currentUserId,
   } = useContext(UserContext);
 
@@ -140,32 +146,27 @@ export default function BoardPage() {
     const response = await getCurrentUser();
     if (response && response.status == 200) {
       if (!boardId) {
-        // save to profile
         const userInfo = response.data as UserData;
-        userInfo.savedPins.push(id);
-        const updateResponse = await updateUser(userInfo._id, userInfo);
-        if (updateResponse && updateResponse.status == 200) {
-        }
+        savePinToProfile(id, userInfo)
+          .then(() => {
+            setTextPopup("Pin saved to profile!");
+          })
+          .catch((err: string) => {
+            setErrorPopup(err);
+          });
         return;
       }
 
-      const boardResponse = await getBoard(boardId);
-      if (!boardResponse || boardResponse.status !== 200) {
-        console.log("Error finding board!");
-        return;
-      }
-      const newBoard = boardResponse.data as BoardData;
-      newBoard.pins.push(id);
-
-      const updatedBoardResponse = await updateBoard(boardId, {
-        pins: newBoard.pins,
-        title: newBoard.title,
-      });
-      if (!updatedBoardResponse || updatedBoardResponse.status !== 200) {
-        console.log("Error updating board!");
-        return;
-      }
+      savePinToBoard(id, boardId)
+        .then(() => {
+          setTextPopup("Pin saved to board!");
+        })
+        .catch((err) => {
+          setErrorPopup(err);
+        });
     }
+
+    return;
   };
 
   const getBoardInfo = async () => {

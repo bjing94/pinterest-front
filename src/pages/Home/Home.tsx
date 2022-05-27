@@ -8,7 +8,12 @@ import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import { getCurrentUser } from "../../services/AuthService";
-import { getBoard, updateBoard } from "../../services/BoardService";
+import {
+  getBoard,
+  savePinToBoard,
+  savePinToProfile,
+  updateBoard,
+} from "../../services/BoardService";
 import { getRandomPins } from "../../services/PinService";
 import { BoardData, UserData } from "../../services/responses/responses";
 import { updateUser } from "../../services/UserService";
@@ -27,7 +32,14 @@ const breakpointColumnsObj = {
 };
 
 export default function Home() {
-  const { isAuth, userBoards, currentSavedPins } = useContext(UserContext);
+  const {
+    isAuth,
+    setTextPopup,
+    setErrorPopup,
+    userBoards,
+    currentSavedPins,
+    updateUserInfo,
+  } = useContext(UserContext);
 
   const [pinsIds, setPinIds] = useState<string[]>([]);
   const [boardId, setBoardId] = useState<string>();
@@ -42,44 +54,43 @@ export default function Home() {
     const response = await getCurrentUser();
     if (response && response.status == 200) {
       if (!boardId) {
-        // save to profile
         const userInfo = response.data as UserData;
-        userInfo.savedPins.push(id);
-        const updateResponse = await updateUser(userInfo._id, userInfo);
-        if (updateResponse && updateResponse.status == 200) {
-          console.log("Saved to profile: ");
-        }
+        savePinToProfile(id, userInfo)
+          .then(() => {
+            setTextPopup("Pin saved to profile!");
+          })
+          .catch((err: string) => {
+            setErrorPopup(err);
+          });
+
         return;
       }
 
-      const boardResponse = await getBoard(boardId);
-      if (!boardResponse || boardResponse.status !== 200) {
-        console.log("Error finding board!");
-        return;
-      }
-      const newBoard = boardResponse.data as BoardData;
-      newBoard.pins.push(id);
-
-      const updatedBoardResponse = await updateBoard(boardId, {
-        pins: newBoard.pins,
-        title: newBoard.title,
-      });
-      if (!updatedBoardResponse || updatedBoardResponse.status !== 200) {
-        console.log("Error updating board!");
-        return;
-      }
+      savePinToBoard(id, boardId)
+        .then(() => {
+          setTextPopup("Pin saved to board!");
+        })
+        .catch((err) => {
+          setErrorPopup(err);
+        });
     }
+
+    return;
   };
 
   const getPins = async () => {
     const data = await getRandomPins();
-    if (data) {
-      setPinIds(
-        data.map((pin) => {
-          return pin._id;
-        })
-      );
+
+    if (!data) {
+      throw "No pins on the server!";
     }
+
+    console.log("Got pins: ", data);
+    setPinIds(
+      data.map((pin) => {
+        return pin._id;
+      })
+    );
   };
 
   useEffect(() => {
@@ -109,7 +120,9 @@ export default function Home() {
             setBoardId(boardId);
           }}
           onSavePin={(pinId) => {
-            handleSavePin(pinId);
+            handleSavePin(pinId).then(() => {
+              updateUserInfo();
+            });
           }}
           onShowCreateBoard={() => {
             setShowCreateBoard(true);

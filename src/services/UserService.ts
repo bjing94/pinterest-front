@@ -14,6 +14,21 @@ export async function subscribe(
       return response;
     })
     .catch((err: AxiosError<ErrorData>) => {
+      console.log(err.response);
+      return err.response;
+    });
+}
+
+export async function unsubscribe(
+  userId: string
+): Promise<AxiosResponse<UserData | ErrorData> | undefined> {
+  return axiosInstance
+    .post(`user/unsubscribe/${userId}`)
+    .then((response: AxiosResponse<UserData>) => {
+      return response;
+    })
+    .catch((err: AxiosError<ErrorData>) => {
+      console.log(err.response);
       return err.response;
     });
 }
@@ -27,6 +42,7 @@ export async function getUser(
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
+      console.log(error.response);
       return error.response;
     });
 }
@@ -40,6 +56,7 @@ export async function findUser(
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
+      console.log(error.response);
       return error.response;
     });
 }
@@ -54,6 +71,7 @@ export async function updateUser(
       return response;
     })
     .catch((error: AxiosError<ErrorData>) => {
+      console.log(error.response);
       return error.response;
     });
 }

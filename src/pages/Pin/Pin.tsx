@@ -24,7 +24,12 @@ import {
   PinData,
   UserData,
 } from "../../services/responses/responses";
-import { getUser, subscribe, updateUser } from "../../services/UserService";
+import {
+  getUser,
+  subscribe,
+  unsubscribe,
+  updateUser,
+} from "../../services/UserService";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import {
   createComment,
@@ -34,7 +39,13 @@ import {
 } from "../../services/CommentService";
 import Dropdown from "../../components/Dropdown";
 import DropdownBoards from "../../components/DropdownBoards/DropdownBoards";
-import { getBoard, getBoards, updateBoard } from "../../services/BoardService";
+import {
+  getBoard,
+  getBoards,
+  savePinToBoard,
+  savePinToProfile,
+  updateBoard,
+} from "../../services/BoardService";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
 import UserContext from "../../store/userContext";
 import ErrorPage from "../ErrorPages/ErrorPage";
@@ -42,7 +53,7 @@ import LoadingPage from "../LoadingPage/LoadingPage";
 
 export default function Pin() {
   const { id } = useParams();
-  const { setTextPopup } = useContext(UserContext);
+  const { setTextPopup, setErrorPopup } = useContext(UserContext);
 
   // Current user information
   const [boardId, setBoardId] = useState<string | undefined>(undefined);
@@ -55,6 +66,7 @@ export default function Pin() {
 
   // Author information
   const [authorInfo, setAuthorInfo] = useState<UserData | undefined>(undefined);
+  const [authorId, setAuthorId] = useState<string | undefined>(undefined);
   const [avatarId, setAvatarId] = useState("");
 
   // Pin information
@@ -95,6 +107,22 @@ export default function Pin() {
     });
   };
 
+  const getAuthorInfo = async () => {
+    if (!authorInfo?._id) {
+      setErrorPopup("Error loading author data!");
+      return;
+    }
+    const userResponse = await getUser(authorInfo._id);
+    if (userResponse && userResponse.status == 200) {
+      const userData = userResponse.data as UserData;
+      setAuthorInfo(userData);
+
+      const avatarSrc = await getStaticImage(userData.avatarSrc);
+      if (avatarSrc) {
+        setAvatarId(avatarSrc);
+      }
+    }
+  };
   const getPinInfo = async () => {
     if (id) {
       const pinResponse = await getPin(id);
@@ -107,7 +135,6 @@ export default function Pin() {
         setDescription(pinInfo.content);
         setTitle(pinInfo.title);
         setComments(pinInfo.comments ?? []);
-
         const userResponse = await getUser(pinInfo.userId);
         if (userResponse && userResponse.status == 200) {
           const userData = userResponse.data as UserData;
@@ -118,7 +145,6 @@ export default function Pin() {
             setAvatarId(avatarSrc);
           }
         }
-
         downloadStaticImage(pinInfo.imgId).then((res: string) => {
           setDownloadLink(res);
         });
@@ -184,9 +210,20 @@ export default function Pin() {
     }
 
     if (isAuth) {
-      await subscribe(authorInfo._id);
+      if (!isSubscribed) {
+        await subscribe(authorInfo._id);
+        setTextPopup("Subscribed!");
+        await getAuthorInfo();
+        return;
+      }
+      if (isSubscribed) {
+        await unsubscribe(authorInfo._id);
+        setTextPopup("Unsubscribed!");
+        await getAuthorInfo();
+        return;
+      }
     } else {
-      console.log("Not authenticated!");
+      setErrorPopup("Not authenticated!");
     }
   };
 
@@ -198,7 +235,7 @@ export default function Pin() {
         setTextPopup("Copied to clipboard.");
       })
       .catch(() => {
-        console.log("Didn't copy!");
+        setErrorPopup("Didn't copy!");
       });
   };
 
@@ -210,35 +247,27 @@ export default function Pin() {
     const response = await getCurrentUser();
     if (response && response.status == 200) {
       if (!boardId) {
-        console.log("Saving to profile: ");
-        // save to profile
         const userInfo = response.data as UserData;
-        userInfo.savedPins.push(id);
-        const updateResponse = await updateUser(userInfo._id, userInfo);
-        if (updateResponse && updateResponse.status == 200) {
-          console.log("Saved to profile: ", updateResponse.data);
-        }
+        savePinToProfile(id, userInfo)
+          .then(() => {
+            setTextPopup("Pin saved to profile!");
+          })
+          .catch((err: string) => {
+            setErrorPopup(err);
+          });
         return;
       }
 
-      const boardResponse = await getBoard(boardId);
-      if (!boardResponse || boardResponse.status !== 200) {
-        console.log("Error finding board!");
-        return;
-      }
-      const newBoard = boardResponse.data as BoardData;
-      newBoard.pins.push(id);
-
-      const updatedBoardResponse = await updateBoard(boardId, {
-        pins: newBoard.pins,
-        title: newBoard.title,
-      });
-      if (!updatedBoardResponse || updatedBoardResponse.status !== 200) {
-        console.log("Error updating board!");
-        return;
-      }
-      console.log(updatedBoardResponse);
+      savePinToBoard(id, boardId)
+        .then(() => {
+          setTextPopup("Pin saved to board!");
+        })
+        .catch((err) => {
+          setErrorPopup(err);
+        });
     }
+
+    return;
   };
 
   const handleCreateComment = async (content: string) => {
@@ -258,14 +287,14 @@ export default function Pin() {
       content: content,
     });
     if (!commentResponse || commentResponse.status !== 201) {
-      console.log("Comment wasnt created");
+      setErrorPopup("Comment wasnt created");
       return;
     }
     const commentData = commentResponse.data as CommentData;
 
     const pinResponse = await getPin(id);
     if (!pinResponse || pinResponse.status !== 200) {
-      console.log("Pin not  found");
+      setErrorPopup("Pin not  found");
       return;
     }
 
@@ -274,7 +303,7 @@ export default function Pin() {
       return;
     }
     newPin.comments.push(commentData._id);
-    const updatedResponse = await updatePin(id, newPin);
+    const updatedResponse = await updatePin(id, { comments: newPin.comments });
     getPinInfo();
   };
 
@@ -299,7 +328,7 @@ export default function Pin() {
     newPin.comments = newPin.comments.filter((id) => {
       return id != commentId;
     });
-    await updatePin(id, newPin);
+    await updatePin(id, { comments: newPin.comments });
     getPinInfo();
   };
 

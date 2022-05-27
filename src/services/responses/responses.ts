@@ -5,7 +5,7 @@ export interface PinData extends CreatePinDto {
   _v: string;
 }
 
-export interface FildeData {
+export interface FileData {
   _id: string;
   _v: string;
   fileName: string;

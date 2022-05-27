@@ -1,3 +1,5 @@
+@import "/src/styles/colors";
+
 .text-popup {
   position: fixed;
   z-index: 2;
@@ -10,11 +12,24 @@
     min-height: max-content;
     min-width: max-content;
     width: fit-content;
+  }
+
+  animation: slideUp 0.5s;
+
+  &.info .card-container {
     background-color: black;
     color: white;
   }
 
-  animation: slideUp 0.5s;
+  &.error .card-container {
+    background-color: $red;
+    color: white;
+  }
+
+  &.warning .card-container {
+    background-color: $warning;
+    color: white;
+  }
 }
 
 @keyframes slideUp {

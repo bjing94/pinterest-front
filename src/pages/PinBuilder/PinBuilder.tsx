@@ -15,6 +15,7 @@ import ProfileInfo from "../../components/ProfileInfo/ProfileInfo";
 import {
   BoardData,
   ErrorData,
+  FileData,
   UserData,
 } from "../../services/responses/responses";
 import { getCurrentUser } from "../../services/AuthService";
@@ -78,19 +79,24 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
     setIsLoading(true);
 
     const uploadRes = await uploadFile(imgFile);
-    if (!uploadRes) {
-      setError("Image was not uploaded!");
+    if (!uploadRes || uploadRes.status !== 200) {
+      console.log(uploadRes);
+      if (uploadRes?.status === 413) {
+        setError("Image is too large! Limit is 5 Mb.");
+      } else {
+        setError("Image was not uploaded!");
+      }
       setIsLoading(false);
       return;
     }
+
     const userData = (await getCurrentUser())!.data as UserData;
 
     const dto: CreatePinDto = {
       title: title,
-      imgId: uploadRes._id,
+      imgId: (uploadRes.data as FileData)._id,
       content: description,
       userId: userData._id,
-      username: userData.username,
       boardId: boardId,
     };
 

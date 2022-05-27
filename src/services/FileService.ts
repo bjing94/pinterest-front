@@ -1,10 +1,11 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { response } from "express";
-import { axiosInstance, baseURL, frontURL } from "./axiosInstance";
-import { CreatePinDto, CreateUserDto } from "./dto/create-pin.dto";
-import { FildeData } from "./responses/responses";
+import { axiosInstance, frontURL } from "./axiosInstance";
+import { serverErrorResponse } from "./responses/defaultResponses";
+import { ErrorData, FileData } from "./responses/responses";
 
-export async function uploadFile(file: File): Promise<FildeData | null> {
+export async function uploadFile(
+  file: File
+): Promise<AxiosResponse<FileData | ErrorData> | undefined> {
   const bodyFormData = new FormData();
   bodyFormData.append("files", file);
   return axiosInstance
@@ -13,21 +14,23 @@ export async function uploadFile(file: File): Promise<FildeData | null> {
         "Content-type": "multipart/form-data",
       },
     })
-    .then((response: AxiosResponse<FildeData>) => {
-      return response.data;
+    .then((response: AxiosResponse<FileData>) => {
+      return response;
     })
-    .catch((err: AxiosError) => {
-      return null;
+    .catch((err: AxiosError<ErrorData>) => {
+      console.log(err.response);
+      return err.response;
     });
 }
 
 export async function getStaticImage(imgId: string): Promise<string | null> {
   const imgInfo = await axiosInstance
     .get(`files/${imgId}`)
-    .then((response: AxiosResponse<FildeData>) => {
+    .then((response: AxiosResponse<FileData>) => {
       return response.data;
     })
-    .catch((err: AxiosError) => {
+    .catch((err: AxiosError<ErrorData>) => {
+      console.log(err.response);
       return null;
     });
 
