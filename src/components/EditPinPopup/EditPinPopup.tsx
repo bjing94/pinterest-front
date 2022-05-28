@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
-import Card from "../Card/Card";
 import Flexbox from "../Flexbox/Flexbox";
 import Input from "../Input";
 import Typography from "../Typgoraphy/Typography";
@@ -172,7 +171,7 @@ function TextProperty({ label, value, onInput }: TextPropertyProps) {
 }
 
 export default function EditPinPopup({
-  pinId: pinId,
+  pinId,
   title,
   onClose,
   onDelete,

@@ -31,6 +31,7 @@ export async function getBoards(ids: string[]): Promise<BoardData[]> {
       if (response !== undefined && response.status === 200) {
         return response.data as BoardData;
       }
+      return undefined;
     })
     .filter((data): data is BoardData => {
       return data !== undefined;

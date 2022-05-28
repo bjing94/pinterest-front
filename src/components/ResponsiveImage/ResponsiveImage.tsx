@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import "./ResponsiveImage.scss";
 
@@ -7,34 +7,51 @@ interface ResponsiveImageProps {
   overlayContent?: any;
   maxHeight?: string;
   minHeight?: string;
+  className?: string;
 }
 
 const ResponsiveImage = React.forwardRef<
   HTMLImageElement,
   ResponsiveImageProps
->(({ src, overlayContent, maxHeight = "none", minHeight = "none" }, ref) => {
-  return (
-    <div
-      className="responsive-image"
-      style={{ maxHeight: maxHeight, minHeight }}
-    >
+>(
+  (
+    {
+      src,
+      overlayContent,
+      className = "",
+      maxHeight = "none",
+      minHeight = "none",
+    },
+    ref
+  ) => {
+    return (
       <div
-        className="responsive-image__container"
+        className={`responsive-image ${className}`}
         style={{ maxHeight: maxHeight, minHeight }}
       >
-        <img style={{ minHeight }} src={src} ref={ref} />
-      </div>
-
-      {overlayContent && (
         <div
-          className="responsive-image__overlay"
+          className="responsive-image__container"
           style={{ maxHeight: maxHeight, minHeight }}
         >
-          {overlayContent}
+          <img
+            alt="responsive-image"
+            style={{ minHeight }}
+            src={src}
+            ref={ref}
+          />
         </div>
-      )}
-    </div>
-  );
-});
+
+        {overlayContent && (
+          <div
+            className="responsive-image__overlay"
+            style={{ maxHeight: maxHeight, minHeight }}
+          >
+            {overlayContent}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
 
 export default ResponsiveImage;

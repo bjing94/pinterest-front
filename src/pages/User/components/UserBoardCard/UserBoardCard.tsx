@@ -9,15 +9,10 @@ import RoundButton from "../../../../components/RoundButton/RoundButton";
 import Typography from "../../../../components/Typgoraphy/Typography";
 import convertAgeToString from "../../../../helpers/AgeToString";
 import copyCurrentUrl from "../../../../helpers/copyCurrentUrl";
-import copyToClipboard from "../../../../helpers/copyCurrentUrl";
 import { getBoard } from "../../../../services/BoardService";
 import { getStaticImage } from "../../../../services/FileService";
 import { getPin } from "../../../../services/PinService";
-import {
-  BoardData,
-  ErrorData,
-  PinData,
-} from "../../../../services/responses/responses";
+import { BoardData, PinData } from "../../../../services/responses/responses";
 
 import "./UserBoardCard.scss";
 
@@ -74,7 +69,7 @@ export default function UserBoardCard({
   const handleGetBoard = async () => {
     const board = await getBoard(id);
     if (board) {
-      if (board.status == 200) {
+      if (board.status === 200) {
         const boardData = board.data as BoardData;
         const imgSrcs = await getSrcFromPins(boardData.pins);
         setCoverImages(imgSrcs);
@@ -86,8 +81,6 @@ export default function UserBoardCard({
             new Date()
           )
         );
-      } else {
-        const errorData = board.data as ErrorData;
       }
     } else {
       console.log("ERROR!");
@@ -140,6 +133,7 @@ export default function UserBoardCard({
         </Link>
         <div className="user-board__main-img">
           <img
+            alt="main-img"
             src={coverImages[0] ?? ""}
             style={{ background: `${coverImages[0] ? "none" : "gray"}` }}
           />
@@ -150,12 +144,14 @@ export default function UserBoardCard({
         >
           <div className="user-board__top-img">
             <img
+              alt="top-img"
               src={coverImages[1] ?? ""}
               style={{ background: `${coverImages[1] ? "none" : "gray"}` }}
             />
           </div>
           <div className="user-board__bottom-img">
             <img
+              alt="bottom-img"
               className="user-board__bottom-img"
               src={coverImages[2] ?? ""}
               style={{ background: `${coverImages[2] ? "none" : "gray"}` }}

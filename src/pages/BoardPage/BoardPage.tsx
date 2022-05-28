@@ -20,7 +20,7 @@ import {
 } from "../../services/BoardService";
 import { UpdatePinDto } from "../../services/dto/update-pin.dto";
 import { BoardData, UserData } from "../../services/responses/responses";
-import { getUser, subscribe, updateUser } from "../../services/UserService";
+import { getUser, subscribe, unsubscribe } from "../../services/UserService";
 import UserContext from "../../store/userContext";
 import LoadingPage from "../LoadingPage/LoadingPage";
 
@@ -138,13 +138,25 @@ export default function BoardPage() {
     }
   };
 
+  const handleUnSubscribe = async (subscribeToId: string) => {
+    if (!authorInfo) {
+      return;
+    }
+    const isAuth = await checkLogin();
+    if (isAuth) {
+      await unsubscribe(subscribeToId);
+    } else {
+      console.log("Not authenticated!");
+    }
+  };
+
   const handleSavePin = async (id: string) => {
     if (!id) {
       return;
     }
 
     const response = await getCurrentUser();
-    if (response && response.status == 200) {
+    if (response && response.status === 200) {
       if (!boardId) {
         const userInfo = response.data as UserData;
         savePinToProfile(id, userInfo)
@@ -255,6 +267,7 @@ export default function BoardPage() {
             setShowSubscribersPopup(false);
           }}
           onSubscribe={handleSubscribe}
+          onUnSubscribe={handleUnSubscribe}
         />
       )}
       <Flexbox flexDirection="column" fluid>

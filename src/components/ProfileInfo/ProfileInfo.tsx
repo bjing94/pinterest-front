@@ -1,5 +1,3 @@
-import { AiFillAmazonCircle } from "react-icons/ai";
-import { FaUser } from "react-icons/fa";
 import { BaseStyle } from "../../types/types";
 import Avatar from "../Avatar/Avatar";
 import Box from "../Box/Box";

@@ -15,21 +15,15 @@ import {
   downloadStaticImage,
   getStaticImage,
 } from "../../services/FileService";
-import { deletePin, getPin, updatePin } from "../../services/PinService";
+import { getPin, updatePin } from "../../services/PinService";
 import { checkLogin, getCurrentUser } from "../../services/AuthService";
 import {
-  BoardData,
   CommentData,
   ErrorData,
   PinData,
   UserData,
 } from "../../services/responses/responses";
-import {
-  getUser,
-  subscribe,
-  unsubscribe,
-  updateUser,
-} from "../../services/UserService";
+import { getUser, subscribe, unsubscribe } from "../../services/UserService";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import {
   createComment,
@@ -40,11 +34,9 @@ import {
 import Dropdown from "../../components/Dropdown";
 import DropdownBoards from "../../components/DropdownBoards/DropdownBoards";
 import {
-  getBoard,
   getBoards,
   savePinToBoard,
   savePinToProfile,
-  updateBoard,
 } from "../../services/BoardService";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
 import UserContext from "../../store/userContext";
@@ -53,7 +45,8 @@ import LoadingPage from "../LoadingPage/LoadingPage";
 
 export default function Pin() {
   const { id } = useParams();
-  const { setTextPopup, setErrorPopup } = useContext(UserContext);
+  const { setTextPopup, setErrorPopup, updateUserInfo, userBoards } =
+    useContext(UserContext);
 
   // Current user information
   const [boardId, setBoardId] = useState<string | undefined>(undefined);
@@ -66,8 +59,6 @@ export default function Pin() {
 
   // Author information
   const [authorInfo, setAuthorInfo] = useState<UserData | undefined>(undefined);
-  const [authorId, setAuthorId] = useState<string | undefined>(undefined);
-  const [avatarId, setAvatarId] = useState("");
 
   // Pin information
   const [description, setDescription] = useState<string | undefined>(undefined);
@@ -83,9 +74,6 @@ export default function Pin() {
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [showBoards, setShowBoards] = useState(false);
 
-  // Responsive design
-  const [isTablet, setIsTablet] = useState(false);
-
   //Error handling
   const [errorMsg, setErrorMsg] = useState("");
   const [errorCode, setErrorCode] = useState(0);
@@ -100,7 +88,6 @@ export default function Pin() {
         return;
       }
 
-      const { _id, boards } = response.data as UserData;
       setCurrentUserInfo(response.data as UserData);
 
       checkSaved();
@@ -113,14 +100,9 @@ export default function Pin() {
       return;
     }
     const userResponse = await getUser(authorInfo._id);
-    if (userResponse && userResponse.status == 200) {
+    if (userResponse && userResponse.status === 200) {
       const userData = userResponse.data as UserData;
       setAuthorInfo(userData);
-
-      const avatarSrc = await getStaticImage(userData.avatarSrc);
-      if (avatarSrc) {
-        setAvatarId(avatarSrc);
-      }
     }
   };
   const getPinInfo = async () => {
@@ -136,14 +118,9 @@ export default function Pin() {
         setTitle(pinInfo.title);
         setComments(pinInfo.comments ?? []);
         const userResponse = await getUser(pinInfo.userId);
-        if (userResponse && userResponse.status == 200) {
+        if (userResponse && userResponse.status === 200) {
           const userData = userResponse.data as UserData;
           setAuthorInfo(userData);
-
-          const avatarSrc = await getStaticImage(userData.avatarSrc);
-          if (avatarSrc) {
-            setAvatarId(avatarSrc);
-          }
         }
         downloadStaticImage(pinInfo.imgId).then((res: string) => {
           setDownloadLink(res);
@@ -163,7 +140,7 @@ export default function Pin() {
   const checkSubscribed = async () => {
     const res = await getCurrentUser();
     if (res) {
-      if (res.status == 200) {
+      if (res.status === 200) {
         const { _id } = res.data as UserData;
         if (authorInfo) {
           const subbed =
@@ -245,7 +222,7 @@ export default function Pin() {
     }
 
     const response = await getCurrentUser();
-    if (response && response.status == 200) {
+    if (response && response.status === 200) {
       if (!boardId) {
         const userInfo = response.data as UserData;
         savePinToProfile(id, userInfo)
@@ -303,7 +280,7 @@ export default function Pin() {
       return;
     }
     newPin.comments.push(commentData._id);
-    const updatedResponse = await updatePin(id, { comments: newPin.comments });
+    await updatePin(id, { comments: newPin.comments });
     getPinInfo();
   };
 
@@ -326,7 +303,7 @@ export default function Pin() {
       return;
     }
     newPin.comments = newPin.comments.filter((id) => {
-      return id != commentId;
+      return id !== commentId;
     });
     await updatePin(id, { comments: newPin.comments });
     getPinInfo();
@@ -423,7 +400,6 @@ export default function Pin() {
   if ((!userInfoReady && isAuth === undefined) || !pinInfoReady) {
     return <LoadingPage />;
   }
-
   if (!isAuth && pinInfoReady) {
     return (
       <Flexbox
@@ -436,14 +412,6 @@ export default function Pin() {
           setShowBoards(false);
         }}
       >
-        {showCreateBoard && (
-          <BoardCreatePopup
-            onClose={() => {
-              setShowCreateBoard(false);
-            }}
-            onSubmit={(value: string) => {}}
-          />
-        )}
         <Toolbar />
         <Card className="pin__card">
           <Flexbox alignItems="flex-start" className="pin__content">
@@ -525,8 +493,8 @@ export default function Pin() {
   }
 
   if (pinInfoReady && userInfoReady) {
-    const { boards, _id: currentUserId } = currentUserInfo;
-
+    const { _id: currentUserId } = currentUserInfo;
+    const boards = userBoards.map(({ _id }) => _id);
     return (
       <Flexbox
         justifyContent="flex-start"
@@ -543,7 +511,9 @@ export default function Pin() {
             onClose={() => {
               setShowCreateBoard(false);
             }}
-            onSubmit={(value: string) => {}}
+            onSubmit={(value: string) => {
+              updateUserInfo();
+            }}
           />
         )}
         <Toolbar />
@@ -650,7 +620,5 @@ export default function Pin() {
       </Flexbox>
     );
   }
-  return (
-    <div>{`pinInfoReady: ${pinInfoReady}\n userInfoReady: ${userInfoReady}`}</div>
-  );
+  return <div></div>;
 }

@@ -1,14 +1,10 @@
 import React, { useContext } from "react";
-import { AiFillAmazonCircle } from "react-icons/ai";
-import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import UserContext from "../../store/userContext";
-import { lightGray } from "../../styles/colors";
 import { BaseStyle } from "../../types/types";
 import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";
 import Flexbox from "../Flexbox/Flexbox";
-import RoundButton from "../RoundButton/RoundButton";
 import Typography from "../Typgoraphy/Typography";
 
 import "./CommunityInfo.scss";
@@ -62,7 +58,7 @@ export default function CommunityInfo({
           onClick={onClickSubscribe}
           color={`${isSubscribed ? "secondary" : "primary"}`}
         >
-          {`${isSubscribed ? "Subscribed" : "Subscribe"}`}
+          {`${isSubscribed ? "Unsubscribe" : "Subscribe"}`}
         </Button>
       )}
     </Flexbox>

@@ -50,7 +50,7 @@ export default function TopBar({
           <Flexbox>
             <Link to="/">
               <RoundButton size={32}>
-                <img className="logo" width={24} height={24} />
+                <img alt="logo" className="logo" width={24} height={24} />
               </RoundButton>
             </Link>
             <Link to="/">
@@ -112,7 +112,7 @@ export default function TopBar({
             <Box margin="0px 10px 0px 0px">
               <Link to="/">
                 <RoundButton size={32}>
-                  <img className="logo" width={24} height={24} />
+                  <img alt="logo" className="logo" width={24} height={24} />
                 </RoundButton>
               </Link>
             </Box>

@@ -1,4 +1,4 @@
-import React, { ReactChild } from "react";
+import React from "react";
 import { BaseStyle } from "../../types/types";
 import Card from "../Card/Card";
 import Flexbox from "../Flexbox/Flexbox";

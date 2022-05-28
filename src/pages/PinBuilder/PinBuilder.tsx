@@ -13,7 +13,6 @@ import "./PinBuilder.scss";
 import { AiFillDelete } from "react-icons/ai";
 import ProfileInfo from "../../components/ProfileInfo/ProfileInfo";
 import {
-  BoardData,
   ErrorData,
   FileData,
   UserData,
@@ -31,6 +30,7 @@ import ButtonGroup from "../../components/ButtonGroup/ButtonGroup";
 import { Navigate } from "react-router-dom";
 import UserContext from "../../store/userContext";
 import Box from "../../components/Box/Box";
+import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
 
 interface PinBuilderProps {
   isAuth?: boolean;
@@ -40,7 +40,6 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
   const { setTextPopup } = useContext(UserContext);
 
   const [uploadedImg, setUploadedImg] = useState<string | undefined>(undefined);
-  const [imgHeight, setImgHeight] = useState(0);
   const [error, setError] = useState("");
   const [userInfo, setUserInfo] = useState<UserData | undefined>();
   const [showCreateBoard, setShowCreateBoard] = useState(false);
@@ -64,11 +63,11 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
     }
 
     const imgFile = fileRef.current?.files[0];
-    if (title.length == 0) {
+    if (title.length === 0) {
       setError("Title must not be empty!");
       return;
     }
-    if (boardId.length == 0) {
+    if (boardId.length === 0) {
       setError("Select a board!");
       return;
     }
@@ -154,10 +153,7 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
           img.src = fr.result.toString();
         }
       };
-      img.onload = function () {
-        const multiplier = 340 / img.width;
-        setImgHeight(img.height * multiplier);
-      };
+
       fr.readAsDataURL(selectedFile);
     }
   };
@@ -272,19 +268,21 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
             style={{ display: uploadedImg ? "none" : "block" }}
           />
           {uploadedImg && (
-            <div
-              style={{
-                backgroundImage: `url(${uploadedImg})`,
-                height: imgHeight,
-              }}
-              className="input-pin-container__image"
-            >
-              <Flexbox alignItems="center" style={{ height: "100%" }}>
-                <RoundButton type="action" onClick={handleDeleteImg} size={32}>
-                  <AiFillDelete size={32} />
-                </RoundButton>
-              </Flexbox>
-            </div>
+            <ResponsiveImage
+              className="pin-builder__image"
+              src={uploadedImg}
+              overlayContent={
+                <Flexbox alignItems="center" style={{ height: "100%" }}>
+                  <RoundButton
+                    type="action"
+                    onClick={handleDeleteImg}
+                    size={32}
+                  >
+                    <AiFillDelete size={32} />
+                  </RoundButton>
+                </Flexbox>
+              }
+            />
           )}
           <Flexbox
             style={{

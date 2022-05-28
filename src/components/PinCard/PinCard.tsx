@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FiEdit, FiLink, FiMoreHorizontal, FiShare } from "react-icons/fi";
+import { FiEdit, FiLink } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
@@ -10,14 +10,12 @@ import RoundButton from "../RoundButton/RoundButton";
 import Typography from "../Typgoraphy/Typography";
 import { getStaticImage } from "../../services/FileService";
 import { getPin } from "../../services/PinService";
-import { red } from "../../styles/colors";
 
 import "./PinCard.scss";
 import UserContext from "../../store/userContext";
 import { getUser } from "../../services/UserService";
 import { PinData, UserData } from "../../services/responses/responses";
 import ProfileInfo from "../ProfileInfo/ProfileInfo";
-import LoadingPage from "../../pages/LoadingPage/LoadingPage";
 
 interface PinCardProps {
   pinId: string;
@@ -43,10 +41,8 @@ export default function PinCard({
   onEdit,
 }: PinCardProps) {
   const [user, setUser] = useState<string | undefined>(undefined);
-  const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [showBoards, setShowBoards] = useState(false);
   const [imgSrc, setImgSrc] = useState<string | undefined>(undefined);
-  const [showOverlay, setShowOverlay] = useState(false);
   const [userDisplayId, setUserDisplayId] = useState<string | undefined>(
     undefined
   );
@@ -130,7 +126,6 @@ export default function PinCard({
           <DropdownBoards
             boardIds={boards}
             onClickCreateBoard={() => {
-              setShowCreateBoard(true);
               onShowCreateBoard();
             }}
             onSelect={(boardId: string) => {

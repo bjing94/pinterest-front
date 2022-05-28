@@ -1,5 +1,4 @@
 import React from "react";
-import { BaseStyle } from "../../types/types";
 import Box from "../Box/Box";
 
 import "./Input.scss";

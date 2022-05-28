@@ -1,31 +1,24 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { AiFillAmazonCircle } from "react-icons/ai";
-import { FiLink, FiShare } from "react-icons/fi";
+import React, { useContext, useEffect, useState } from "react";
+import { FiLink } from "react-icons/fi";
 import Masonry from "react-masonry-css";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import ButtonSection from "../../components/ButtonSection";
 import Flexbox from "../../components/Flexbox/Flexbox";
 import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import Typography from "../../components/Typgoraphy/Typography";
-import { CreateUserDto } from "../../services/dto/create-pin.dto";
 import {
   findUser,
-  getUser,
   subscribe,
+  unsubscribe,
   updateUser,
 } from "../../services/UserService";
-import {
-  BoardData,
-  ErrorData,
-  UserData,
-} from "../../services/responses/responses";
+import { BoardData, UserData } from "../../services/responses/responses";
 import UserBoardCard from "./components/UserBoardCard/UserBoardCard";
 import { checkLogin, getCurrentUser } from "../../services/AuthService";
 import { getStaticImage } from "../../services/FileService";
 import Toolbar from "../../components/Toolbar/Toolbar";
-import TextPopup from "../../components/TextPopup";
 import {
   createBoard,
   getBoard,
@@ -66,7 +59,7 @@ export default function User() {
     setErrorPopup,
     userBoards,
     _id: currentUserId,
-    isAuth,
+    updateUserInfo,
   } = useContext(UserContext);
 
   const [profileInfo, setProfileInfo] = useState<UserData | undefined>();
@@ -101,7 +94,7 @@ export default function User() {
     }
     const res = await getCurrentUser();
     if (res) {
-      if (res.status == 200) {
+      if (res.status === 200) {
         const { _id } = res.data as UserData;
         if (profileInfo.subscribers.find((a) => a === _id) !== undefined) {
           setIsSubscribed(true);
@@ -120,6 +113,20 @@ export default function User() {
     } else {
       console.log("Not authenticated!");
     }
+    getProfileInfo();
+  };
+
+  const handleUnSubscribe = async (subscribeToId: string) => {
+    if (!profileInfo) {
+      return;
+    }
+    const isAuth = await checkLogin();
+    if (isAuth) {
+      await unsubscribe(subscribeToId);
+    } else {
+      console.log("Not authenticated!");
+    }
+    getProfileInfo();
   };
 
   const handleCopyUserLink = async () => {
@@ -216,7 +223,7 @@ export default function User() {
     }
 
     const response = await getCurrentUser();
-    if (response && response.status == 200) {
+    if (response && response.status === 200) {
       if (!boardId) {
         const userInfo = response.data as UserData;
         savePinToProfile(pindId, userInfo)
@@ -263,7 +270,7 @@ export default function User() {
       const response = await findUser({ displayId: displayId });
 
       if (response) {
-        if (response.status == 200) {
+        if (response.status === 200) {
           const user = response.data as UserData;
           setProfileInfo(user);
           await checkSubscribed();
@@ -364,6 +371,9 @@ export default function User() {
             onClose={() => {
               setShowEditBoard(false);
             }}
+            onSubmit={() => {
+              updateUserInfo();
+            }}
           />
         )}
         {showSubscribersPopup && (
@@ -374,6 +384,7 @@ export default function User() {
               setShowSubscribersPopup(false);
             }}
             onSubscribe={handleSubscribe}
+            onUnSubscribe={handleUnSubscribe}
           />
         )}
         {showSubscribtionsPopup && (
@@ -384,6 +395,7 @@ export default function User() {
               setShowSubscribtionsPopup(false);
             }}
             onSubscribe={handleSubscribe}
+            onUnSubscribe={handleUnSubscribe}
           />
         )}
         {showCreateBoard && (
@@ -521,6 +533,10 @@ export default function User() {
             onClose={() => {
               setShowEditBoard(false);
             }}
+            onSubmit={() => {
+              updateUserInfo();
+              getProfileInfo();
+            }}
           />
         )}
         {showEditPin && (
@@ -544,6 +560,7 @@ export default function User() {
               setShowSubscribersPopup(false);
             }}
             onSubscribe={handleSubscribe}
+            onUnSubscribe={handleUnSubscribe}
           />
         )}
         {showSubscribtionsPopup && (
@@ -554,6 +571,7 @@ export default function User() {
               setShowSubscribtionsPopup(false);
             }}
             onSubscribe={handleSubscribe}
+            onUnSubscribe={handleUnSubscribe}
           />
         )}
         {showCreateBoard && (

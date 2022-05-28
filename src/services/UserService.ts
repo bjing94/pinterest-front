@@ -1,6 +1,5 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { axiosInstance } from "./axiosInstance";
-import { CreateUserDto } from "./dto/create-pin.dto";
 import { FindUserDto } from "./dto/find-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { ErrorData, UserData } from "./responses/responses";

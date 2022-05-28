@@ -1,22 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FaPlus, FaQuestion } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import Masonry from "react-masonry-css";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
 import Flexbox from "../../components/Flexbox/Flexbox";
 import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import { getCurrentUser } from "../../services/AuthService";
-import {
-  getBoard,
-  savePinToBoard,
-  savePinToProfile,
-  updateBoard,
-} from "../../services/BoardService";
+import { savePinToBoard, savePinToProfile } from "../../services/BoardService";
 import { findPins, getRandomPins } from "../../services/PinService";
-import { BoardData, UserData } from "../../services/responses/responses";
-import { updateUser } from "../../services/UserService";
+import { UserData } from "../../services/responses/responses";
 import UserContext from "../../store/userContext";
 
 // import "./Search.scss";
@@ -32,18 +26,16 @@ const breakpointColumnsObj = {
 };
 
 export default function Search() {
-  const [searchParams, setSearchParams] = useSearchParams();
   const { isAuth, userBoards, setTextPopup, setErrorPopup, currentSavedPins } =
     useContext(UserContext);
 
   const [pinsIds, setPinIds] = useState<string[]>([]);
   const [boardId, setBoardId] = useState<string>();
-  const [boards, setBoards] = useState<string[]>([]);
   const [showCreateBoard, setShowCreateBoard] = useState(false);
 
   const handleSearchPins = async () => {
     const queryString = window.location.search;
-    const response = await findPins(queryString);
+    await findPins(queryString);
   };
 
   const handleSavePin = async (id: string) => {
@@ -52,7 +44,7 @@ export default function Search() {
     }
 
     const response = await getCurrentUser();
-    if (response && response.status == 200) {
+    if (response && response.status === 200) {
       if (!boardId) {
         const userInfo = response.data as UserData;
         savePinToProfile(id, userInfo)
@@ -93,8 +85,7 @@ export default function Search() {
     getCurrentUser().then((response) => {
       if (!response || response.status !== 200) return;
 
-      const userData = response.data as UserData;
-      setBoards(userData.boards);
+      response.data as UserData;
     });
 
     handleSearchPins();

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FaPlus, FaQuestion } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import Masonry from "react-masonry-css";
 import { Link } from "react-router-dom";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
@@ -8,15 +8,9 @@ import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import { getCurrentUser } from "../../services/AuthService";
-import {
-  getBoard,
-  savePinToBoard,
-  savePinToProfile,
-  updateBoard,
-} from "../../services/BoardService";
+import { savePinToBoard, savePinToProfile } from "../../services/BoardService";
 import { getRandomPins } from "../../services/PinService";
-import { BoardData, UserData } from "../../services/responses/responses";
-import { updateUser } from "../../services/UserService";
+import { UserData } from "../../services/responses/responses";
 import UserContext from "../../store/userContext";
 
 import "./Home.scss";
@@ -43,7 +37,6 @@ export default function Home() {
 
   const [pinsIds, setPinIds] = useState<string[]>([]);
   const [boardId, setBoardId] = useState<string>();
-  const [boards, setBoards] = useState<string[]>([]);
   const [showCreateBoard, setShowCreateBoard] = useState(false);
 
   const handleSavePin = async (id: string) => {
@@ -52,7 +45,7 @@ export default function Home() {
     }
 
     const response = await getCurrentUser();
-    if (response && response.status == 200) {
+    if (response && response.status === 200) {
       if (!boardId) {
         const userInfo = response.data as UserData;
         savePinToProfile(id, userInfo)
@@ -82,7 +75,8 @@ export default function Home() {
     const data = await getRandomPins();
 
     if (!data) {
-      throw "No pins on the server!";
+      setErrorPopup("No pins on the server!");
+      return;
     }
 
     console.log("Got pins: ", data);
@@ -95,12 +89,6 @@ export default function Home() {
 
   useEffect(() => {
     getPins();
-    getCurrentUser().then((response) => {
-      if (!response || response.status !== 200) return;
-
-      const userData = response.data as UserData;
-      setBoards(userData.boards);
-    });
   }, []);
 
   const pinCards = pinsIds.map((id) => {

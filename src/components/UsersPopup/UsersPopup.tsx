@@ -19,6 +19,7 @@ interface UsersPopupProps {
   title: string;
   onClose: () => void;
   onSubscribe: (userId: string) => void;
+  onUnSubscribe: (userId: string) => void;
 }
 
 export default function UsersPopup({
@@ -26,6 +27,7 @@ export default function UsersPopup({
   title,
   onClose,
   onSubscribe,
+  onUnSubscribe,
 }: UsersPopupProps) {
   const { _id: currentUserId, isAuth } = useContext(UserContext);
 
@@ -48,10 +50,6 @@ export default function UsersPopup({
       });
 
     setUsers(users);
-  };
-
-  const handleShowMore = () => {
-    setAmountLoaded(amountLoaded + 20);
   };
 
   const userElements = users.map((user) => {
@@ -82,7 +80,14 @@ export default function UsersPopup({
           </Button>
         )}
         {isSubscribed && !isYou && isAuth && (
-          <Button color="secondary">Subscribed</Button>
+          <Button
+            color="secondary"
+            onClick={() => {
+              onUnSubscribe(user._id);
+            }}
+          >
+            Unsubscribe
+          </Button>
         )}
       </Flexbox>
     );
@@ -90,7 +95,7 @@ export default function UsersPopup({
 
   useEffect(() => {
     loadUsers();
-  }, [amountLoaded]);
+  }, [userIds, amountLoaded]);
   return (
     <Popup containerClass="users-popup__container">
       <Flexbox flexDirection="column" style={{ height: "100%" }}>

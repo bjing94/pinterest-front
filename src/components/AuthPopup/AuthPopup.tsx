@@ -1,7 +1,6 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { register, login } from "../../services/AuthService";
-import UserContext from "../../store/userContext";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
 import Flexbox from "../Flexbox/Flexbox";
@@ -61,7 +60,7 @@ export default function AuthPopup({
         return;
       }
 
-      if (password != repeatPassword) {
+      if (password !== repeatPassword) {
         setError("Password don't match");
         return;
       }
@@ -73,7 +72,7 @@ export default function AuthPopup({
         password: password,
       });
 
-      if (res?.status == 201) {
+      if (res?.status === 201) {
         setError("");
         onClose();
       } else {
@@ -81,7 +80,7 @@ export default function AuthPopup({
       }
     } else {
       const res = await login({ email: email, password: password });
-      if (res?.status == 200) {
+      if (res?.status === 200) {
         onClose();
         window.location.reload();
       } else {
@@ -101,7 +100,7 @@ export default function AuthPopup({
         <Flexbox flexDirection="column">
           <Box width="100%" margin="0px 0px 50px 0px">
             <RoundButton size={48} className="auth-popup__logo">
-              <img className="logo" width={32} height={32} />
+              <img alt="logo" className="logo" width={32} height={32} />
             </RoundButton>
             <RoundButton
               size={32}

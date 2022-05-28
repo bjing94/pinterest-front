@@ -43,6 +43,17 @@
     margin-left: 20px;
   }
 
+  &__image {
+    & .responsive-image__overlay {
+      & * {
+        visibility: visible;
+      }
+      &:hover {
+        background: none;
+      }
+    }
+  }
+
   @include tablet {
     &__card {
       max-width: 600px;

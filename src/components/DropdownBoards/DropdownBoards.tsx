@@ -50,7 +50,7 @@ function DropdownItem({ boardData, onClick }: DropdownItemProps) {
   const { title, pins } = boardData;
 
   const getCoverImg = async () => {
-    if (pins.length == 0) {
+    if (pins.length === 0) {
       return;
     }
 
@@ -75,7 +75,11 @@ function DropdownItem({ boardData, onClick }: DropdownItemProps) {
   return (
     <li className="board-dropdown__item">
       <Flexbox style={{ height: "100%" }} alignItems="center">
-        <img className="board-dropdown__item__img" src={coverImg} />
+        <img
+          alt="board-item"
+          className="board-dropdown__item__img"
+          src={coverImg}
+        />
         <Typography
           fontSize={16}
           fontWeight="bold"
@@ -218,7 +222,7 @@ export default function DropdownBoards({
     };
 
     handleGetBoards();
-  }, []);
+  }, [boardIds]);
 
   let title = "";
   if (boards.length !== 0 && selection) {

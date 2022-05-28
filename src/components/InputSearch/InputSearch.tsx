@@ -1,4 +1,4 @@
-import React, { FormEvent, ReactPropTypes, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import "./InputSearch.scss";
 

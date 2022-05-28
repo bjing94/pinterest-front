@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Box from "../../../../components/Box/Box";
 import Button from "../../../../components/Button/Button";
 import Flexbox from "../../../../components/Flexbox/Flexbox";

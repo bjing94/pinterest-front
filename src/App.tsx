@@ -31,11 +31,17 @@ function App() {
 
   const getAuthUserInfo = async () => {
     const userResponse = await getCurrentUser();
-    if (!userResponse || userResponse.status !== 200) return;
+    if (!userResponse || userResponse.status !== 200) {
+      handleSetErrorPopup("Error updating user!");
+      return;
+    }
     const user = userResponse.data as UserData;
     setCurrentUser(user);
     const boards = await getBoards(user.boards);
     setCurrentBoards(boards);
+    await handleSetTextPopup("User updated!");
+    console.log("User updated!");
+    console.log("Boards", boards);
   };
 
   const checkIsAuth = async () => {

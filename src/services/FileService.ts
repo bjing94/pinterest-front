@@ -1,6 +1,5 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { axiosInstance, frontURL } from "./axiosInstance";
-import { serverErrorResponse } from "./responses/defaultResponses";
 import { ErrorData, FileData } from "./responses/responses";
 
 export async function uploadFile(
@@ -39,10 +38,9 @@ export async function getStaticImage(imgId: string): Promise<string | null> {
   }
 
   return frontURL + "/images" + `/${imgInfo.url}`; // 12-05-2022/img5.jpg
-  // it is rerouted by nginx to /var/www/ivan-dev/images/12-05-2022/img5.jpg
 }
 
 export async function downloadStaticImage(imgId: string) {
-  const link = axiosInstance.defaults.baseURL + "files/download/" + imgId;
+  const link = axiosInstance.defaults.baseURL + "/files/download/" + imgId;
   return link;
 }

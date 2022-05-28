@@ -1,7 +1,4 @@
-import { AxiosResponse } from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { FaCross, FaWindowClose } from "react-icons/fa";
 import {
   getBoard,
   updateBoard,
@@ -22,12 +19,14 @@ interface EditBoardPopupProps {
   boardId: string;
   title: string;
   onClose: () => void;
+  onSubmit: () => void;
 }
 
 export default function EditBoardPopup({
   boardId,
   title,
   onClose,
+  onSubmit,
 }: EditBoardPopupProps) {
   const { setTextPopup } = useContext(UserContext);
 
@@ -50,12 +49,14 @@ export default function EditBoardPopup({
 
     const newBoard: UpdateBoardDto = { title: titleValue };
     await updateBoard(boardId, newBoard);
+    onSubmit();
   };
 
   const handleDeleteBoard = async () => {
     const response = await deleteBoard(boardId);
     if (response?.status === 200) {
       setTextPopup("Board deleted!");
+      onSubmit();
       onClose();
     }
   };

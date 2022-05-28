@@ -1,18 +1,12 @@
 import { AxiosResponse } from "axios";
 import React, { useEffect, useState } from "react";
-import { AiFillAmazonCircle, AiFillHeart, AiFillLike } from "react-icons/ai";
-import { FaComment } from "react-icons/fa";
+import { AiFillHeart, AiFillLike } from "react-icons/ai";
 import { FiMoreHorizontal } from "react-icons/fi";
 import { IoIosArrowForward } from "react-icons/io";
 import convertAgeToString from "../../helpers/AgeToString";
-import { getCurrentUser } from "../../services/AuthService";
 import {
-  createComment,
-  deleteComment,
   getComment,
-  updateComment,
 } from "../../services/CommentService";
-import { getPin, updatePin } from "../../services/PinService";
 import { CommentData, UserData } from "../../services/responses/responses";
 import { getUser } from "../../services/UserService";
 import { darkGray, red } from "../../styles/colors";
@@ -22,7 +16,6 @@ import Box from "../Box/Box";
 import Button from "../Button/Button";
 import Dropdown from "../Dropdown";
 import Flexbox from "../Flexbox/Flexbox";
-import { ResponsiveInput } from "../ResponsiveInput/ResponsiveInput";
 import RoundButton from "../RoundButton/RoundButton";
 import Typography from "../Typgoraphy/Typography";
 
@@ -46,6 +39,9 @@ function CommentInput({ show, onSubmit }: CommentInputProps) {
   const [commentValue, setCommentValue] = useState("");
   const [buttonActive, setButtonActive] = useState(false);
 
+  useEffect(() => {
+    setButtonActive(commentValue.length !== 0);
+  }, [commentValue]);
   return (
     <Flexbox
       flexDirection="column"
@@ -55,7 +51,6 @@ function CommentInput({ show, onSubmit }: CommentInputProps) {
       <div className="comment__input">
         <AutoTextarea
           onInput={(value: string) => {
-            setButtonActive(value.length !== 0);
             setCommentValue(value);
           }}
           value={commentValue}
@@ -64,7 +59,16 @@ function CommentInput({ show, onSubmit }: CommentInputProps) {
       </div>
       <Box margin="10px 0px 0px 0px" width="100%">
         <Flexbox fluid justifyContent="flex-end">
-          <Button className="comment__input-cancel-btn">Cancel</Button>
+          <Button
+            className="comment__input-cancel-btn"
+            active={commentValue.length > 0}
+            onClick={() => {
+              setCommentValue("");
+            }}
+            color="secondary"
+          >
+            Cancel
+          </Button>
           <Box margin="0px 0px 0px 10px">
             <Button
               className="comment__input-send-btn"

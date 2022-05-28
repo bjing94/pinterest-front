@@ -1,17 +1,16 @@
-import React, { useRef, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import { register, login, getCurrentUser } from "../../services/AuthService";
+import React, { useContext, useRef } from "react";
+import { getCurrentUser } from "../../services/AuthService";
 import { createBoard } from "../../services/BoardService";
 import {
   BoardData,
   ErrorData,
   UserData,
 } from "../../services/responses/responses";
+import UserContext from "../../store/userContext";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
 import Flexbox from "../Flexbox/Flexbox";
 import Input from "../Input";
-import RoundButton from "../RoundButton/RoundButton";
 import Typography from "../Typgoraphy/Typography";
 
 import "./BoardCreatePopup.scss";
@@ -26,18 +25,17 @@ export default function BoardCreatePopup({
   onClose,
   onSubmit,
 }: BoardCreatePopupProps) {
+  const { setTextPopup, setErrorPopup } = useContext(UserContext);
   const titleRef = useRef<HTMLInputElement>(null);
-  const [errorText, setErrorText] = useState("");
 
   const handleCreateBoard = async () => {
-    setErrorText("");
     if (!titleRef || !titleRef.current) {
-      setErrorText("Reference error!");
+      setErrorPopup("Reference error!");
       return;
     }
     const currentUser = await getCurrentUser();
     if (!currentUser || currentUser.status !== 200) {
-      setErrorText("Please log in!");
+      setErrorPopup("Please log in!");
       return;
     }
     const userData = currentUser.data as UserData;
@@ -48,16 +46,18 @@ export default function BoardCreatePopup({
     });
 
     if (!newBoard) {
-      setErrorText("Server error!");
+      setErrorPopup("Server error!");
       return;
     }
     if (newBoard.status !== 201) {
       const error = newBoard.data as ErrorData;
-      setErrorText(error.message);
+      setErrorPopup(error.message);
       return;
     } else {
-      const board = newBoard.data as BoardData;
+      newBoard.data as BoardData;
+      setTextPopup("Board created!");
       onClose();
+      onSubmit();
     }
   };
 
@@ -66,11 +66,6 @@ export default function BoardCreatePopup({
       <div className="create-board-popup__background" onClick={onClose}></div>
       <div className="create-board-popup__container" style={{ width: "400px" }}>
         <Flexbox flexDirection="column" fluid>
-          {errorText && (
-            <Typography fontSize={12} color="error">
-              {errorText}
-            </Typography>
-          )}
           <Typography fontSize={18} fontWeight="bold">
             Create board
           </Typography>

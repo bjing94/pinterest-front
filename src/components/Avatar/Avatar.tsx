@@ -19,6 +19,7 @@ export default function Avatar({ imgId, size }: AvatarProps) {
 
   return (
     <img
+      alt="avatar"
       width={size}
       height={size}
       src={avatarSrc}

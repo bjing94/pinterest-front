@@ -1,9 +1,13 @@
+@import "/src/styles/mixins";
+
 .edit-user-popup {
   &__content {
     width: 100%;
   }
-
-  & .text-property {
+}
+@include phone524 {
+  .text-property {
     flex-direction: column;
+    align-items: flex-start !important;
   }
 }

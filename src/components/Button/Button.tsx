@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, HTMLProps } from "react";
+import React, { HTMLProps } from "react";
 import { BaseStyle } from "../../types/types";
 
 import "./Button.scss";

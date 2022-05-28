@@ -37,7 +37,24 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "plugins": [
+      "unused-imports"
+    ],
+    "rules": {
+      "no-unused-vars": "off",
+      "unused-imports/no-unused-imports": "error",
+      "unused-imports/no-unused-vars": [
+        "off",
+        {
+          "vars": "all",
+          "varsIgnorePattern": "^_",
+          "args": "after-used",
+          "argsIgnorePattern": "^_"
+        }
+      ],
+      "no-useless-concat": "off"
+    }
   },
   "browserslist": {
     "production": [
@@ -59,6 +76,7 @@
     "@types/react-router-dom": "^5.3.3",
     "csstype": "^3.0.11",
     "dotenv": "^16.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "stylelint": "^14.6.1",
     "stylelint-config-standard": "^25.0.0",
     "stylelint-config-standard-scss": "^3.0.0"
