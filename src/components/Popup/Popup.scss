@@ -1,0 +1,26 @@
+.popup {
+  &__container {
+    min-width: 0;
+    max-height: 600px;
+    height: 80%;
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  &__background {
+    position: fixed;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba($color: #000000, $alpha: 0.5);
+  }
+
+  &__root {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+}

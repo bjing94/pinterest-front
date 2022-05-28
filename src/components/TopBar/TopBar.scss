@@ -1,3 +1,5 @@
+@import "/src/styles/mixins";
+
 .logo {
   content: url("../../../images/pinterest-logo.png");
 }
@@ -19,4 +21,23 @@
     transform: scale(1);
     box-shadow: 0 0 12px 2px rgb(0 0 0 / 20%);
   }
+}
+
+.phone-grid {
+  display: none;
+  @include phone {
+    display: block;
+  }
+}
+
+.desktop-grid {
+  display: block;
+  @include phone {
+    display: none;
+  }
+}
+
+.burger-button {
+  margin-left: 10px;
+  flex-shrink: 0;
 }

@@ -3,6 +3,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import Box from "../Box/Box";
 import Card from "../Card/Card";
 import Flexbox from "../Flexbox/Flexbox";
+import Popup from "../Popup";
 import RoundButton from "../RoundButton/RoundButton";
 import Typography from "../Typgoraphy/Typography";
 
@@ -22,7 +23,7 @@ export default function EditPopup({
   bottomContent,
 }: EditBoardPopupProps) {
   return (
-    <div className="edit-popup__background" onClick={onClose}>
+    <Popup containerClass="edit-popup__background" onClickBackground={onClose}>
       <Box
         margin="100px 0px 0px 0px"
         onClick={(event: Event) => {
@@ -47,6 +48,6 @@ export default function EditPopup({
           </Flexbox>
         </Card>
       </Box>
-    </div>
+    </Popup>
   );
 }

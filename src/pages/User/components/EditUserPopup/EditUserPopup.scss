@@ -1,0 +1,9 @@
+.edit-user-popup {
+  &__content {
+    width: 100%;
+  }
+
+  & .text-property {
+    flex-direction: column;
+  }
+}

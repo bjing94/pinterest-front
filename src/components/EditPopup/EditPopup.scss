@@ -1,3 +1,5 @@
+@import "/src/styles/mixins";
+
 .edit-popup {
   &__container {
     min-width: 0;
@@ -29,5 +31,11 @@
   &__bottom {
     padding-top: 10px;
     width: 100%;
+  }
+
+  @include phone {
+    &__container {
+      width: 300px;
+    }
   }
 }

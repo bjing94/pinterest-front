@@ -209,10 +209,8 @@ export default function PinCard({
     avatarId !== undefined &&
     userDisplayId !== undefined;
   if (!isLoaded) {
-    console.log("not loaded:", { imgSrc, user, avatarId, userDisplayId });
     return <div></div>;
   }
-  console.log("loaded:", isLoaded, { imgSrc, user, avatarId, userDisplayId });
   return (
     <div
       className="user-pin-card__container"

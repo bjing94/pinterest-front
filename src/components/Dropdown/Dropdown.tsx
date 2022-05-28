@@ -15,12 +15,8 @@ interface DropdownProps extends BaseStyle {
 }
 
 export default function Dropdown({
-  width = "100%",
-  padding = "0",
   children,
   onClickItem,
-  left = "50%",
-  top = "100%",
   className = "",
 }: DropdownProps) {
   let childElements = null;
@@ -34,17 +30,7 @@ export default function Dropdown({
     });
   }
   return (
-    <Card
-      style={{
-        padding: padding,
-        minWidth: 0,
-        width: width,
-        left: left,
-        top: top,
-        borderRadius: "0.5em",
-      }}
-      className={`dropdown__list ${className}`}
-    >
+    <Card className={`dropdown__list ${className}`}>
       <Flexbox fluid flexDirection="column">
         {childElements}
       </Flexbox>

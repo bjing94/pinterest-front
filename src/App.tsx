@@ -15,10 +15,12 @@ import TextPopup from "./components/TextPopup";
 import { getBoards } from "./services/BoardService";
 import BoardPage from "./pages/BoardPage/BoardPage";
 import Search from "./pages/Search";
+import Sidebar from "./components/Sidebar";
 
 function App() {
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showRegisterPopup, setShowRegisterPopup] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
   const [isAuth, setIsAuth] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserData | null>();
   const [textPopupMsg, setTextPopupMsg] = useState<string>("");
@@ -32,7 +34,6 @@ function App() {
     if (!userResponse || userResponse.status !== 200) return;
     const user = userResponse.data as UserData;
     setCurrentUser(user);
-
     const boards = await getBoards(user.boards);
     setCurrentBoards(boards);
   };
@@ -98,6 +99,9 @@ function App() {
             setShowRegisterPopup(true);
           }}
           onClickLogout={handleLogout}
+          onClickBurger={() => {
+            setShowSidebar(!showSidebar);
+          }}
         />
         {textPopupMsg && <TextPopup>{textPopupMsg}</TextPopup>}
         {errorPopupMsg && <TextPopup type="error">{errorPopupMsg}</TextPopup>}
@@ -116,6 +120,16 @@ function App() {
             registerMode={true}
           />
         )}
+        <Sidebar
+          isAuth={isAuth}
+          show={showSidebar}
+          onClickLogin={() => {
+            setShowAuthPopup(true);
+          }}
+          onClickRegister={() => {
+            setShowRegisterPopup(true);
+          }}
+        />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/pin-builder" element={<PinBuilder isAuth={isAuth} />} />

@@ -1,20 +1,18 @@
 import { AxiosResponse } from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import { FaCross, FaWindowClose } from "react-icons/fa";
 import Avatar from "../Avatar/Avatar";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
-import Card from "../Card/Card";
 import Flexbox from "../Flexbox/Flexbox";
 import RoundButton from "../RoundButton/RoundButton";
-import Toolbar from "../Toolbar/Toolbar";
 import Typography from "../Typgoraphy/Typography";
 import { UserData } from "../../services/responses/responses";
 import { getUser } from "../../services/UserService";
 import UserContext from "../../store/userContext";
 
 import "./UsersPopup.scss";
+import Popup from "../Popup";
 
 interface UsersPopupProps {
   userIds: string[];
@@ -94,32 +92,27 @@ export default function UsersPopup({
     loadUsers();
   }, [amountLoaded]);
   return (
-    <div className="users-popup__background">
-      <Box margin="100px 0px 0px 0px">
-        <Card className="users-popup__container">
-          <Flexbox flexDirection="column" style={{ height: "100%" }}>
-            <Box margin="0px 0px 20px 0px" width="400px">
-              <Flexbox fluid justifyContent="center" alignItems="center">
-                <Typography fontSize={16} fontWeight="bold">
-                  {title}
-                </Typography>
-                <RoundButton size={32} onClick={onClose}>
-                  <AiOutlineClose size={24} />
-                </RoundButton>
-              </Flexbox>
-            </Box>
-            <div className="users-popup__list">
-              {userElements}
-              {/* <div style={{ background: "red", height: "800px" }}></div> */}
-              {amountLoaded > 10 && userIds.length > amountLoaded && (
-                <Flexbox fluid justifyContent="center">
-                  <Button>Show more</Button>
-                </Flexbox>
-              )}
-            </div>
+    <Popup containerClass="users-popup__container">
+      <Flexbox flexDirection="column" style={{ height: "100%" }}>
+        <Box margin="0px 0px 20px 0px" width="400px">
+          <Flexbox fluid justifyContent="center" alignItems="center">
+            <Typography fontSize={16} fontWeight="bold">
+              {title}
+            </Typography>
+            <RoundButton size={32} onClick={onClose}>
+              <AiOutlineClose size={24} />
+            </RoundButton>
           </Flexbox>
-        </Card>
-      </Box>
-    </div>
+        </Box>
+        <div className="users-popup__list">
+          {userElements}
+          {amountLoaded > 10 && userIds.length > amountLoaded && (
+            <Flexbox fluid justifyContent="center">
+              <Button>Show more</Button>
+            </Flexbox>
+          )}
+        </div>
+      </Flexbox>
+    </Popup>
   );
 }

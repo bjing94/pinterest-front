@@ -46,6 +46,7 @@ import EditPinPopup from "../../components/EditPinPopup/EditPinPopup";
 import { UpdatePinDto } from "../../services/dto/update-pin.dto";
 import ErrorPage from "../ErrorPages/ErrorPage";
 import EditUserPopup from "./components/EditUserPopup/EditUserPopup";
+import copyCurrentUrl from "../../helpers/copyCurrentUrl";
 
 const breakpointColumnsObj = {
   default: 7,
@@ -122,14 +123,12 @@ export default function User() {
   };
 
   const handleCopyUserLink = async () => {
-    const url = window.location.href;
-    navigator.clipboard
-      .writeText(url)
+    copyCurrentUrl()
       .then(() => {
         setTextPopup("Copied to clipboard.");
       })
       .catch(() => {
-        console.log("Didn't copy!");
+        setErrorPopup("Didn't copy!");
       });
   };
 
@@ -396,7 +395,11 @@ export default function User() {
           />
         )}
         <Toolbar />
-        <Flexbox flexDirection="column" alignItems="center">
+        <Flexbox
+          flexDirection="column"
+          alignItems="center"
+          className="user-page"
+        >
           <RoundButton
             size={128}
             style={{ background: `url(${avatar}) center center` }}
@@ -436,7 +439,12 @@ export default function User() {
           </div>
           <Box margin="20px 0 0 0">
             <Flexbox>
-              <RoundButton size={48} onClick={handleCopyUserLink}>
+              <RoundButton
+                size={48}
+                onClick={() => {
+                  handleCopyUserLink();
+                }}
+              >
                 <FiLink size={24} />
               </RoundButton>
               {!isSubscribed && currentUserInfo && (
@@ -493,7 +501,7 @@ export default function User() {
     );
   } else {
     return (
-      <div>
+      <>
         {showEditUser && (
           <EditUserPopup
             userData={profileInfo}
@@ -557,7 +565,11 @@ export default function User() {
           />
         )}
         <Toolbar />
-        <Flexbox flexDirection="column" alignItems="center">
+        <Flexbox
+          flexDirection="column"
+          alignItems="center"
+          className="user-page"
+        >
           <RoundButton
             size={128}
             style={{ background: `url(${avatar}) center center` }}
@@ -597,7 +609,12 @@ export default function User() {
           </div>
           <Box margin="20px 0 0 0">
             <Flexbox>
-              <RoundButton size={48} onClick={handleCopyUserLink}>
+              <RoundButton
+                size={48}
+                onClick={() => {
+                  handleCopyUserLink();
+                }}
+              >
                 <FiLink size={24} />
               </RoundButton>
               <Button
@@ -643,7 +660,7 @@ export default function User() {
             </Masonry>
           </Flexbox>
         </Flexbox>
-      </div>
+      </>
     );
   }
 }

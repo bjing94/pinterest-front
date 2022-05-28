@@ -2,9 +2,11 @@ import React, { useContext, useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { register, login } from "../../services/AuthService";
 import UserContext from "../../store/userContext";
+import Box from "../Box/Box";
 import Button from "../Button/Button";
 import Flexbox from "../Flexbox/Flexbox";
 import Input from "../Input";
+import Popup from "../Popup";
 import RoundButton from "../RoundButton/RoundButton";
 import Typography from "../Typgoraphy/Typography";
 
@@ -87,94 +89,87 @@ export default function AuthPopup({
       }
     }
   };
-
   return (
-    <div className="auth-popup__background" onClick={onClose}>
-      <div
-        className="auth-popup__container"
-        onClick={(event) => {
-          event.stopPropagation();
+    <Popup containerClass="auth-popup__container" onClickBackground={onClose}>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          handleAuth();
+          onSubmit();
         }}
       >
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleAuth();
-            onSubmit();
-          }}
-        >
-          <Flexbox flexDirection="column">
-            <Flexbox
-              justifyContent="space-between"
-              style={{ width: "100%", paddingLeft: "168px" }}
+        <Flexbox flexDirection="column">
+          <Box width="100%" margin="0px 0px 50px 0px">
+            <RoundButton size={48} className="auth-popup__logo">
+              <img className="logo" width={32} height={32} />
+            </RoundButton>
+            <RoundButton
+              size={32}
+              onClick={onClose}
+              className="auth-popup__close"
             >
-              <RoundButton size={48}>
-                <img className="logo" width={32} height={32} />
-              </RoundButton>
-              <RoundButton size={32} onClick={onClose}>
-                <AiOutlineClose size={24} />
-              </RoundButton>
-            </Flexbox>
-            <div style={{ width: "400px" }}>
-              <Typography>Welcome to Pinterest</Typography>
-            </div>
-            <Flexbox flexDirection="column" className="auth-popup__info">
-              {error && (
-                <Typography fontSize={12} color="error">
-                  {error}
-                </Typography>
-              )}
-              {registerMode && (
-                <>
-                  <Input
-                    placeholder="my name"
-                    className="auth-popup__input"
-                    ref={usernameRef}
-                    type="text"
-                  />
-                  <Input
-                    placeholder="super-id"
-                    className="auth-popup__input"
-                    ref={displayIdRef}
-                    type="text"
-                  />
-                </>
-              )}
-              <Input
-                placeholder="example@gmail.com"
-                className="auth-popup__input"
-                ref={emailRef}
-                type="text"
-              />
-              <Input
-                placeholder="awesome_password"
-                className="auth-popup__input"
-                ref={passwordRef}
-                type="text"
-              />
-              {registerMode && (
-                <>
-                  <Input
-                    placeholder="awesome_password"
-                    className="auth-popup__input"
-                    ref={repeatPasswordRef}
-                    type="text"
-                  />
+              <AiOutlineClose size={24} />
+            </RoundButton>
+          </Box>
+          <div style={{ width: "100%" }}>
+            <Typography>Welcome to Pinterest</Typography>
+          </div>
+          <Flexbox flexDirection="column" className="auth-popup__info">
+            {error && (
+              <Typography fontSize={12} color="error">
+                {error}
+              </Typography>
+            )}
+            {registerMode && (
+              <>
+                <Input
+                  placeholder="my name"
+                  className="auth-popup__input"
+                  ref={usernameRef}
+                  type="text"
+                />
+                <Input
+                  placeholder="super-id"
+                  className="auth-popup__input"
+                  ref={displayIdRef}
+                  type="text"
+                />
+              </>
+            )}
+            <Input
+              placeholder="example@gmail.com"
+              className="auth-popup__input"
+              ref={emailRef}
+              type="text"
+            />
+            <Input
+              placeholder="awesome_password"
+              className="auth-popup__input"
+              ref={passwordRef}
+              type="text"
+            />
+            {registerMode && (
+              <>
+                <Input
+                  placeholder="awesome_password"
+                  className="auth-popup__input"
+                  ref={repeatPasswordRef}
+                  type="text"
+                />
 
-                  <Button className="auth-popup__register-button" type="submit">
-                    Register
-                  </Button>
-                </>
-              )}
-              {!registerMode && (
-                <Button className="auth-popup__login-button" type="submit">
-                  Login
+                <Button className="auth-popup__register-button" type="submit">
+                  Register
                 </Button>
-              )}
-            </Flexbox>
+              </>
+            )}
+            {!registerMode && (
+              <Button className="auth-popup__login-button" type="submit">
+                Login
+              </Button>
+            )}
           </Flexbox>
-        </form>
-      </div>
-    </div>
+        </Flexbox>
+      </form>
+    </Popup>
   );
 }

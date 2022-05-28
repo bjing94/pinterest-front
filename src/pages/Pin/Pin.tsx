@@ -460,13 +460,11 @@ export default function Pin() {
                 <Flexbox>
                   {showOptionsDropdown && (
                     <Dropdown
-                      width="150px"
-                      padding="10px"
-                      left="-50px"
                       onClickItem={(event: Event) => {
                         event.stopPropagation();
                         setShowOptionsDropdown(false);
                       }}
+                      className="pin__dropdown-options"
                     >
                       <a href={downloadLink} download={`${title}-img`}>
                         <Typography fontSize={12} fontWeight="bold">
@@ -564,13 +562,11 @@ export default function Pin() {
                 <Flexbox>
                   {showOptionsDropdown && (
                     <Dropdown
-                      width="150px"
-                      padding="10px"
-                      left="-50px"
                       onClickItem={(event: Event) => {
                         event.stopPropagation();
                         setShowOptionsDropdown(false);
                       }}
+                      className="pin__dropdown-options"
                     >
                       <a href={downloadLink} download={`${title}-img`}>
                         <Typography fontSize={12} fontWeight="bold">

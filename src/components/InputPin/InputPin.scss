@@ -4,7 +4,8 @@
   position: relative;
   display: block;
   height: 510px;
-  width: 340px;
+  width: 100%;
+  max-width: 340px;
   background-color: $light-gray;
   border-radius: 1rem;
   padding: 1rem;

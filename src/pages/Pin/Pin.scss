@@ -33,6 +33,17 @@
     margin-top: 2rem;
   }
 
+  &__dropdown-options {
+    padding: 0;
+    min-width: 120px;
+    width: fit-content;
+    top: 30px;
+    & .dropdown__item {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+
   @include tablet {
     &__content {
       flex-direction: column;
@@ -67,6 +78,18 @@
           // object-fit: fill;
         }
       }
+    }
+  }
+
+  @include phone524 {
+    &__card {
+      max-width: 300px;
+      padding: 0;
+    }
+
+    &__info {
+      padding-left: 10px;
+      padding-right: 10px;
     }
   }
 }

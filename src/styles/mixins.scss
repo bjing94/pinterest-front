@@ -9,3 +9,15 @@
     @content;
   }
 }
+
+@mixin phone {
+  @media (max-width: 440px) {
+    @content;
+  }
+}
+
+@mixin phone524 {
+  @media (max-width: 524px) {
+    @content;
+  }
+}

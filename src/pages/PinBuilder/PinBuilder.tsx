@@ -30,6 +30,7 @@ import Dropdown from "../../components/Dropdown";
 import ButtonGroup from "../../components/ButtonGroup/ButtonGroup";
 import { Navigate } from "react-router-dom";
 import UserContext from "../../store/userContext";
+import Box from "../../components/Box/Box";
 
 interface PinBuilderProps {
   isAuth?: boolean;
@@ -221,12 +222,13 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
                 setShowOptionsDropdown(false);
               }}
               left="-60px"
+              className="pin-builder__dropdown-options"
             >
-              <div onClick={handleDeletePin}>
+              <Box onClick={handleDeletePin}>
                 <Typography fontSize={12} fontWeight="bold">
-                  Delete
+                  Clear
                 </Typography>
-              </div>
+              </Box>
               <Typography fontSize={12} fontWeight="bold">
                 Duplicate
               </Typography>
@@ -259,7 +261,11 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
             )}
           </ButtonGroup>
         </Flexbox>
-        <Flexbox alignItems="flex-start" style={{ marginTop: "2rem" }}>
+        <Flexbox
+          className="pin-builder__content"
+          alignItems="flex-start"
+          style={{ marginTop: "2rem" }}
+        >
           <InputPin
             ref={fileRef}
             onInputChange={handleUploadImg}
@@ -282,24 +288,24 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
           )}
           <Flexbox
             style={{
-              marginLeft: "3.25rem",
-              paddingTop: "32px",
-              width: "350px",
+              width: "100%",
             }}
             flexDirection="column"
             justifyContent="flex-start"
             alignItems="flex-start"
+            className="pin-builder__input-container"
           >
             <ResponsiveInput
               placeholder="Добавьте название"
               tip="В лентах видны только первые 40 символов"
               symbolsLimit={100}
-              fontSize="2rem"
+              fontSize="20px"
               ref={titleRef}
               onInput={(value: string) => {
                 setTitle(value);
               }}
               value={title}
+              className="input-title"
             />
             <ProfileInfo
               username={username}
@@ -315,6 +321,7 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
                 setDescription(value);
               }}
               value={description}
+              className="input-description"
             />
           </Flexbox>
         </Flexbox>

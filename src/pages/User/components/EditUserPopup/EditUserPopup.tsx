@@ -7,6 +7,8 @@ import { UpdateUserDto } from "../../../../services/dto/update-user.dto";
 import { UserData } from "../../../../services/responses/responses";
 import EditPopup from "../../../../components/EditPopup/EditPopup";
 
+import "./EditUserPopup.scss";
+
 interface TextPropertyProps {
   label: string;
   value: string;
@@ -17,7 +19,12 @@ interface TextPropertyProps {
 function TextProperty({ label, value, onInput, id }: TextPropertyProps) {
   return (
     <Box width="100%" margin="0px 0px 20px 0px">
-      <Flexbox fluid justifyContent="space-between" alignItems="center">
+      <Flexbox
+        className="text-property"
+        fluid
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Box margin="0px 50px 0px 0px">
           <label htmlFor={id}>{label}</label>
         </Box>
@@ -52,7 +59,7 @@ export default function EditUserPopup({
   const [newPassword, setNewPassword] = useState("");
 
   const mainContent = (
-    <Box width="583px">
+    <Box className="edit-user-popup__content">
       <TextProperty
         label="Username"
         value={currentUsername}

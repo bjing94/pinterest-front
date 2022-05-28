@@ -37,15 +37,6 @@ interface CommentSectionProps {
   onDelete: any;
 }
 
-interface CommentReplyProps {
-  username: string;
-  content: string;
-  isLiked: boolean;
-  isUseful: boolean;
-  date: string;
-  usefulCount: number;
-}
-
 interface CommentInputProps {
   show: boolean;
   onSubmit: any;

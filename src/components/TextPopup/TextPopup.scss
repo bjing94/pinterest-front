@@ -5,7 +5,7 @@
   z-index: 2;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 40px;
+  bottom: 60px;
 
   & .card-container {
     padding: 20px;
@@ -38,6 +38,6 @@
   }
 
   to {
-    bottom: 40px;
+    bottom: 60px;
   }
 }

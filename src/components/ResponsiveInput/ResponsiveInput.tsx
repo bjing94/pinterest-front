@@ -18,7 +18,16 @@ export const ResponsiveInput = React.forwardRef<
   ResponsiveInputProps
 >(
   (
-    { style, placeholder, tip, symbolsLimit, fontSize, value, onInput },
+    {
+      style,
+      placeholder,
+      tip,
+      symbolsLimit,
+      fontSize,
+      value,
+      onInput,
+      className,
+    },
     ref
   ) => {
     const [showTip, setShowTip] = useState(false);
@@ -29,7 +38,10 @@ export const ResponsiveInput = React.forwardRef<
     } as React.CSSProperties;
 
     return (
-      <div className="input-container" style={{ ...styles, fontSize }}>
+      <div
+        className={`input-container ${className}`}
+        style={{ ...styles, fontSize }}
+      >
         <textarea
           name="text"
           onInput={(event) => {
