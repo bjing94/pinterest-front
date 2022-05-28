@@ -13,8 +13,6 @@ import { findPins, getRandomPins } from "../../services/PinService";
 import { UserData } from "../../services/responses/responses";
 import UserContext from "../../store/userContext";
 
-// import "./Search.scss";
-
 const breakpointColumnsObj = {
   default: 7,
   1820: 6, // 1800 or less

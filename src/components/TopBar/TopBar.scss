@@ -25,6 +25,7 @@
 
 .phone-grid {
   display: none;
+
   @include phone {
     display: block;
   }
@@ -32,6 +33,7 @@
 
 .desktop-grid {
   display: block;
+
   @include phone {
     display: none;
   }

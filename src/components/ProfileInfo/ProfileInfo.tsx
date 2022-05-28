@@ -4,8 +4,6 @@ import Box from "../Box/Box";
 import Flexbox from "../Flexbox/Flexbox";
 import Typography from "../Typgoraphy/Typography";
 
-import "./ProfileInfo.scss";
-
 interface ProfileInfoProps extends BaseStyle {
   username: string;
   avatarId: string;

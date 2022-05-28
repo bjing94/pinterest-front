@@ -3,29 +3,26 @@
 .responsive-textarea-container {
   position: relative;
   display: grid;
+
   --input-content: "abcdefg";
+
   width: 100%;
 
   &::after {
     content: var(--input-content);
-
     white-space: pre-wrap;
     overflow-x: hidden;
     overflow-wrap: break-word;
-
     visibility: hidden;
     grid-area: 1 / 1 / 2 / 2;
-
     border-bottom: 2px black hidden;
   }
 
   textarea {
     /* You could leave this, but after a user resizes, then it ruins the auto sizing */
     resize: none;
-
     overflow: hidden;
     grid-area: 1 / 1 / 2 / 2;
-
     border: none;
     padding: 0;
     outline: none;

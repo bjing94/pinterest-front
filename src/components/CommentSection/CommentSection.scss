@@ -1,4 +1,4 @@
-@import "../../styles/colors.scss";
+@import "../../styles/colors";
 
 .comment {
   &__content {
@@ -23,6 +23,7 @@
 
   &__container {
     width: 100%;
+
     &:not(:last-child) {
       margin-bottom: 1rem;
     }
@@ -40,6 +41,7 @@
 
   &-section {
     width: 100%;
+
     &__btn {
       transition: all 0.2s ease-in-out;
     }

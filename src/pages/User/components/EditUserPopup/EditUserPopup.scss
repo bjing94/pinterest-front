@@ -5,6 +5,7 @@
     width: 100%;
   }
 }
+
 @include phone524 {
   .text-property {
     flex-direction: column;

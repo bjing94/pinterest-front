@@ -33,6 +33,7 @@
     padding: 0;
     width: fit-content;
     top: 30px;
+
     & .dropdown__item {
       padding-left: 1em;
       padding-right: 1em;
@@ -48,6 +49,7 @@
       & * {
         visibility: visible;
       }
+
       &:hover {
         background: none;
       }
@@ -69,15 +71,18 @@
     &__content {
       flex-direction: column;
     }
+
     &__input-container {
-      margin-left: 0px;
+      margin-left: 0;
     }
   }
 }
+
 @include phone524 {
   .input-description {
     padding-bottom: 0;
   }
+
   .input-title {
     padding-bottom: 0;
     margin-top: 20px;

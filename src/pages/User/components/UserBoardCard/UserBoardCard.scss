@@ -23,15 +23,17 @@
   }
 
   &__main-img {
-    border-radius: 1rem 0rem 0rem 1rem;
+    border-radius: 1rem 0 0 1rem;
     border-right: 2px solid white;
   }
+
   &__top-img {
-    border-radius: 0rem 1rem 0rem 0rem;
+    border-radius: 0 1rem 0 0;
     border-bottom: 1px solid white;
   }
+
   &__bottom-img {
-    border-radius: 0rem 0rem 1rem 0rem;
+    border-radius: 0 0 1rem;
     border-top: 1px solid white;
   }
 
@@ -44,6 +46,7 @@
       width: 100%;
       height: 100%;
     }
+
     & .user-board__overlay:hover {
       opacity: 1;
     }
@@ -63,7 +66,7 @@
     height: 100%;
     width: 100%;
     z-index: 2;
-    background: rgba($color: #000000, $alpha: 0.3);
+    background: rgba($color: #000, $alpha: 30%);
     border-radius: 1rem;
   }
 }

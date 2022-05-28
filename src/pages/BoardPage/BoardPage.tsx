@@ -24,8 +24,6 @@ import { getUser, subscribe, unsubscribe } from "../../services/UserService";
 import UserContext from "../../store/userContext";
 import LoadingPage from "../LoadingPage/LoadingPage";
 
-import "./BoardPage.scss";
-
 const breakpointColumnsObj = {
   default: 7,
   1820: 6, // 1800 or less
