@@ -5,6 +5,9 @@ export default function convertAgeToString(start: Date, end: Date) {
   const toDays = 1 / (1000 * 60 * 60 * 24);
   const toMonths = 1 / (1000 * 60 * 60 * 24 * 7);
   const toYears = 1 / (1000 * 60 * 60 * 24 * 7 * 365);
+  if (Math.floor(milliseconds * toMinutes) < 1) {
+    return `Just now`;
+  }
   if (Math.floor(milliseconds * toMinutes) < 60) {
     return `${Math.floor(milliseconds * toMinutes)} minutes`;
   }

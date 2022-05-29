@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { FiLink } from "react-icons/fi";
 import { Link } from "react-router-dom";
@@ -13,6 +13,7 @@ import { getBoard } from "../../../../services/BoardService";
 import { getStaticImage } from "../../../../services/FileService";
 import { getPin } from "../../../../services/PinService";
 import { BoardData, PinData } from "../../../../services/responses/responses";
+import UserContext from "../../../../store/userContext";
 
 import "./UserBoardCard.scss";
 
@@ -61,35 +62,35 @@ export default function UserBoardCard({
   onEdit,
   isOwner,
 }: UserBoardCardProps) {
+  const { setTextPopup, setErrorPopup } = useContext(UserContext);
   const [coverImages, setCoverImages] = useState<string[]>([]);
   const [title, setTitle] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
   const [age, setAge] = useState<string>("");
 
-  const handleGetBoard = async () => {
-    const board = await getBoard(id);
-    if (board) {
-      if (board.status === 200) {
-        const boardData = board.data as BoardData;
-        const imgSrcs = await getSrcFromPins(boardData.pins);
-        setCoverImages(imgSrcs);
-        setAmount(boardData.pins.length);
-        setTitle(boardData.title);
-        setAge(
-          convertAgeToString(
-            new Date(Date.parse(boardData.createdAt)),
-            new Date()
-          )
-        );
-      }
-    } else {
-      console.log("ERROR!");
-    }
-  };
-
   useEffect(() => {
+    const handleGetBoard = async () => {
+      const board = await getBoard(id);
+      if (board) {
+        if (board.status === 200) {
+          const boardData = board.data as BoardData;
+          const imgSrcs = await getSrcFromPins(boardData.pins);
+          setCoverImages(imgSrcs);
+          setAmount(boardData.pins.length);
+          setTitle(boardData.title);
+          setAge(
+            convertAgeToString(
+              new Date(Date.parse(boardData.createdAt)),
+              new Date()
+            )
+          );
+        }
+      } else {
+        console.log("ERROR!");
+      }
+    };
     handleGetBoard();
-  }, []);
+  }, [id]);
 
   if (!title) {
     return null;
@@ -124,7 +125,13 @@ export default function UserBoardCard({
               size={32}
               onClick={(e: Event) => {
                 e.preventDefault();
-                copyCurrentUrl();
+                copyCurrentUrl()
+                  .then(() => {
+                    setTextPopup("Copied to clipboard.");
+                  })
+                  .catch(() => {
+                    setErrorPopup("Didn't copy!");
+                  });
               }}
             >
               <FiLink size={24} />
@@ -134,7 +141,7 @@ export default function UserBoardCard({
         <div className="user-board__main-img">
           <img
             alt="main-img"
-            src={coverImages[0] ?? ""}
+            src={coverImages[0] ?? "https://via.placeholder.com/250"}
             style={{ background: `${coverImages[0] ? "none" : "gray"}` }}
           />
         </div>
@@ -145,7 +152,7 @@ export default function UserBoardCard({
           <div className="user-board__top-img">
             <img
               alt="top-img"
-              src={coverImages[1] ?? ""}
+              src={coverImages[1] ?? "https://via.placeholder.com/250"}
               style={{ background: `${coverImages[1] ? "none" : "gray"}` }}
             />
           </div>
@@ -153,7 +160,7 @@ export default function UserBoardCard({
             <img
               alt="bottom-img"
               className="user-board__bottom-img"
-              src={coverImages[2] ?? ""}
+              src={coverImages[2] ?? "https://via.placeholder.com/250"}
               style={{ background: `${coverImages[2] ? "none" : "gray"}` }}
             />
           </div>

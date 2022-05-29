@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { FiLink } from "react-icons/fi";
 import Masonry from "react-masonry-css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import ButtonSection from "../../components/ButtonSection";
 import Flexbox from "../../components/Flexbox/Flexbox";
@@ -29,8 +29,6 @@ import {
 } from "../../services/BoardService";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
 import Box from "../../components/Box/Box";
-
-import "./User.scss";
 import UsersPopup from "../../components/UsersPopup/UsersPopup";
 import UserContext from "../../store/userContext";
 import EditBoardPopup from "../../components/EditBoardPopup/EditBoardPopup";
@@ -40,6 +38,9 @@ import { UpdatePinDto } from "../../services/dto/update-pin.dto";
 import ErrorPage from "../ErrorPages/ErrorPage";
 import EditUserPopup from "./components/EditUserPopup/EditUserPopup";
 import copyCurrentUrl from "../../helpers/copyCurrentUrl";
+
+import "./User.scss";
+import { UpdateUserDto } from "../../services/dto/update-user.dto";
 
 const breakpointColumnsObj = {
   default: 7,
@@ -54,13 +55,9 @@ const breakpointColumnsObj = {
 export default function User() {
   const { id: displayId } = useParams();
 
-  const {
-    setTextPopup,
-    setErrorPopup,
-    userBoards,
-    _id: currentUserId,
-    updateUserInfo,
-  } = useContext(UserContext);
+  const { setTextPopup, setErrorPopup, updateUserInfo, authUserData } =
+    useContext(UserContext);
+  const navigate = useNavigate();
 
   const [profileInfo, setProfileInfo] = useState<UserData | undefined>();
   const [showCreated, setShowCreated] = useState(true);
@@ -113,7 +110,7 @@ export default function User() {
     } else {
       console.log("Not authenticated!");
     }
-    getProfileInfo();
+    refetchProfileInfo();
   };
 
   const handleUnSubscribe = async (subscribeToId: string) => {
@@ -126,7 +123,7 @@ export default function User() {
     } else {
       console.log("Not authenticated!");
     }
-    getProfileInfo();
+    refetchProfileInfo();
   };
 
   const handleCopyUserLink = async () => {
@@ -147,7 +144,7 @@ export default function User() {
     }
 
     setTextPopup("Pin deleted.");
-    getProfileInfo();
+    refetchProfileInfo();
   };
 
   const handleUpdatePin = async (
@@ -156,6 +153,7 @@ export default function User() {
     newId: string,
     createBoardTitle?: string
   ) => {
+    if (!authUserData) return;
     let newBoardId = newId;
     let oldBoardId = oldId;
 
@@ -164,7 +162,7 @@ export default function User() {
       const createBoardResponse = await createBoard({
         title: createBoardTitle,
         pins: [editedPinId],
-        userId: currentUserId,
+        userId: authUserData._id,
       });
       if (!createBoardResponse || createBoardResponse.status !== 201) {
         console.log("Error creating board.");
@@ -172,6 +170,7 @@ export default function User() {
       }
 
       newBoardId = (createBoardResponse.data as BoardData)._id;
+      updateUserInfo();
     }
 
     if (oldBoardId !== "" && oldBoardId !== newBoardId) {
@@ -214,7 +213,17 @@ export default function User() {
 
     updatePin(editedPinId, dto); // update pin info
     setTextPopup("Pin updated.");
-    getProfileInfo();
+    refetchProfileInfo();
+  };
+
+  const handleUpdateUser = async (dto: UpdateUserDto) => {
+    if (!profileInfo) return;
+    await updateUser(profileInfo._id, dto);
+    await refetchProfileInfo();
+    await updateUserInfo();
+    if (dto.displayId !== displayId) {
+      navigate(`/user/${dto.displayId}`, {});
+    }
   };
 
   const handleSavePin = async (pindId: string) => {
@@ -248,24 +257,7 @@ export default function User() {
     return;
   };
 
-  const getCurrentUserInfo = async () => {
-    const response = await getCurrentUser();
-    if (!response || response.status !== 200) return;
-
-    const userData = response.data as UserData;
-    setCurrentUserInfo(userData);
-
-    const currentBoardsData: BoardData[] = await getBoards(userData.boards);
-
-    const newBoardsToPins: { boardId: string; pins: string[] }[] = [];
-    currentBoardsData.forEach((board) => {
-      newBoardsToPins.push({ boardId: board._id, pins: board.pins });
-    });
-
-    setBoardToPins(newBoardsToPins);
-  };
-
-  const getProfileInfo = async () => {
+  const refetchProfileInfo = async () => {
     if (displayId) {
       const response = await findUser({ displayId: displayId });
 
@@ -288,9 +280,47 @@ export default function User() {
   };
 
   useEffect(() => {
+    const getCurrentUserInfo = async () => {
+      const response = await getCurrentUser();
+      if (!response || response.status !== 200) return;
+
+      const userData = response.data as UserData;
+      setCurrentUserInfo(userData);
+
+      const currentBoardsData: BoardData[] = await getBoards(userData.boards);
+
+      const newBoardsToPins: { boardId: string; pins: string[] }[] = [];
+      currentBoardsData.forEach((board) => {
+        newBoardsToPins.push({ boardId: board._id, pins: board.pins });
+      });
+
+      setBoardToPins(newBoardsToPins);
+    };
+
+    const getProfileInfo = async () => {
+      if (displayId) {
+        const response = await findUser({ displayId: displayId });
+
+        if (response) {
+          if (response.status === 200) {
+            const user = response.data as UserData;
+            setProfileInfo(user);
+            await checkSubscribed();
+
+            const staticSrc = await getStaticImage(user.avatarSrc);
+            setAvatar(staticSrc ?? "https://via.placeholder.com/128.jpg");
+            setIsLoading(false);
+          } else {
+            setIsLoading(false);
+          }
+        } else {
+          setIsLoading(false);
+        }
+      }
+    };
     getProfileInfo();
     getCurrentUserInfo();
-  }, []);
+  }, [displayId]);
 
   useEffect(() => {}, [profileInfo, currentUserInfo]);
 
@@ -306,7 +336,7 @@ export default function User() {
     return <ErrorPage errorCode={404} />;
   }
 
-  const isOwner = currentUserId === profileInfo._id;
+  const isOwner = authUserData?._id === profileInfo._id;
 
   const pinElements = profileInfo.createdPins.map((id) => {
     const isSaved = !!boardsToPins.find((data) => {
@@ -323,7 +353,7 @@ export default function User() {
           pinId={id}
           isSaved={isSaved}
           isOwner={isOwner}
-          boards={userBoards.map((board) => board._id)}
+          boards={authUserData?.boards || [""]}
           onSavePin={(pinId) => {
             handleSavePin(pinId);
           }}
@@ -355,7 +385,7 @@ export default function User() {
             setShowEditBoard(true);
             setEditedBoardId(boardId);
           }}
-          isOwner={currentUserId === profileInfo._id}
+          isOwner={authUserData?._id === profileInfo._id}
         />
       </Flexbox>
     );
@@ -403,7 +433,9 @@ export default function User() {
             onClose={() => {
               setShowCreateBoard(false);
             }}
-            onSubmit={() => {}}
+            onSubmit={() => {
+              updateUserInfo();
+            }}
           />
         )}
         <Toolbar />
@@ -521,9 +553,7 @@ export default function User() {
             onClose={() => {
               setShowEditUser(false);
             }}
-            onUpdate={(dto) => {
-              updateUser(profileInfo._id, dto);
-            }}
+            onUpdate={handleUpdateUser}
           />
         )}
         {showEditBoard && (
@@ -535,7 +565,7 @@ export default function User() {
             }}
             onSubmit={() => {
               updateUserInfo();
-              getProfileInfo();
+              refetchProfileInfo();
             }}
           />
         )}
@@ -579,7 +609,9 @@ export default function User() {
             onClose={() => {
               setShowCreateBoard(false);
             }}
-            onSubmit={() => {}}
+            onSubmit={() => {
+              updateUserInfo();
+            }}
           />
         )}
         <Toolbar />

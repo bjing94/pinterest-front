@@ -1,4 +1,4 @@
 export default function copyCurrentUrl() {
   const url = window.location.href;
-  return navigator.clipboard.writeText(url);
+  return window.navigator.clipboard.writeText(url);
 }

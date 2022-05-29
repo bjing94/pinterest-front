@@ -10,9 +10,8 @@ import { checkLogin, getCurrentUser, logout } from "./services/AuthService";
 
 import "./App.scss";
 import { UserProvider } from "./store/userContext";
-import { BoardData, UserData } from "./services/responses/responses";
+import { UserData } from "./services/responses/responses";
 import TextPopup from "./components/TextPopup";
-import { getBoards } from "./services/BoardService";
 import BoardPage from "./pages/BoardPage/BoardPage";
 import Search from "./pages/Search";
 import Sidebar from "./components/Sidebar";
@@ -27,7 +26,6 @@ function App() {
   const [textPopupTimer, setTextPopupTimer] = useState<number>();
   const [errorPopupMsg, setErrorPopupMsg] = useState<string>("");
   const [errorPopupTimer, setErrorPopupTimer] = useState<number>();
-  const [currentBoards, setCurrentBoards] = useState<BoardData[] | null>(null);
 
   const getAuthUserInfo = async () => {
     const userResponse = await getCurrentUser();
@@ -36,8 +34,6 @@ function App() {
     }
     const user = userResponse.data as UserData;
     setCurrentUser(user);
-    const boards = await getBoards(user.boards);
-    setCurrentBoards(boards);
   };
 
   const checkIsAuth = async () => {
@@ -83,13 +79,10 @@ function App() {
     <UserProvider
       value={{
         isAuth: isAuth,
-        _id: currentUser?._id || "",
-        displayId: currentUser?.displayId || "",
         setTextPopup: handleSetTextPopup,
         setErrorPopup: handleSetErrorPopup,
         updateUserInfo: getAuthUserInfo,
-        userBoards: currentBoards || [],
-        currentSavedPins: currentUser?.savedPins || [],
+        authUserData: currentUser || undefined,
       }}
     >
       <div className="App">
@@ -134,7 +127,7 @@ function App() {
         />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/pin-builder" element={<PinBuilder isAuth={isAuth} />} />
+          <Route path="/pin-builder" element={<PinBuilder />} />
           <Route path="/pin/:id" element={<Pin />} />
           <Route path="/user/:id" element={<User />} />
           <Route path="/board/:id" element={<BoardPage />} />

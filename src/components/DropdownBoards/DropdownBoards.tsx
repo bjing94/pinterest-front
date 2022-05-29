@@ -49,26 +49,25 @@ function DropdownItem({ boardData, onClick }: DropdownItemProps) {
   const [coverImg, setCoverImg] = useState("");
   const { title, pins } = boardData;
 
-  const getCoverImg = async () => {
-    if (pins.length === 0) {
-      return;
-    }
-
-    const pinResponse = await getPin(pins[0]);
-
-    if (!pinResponse || pinResponse.status !== 200) {
-      return;
-    }
-    const pin = pinResponse.data as PinData;
-    const img = await getStaticImage(pin.imgId);
-    if (!img) {
-      return;
-    }
-
-    setCoverImg(img);
-  };
-
   useEffect(() => {
+    const getCoverImg = async () => {
+      if (pins.length === 0) {
+        return;
+      }
+
+      const pinResponse = await getPin(pins[0]);
+
+      if (!pinResponse || pinResponse.status !== 200) {
+        return;
+      }
+      const pin = pinResponse.data as PinData;
+      const img = await getStaticImage(pin.imgId);
+      if (!img) {
+        return;
+      }
+
+      setCoverImg(img);
+    };
     getCoverImg();
   }, []);
 

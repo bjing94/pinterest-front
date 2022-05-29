@@ -35,7 +35,7 @@ interface BoardsSelectionPropertyProps {
   label: string;
   value: string;
   onSelect: (boardId: string) => void;
-  boards: BoardData[];
+  boards?: BoardData[];
   onCreate: (boardTitle: string) => void;
 }
 
@@ -58,7 +58,7 @@ function BoardsSelectionProperty({
     </Box>,
   ];
 
-  if (boards.length > 0) {
+  if (boards && boards.length > 0) {
     dropdownItems = boards.map((board) => {
       return (
         <Box
@@ -178,7 +178,7 @@ export default function EditPinPopup({
   onUpdate,
   isSaver = false,
 }: EditPinPopupProps) {
-  const { userBoards } = useContext(UserContext);
+  const { authUserData } = useContext(UserContext);
 
   const [pinData, setPinData] = useState<PinData | null>(null);
   const [imgSrc, setImgSrc] = useState<string>("");
@@ -188,10 +188,11 @@ export default function EditPinPopup({
   const [titleValue, setTitleValue] = useState("");
   const [contentValue, setContentValue] = useState("");
   const [oldBoardId, setOldBoardId] = useState("");
+  const [userBoards, setUserBoards] = useState<BoardData[]>();
 
   const getPinInfo = async () => {
     const pinResponse = await getPin(pinId);
-    if (pinResponse?.status !== 200 || !pinResponse) return;
+    if (pinResponse?.status !== 200 || !pinResponse || !userBoards) return;
 
     const pinData = pinResponse.data as PinData;
     setPinData(pinData);
@@ -222,9 +223,11 @@ export default function EditPinPopup({
   const savedOnBoardName =
     temporaryBoardTitle !== ""
       ? temporaryBoardTitle
-      : userBoards.find((board) => {
+      : userBoards
+      ? userBoards.find((board) => {
           return board._id === selectedBoardId;
-        })?.title || "";
+        })?.title || ""
+      : "";
 
   if (!pinData) return <div>whoops</div>;
   const mainContent = (

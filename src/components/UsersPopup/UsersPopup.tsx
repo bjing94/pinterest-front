@@ -29,7 +29,7 @@ export default function UsersPopup({
   onSubscribe,
   onUnSubscribe,
 }: UsersPopupProps) {
-  const { _id: currentUserId, isAuth } = useContext(UserContext);
+  const { authUserData, isAuth } = useContext(UserContext);
 
   const [amountLoaded, setAmountLoaded] = useState(20);
   const [users, setUsers] = useState<UserData[]>([]);
@@ -53,8 +53,10 @@ export default function UsersPopup({
   };
 
   const userElements = users.map((user) => {
-    const isSubscribed = user.subscribers.includes(currentUserId);
-    const isYou = user._id === currentUserId;
+    const isSubscribed = authUserData
+      ? user.subscribers.includes(authUserData._id)
+      : false;
+    const isYou = user._id === authUserData?._id;
     return (
       <Flexbox fluid>
         <Box margin="0px 10px 0px 0px">

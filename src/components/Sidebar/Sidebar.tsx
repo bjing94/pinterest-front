@@ -18,7 +18,7 @@ export default function Sidebar({
   onClickLogin,
   onClickRegister,
 }: SidebarProps) {
-  const { displayId } = useContext(UserContext);
+  const { authUserData } = useContext(UserContext);
   return (
     <Dropdown className={`sidebar ${show ? "show" : ""}`}>
       <Link to="/">
@@ -42,8 +42,8 @@ export default function Sidebar({
         </Box>
       )}
 
-      {isAuth && (
-        <Link to={`/user/${displayId}`}>
+      {isAuth && authUserData && (
+        <Link to={`/user/${authUserData._id}`}>
           <Typography fontSize={18} fontWeight="bold">
             Profile
           </Typography>

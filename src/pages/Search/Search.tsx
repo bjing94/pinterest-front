@@ -8,9 +8,13 @@ import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import { getCurrentUser } from "../../services/AuthService";
-import { savePinToBoard, savePinToProfile } from "../../services/BoardService";
+import {
+  getBoards,
+  savePinToBoard,
+  savePinToProfile,
+} from "../../services/BoardService";
 import { findPins, getRandomPins } from "../../services/PinService";
-import { UserData } from "../../services/responses/responses";
+import { BoardData, UserData } from "../../services/responses/responses";
 import UserContext from "../../store/userContext";
 
 const breakpointColumnsObj = {
@@ -24,11 +28,12 @@ const breakpointColumnsObj = {
 };
 
 export default function Search() {
-  const { isAuth, userBoards, setTextPopup, setErrorPopup, currentSavedPins } =
+  const { isAuth, setTextPopup, setErrorPopup, authUserData, updateUserInfo } =
     useContext(UserContext);
 
   const [pinsIds, setPinIds] = useState<string[]>([]);
   const [boardId, setBoardId] = useState<string>();
+  const [boardsData, setBoardsData] = useState<BoardData[]>();
   const [showCreateBoard, setShowCreateBoard] = useState(false);
 
   const handleSearchPins = async () => {
@@ -79,20 +84,24 @@ export default function Search() {
   };
 
   useEffect(() => {
+    const getAuthUserBoards = async () => {
+      if (!authUserData) return;
+      const boardsData = await getBoards(authUserData.boards);
+      setBoardsData(boardsData);
+    };
     getPins();
-    getCurrentUser().then((response) => {
-      if (!response || response.status !== 200) return;
-
-      response.data as UserData;
-    });
-
     handleSearchPins();
-  }, []);
+    getAuthUserBoards();
+  }, [authUserData]);
 
   const pinCards = pinsIds.map((id) => {
-    const isSaved =
-      userBoards.findIndex((board) => board.pins.includes(id)) !== -1 ||
-      currentSavedPins.includes(id);
+    let isSaved = false;
+    if (authUserData && boardsData) {
+      isSaved =
+        boardsData.findIndex((board) => board.pins.includes(id)) !== -1 ||
+        authUserData.savedPins.includes(id);
+    }
+
     return (
       <Flexbox
         justifyContent="center"
@@ -101,7 +110,7 @@ export default function Search() {
       >
         <PinCard
           isSaved={isSaved}
-          boards={userBoards.map((board) => board._id)}
+          boards={authUserData?.boards || [""]}
           onSetBoardId={(boardId) => {
             setBoardId(boardId);
           }}
@@ -125,7 +134,9 @@ export default function Search() {
           onClose={() => {
             setShowCreateBoard(false);
           }}
-          onSubmit={(value: string) => {}}
+          onSubmit={(value: string) => {
+            updateUserInfo();
+          }}
         />
       )}
       <Toolbar />

@@ -45,7 +45,7 @@ import LoadingPage from "../LoadingPage/LoadingPage";
 
 export default function Pin() {
   const { id } = useParams();
-  const { setTextPopup, setErrorPopup, updateUserInfo, userBoards } =
+  const { setTextPopup, setErrorPopup, updateUserInfo, authUserData } =
     useContext(UserContext);
 
   // Current user information
@@ -77,22 +77,6 @@ export default function Pin() {
   //Error handling
   const [errorMsg, setErrorMsg] = useState("");
   const [errorCode, setErrorCode] = useState(0);
-
-  const getCurrentUserInfo = async () => {
-    const resAuth = await checkLogin();
-    setIsAuth(resAuth);
-    if (!resAuth) return;
-
-    await getCurrentUser().then((response) => {
-      if (!response || response.status !== 200) {
-        return;
-      }
-
-      setCurrentUserInfo(response.data as UserData);
-
-      checkSaved();
-    });
-  };
 
   const getAuthorInfo = async () => {
     if (!authorInfo?._id) {
@@ -363,12 +347,26 @@ export default function Pin() {
     getPinInfo();
   };
 
-  const loadInfo = async () => {
-    await getPinInfo();
-    await getCurrentUserInfo();
-  };
-
   useEffect(() => {
+    const getCurrentUserInfo = async () => {
+      const resAuth = await checkLogin();
+      setIsAuth(resAuth);
+      if (!resAuth) return;
+
+      await getCurrentUser().then((response) => {
+        if (!response || response.status !== 200) {
+          return;
+        }
+
+        setCurrentUserInfo(response.data as UserData);
+
+        checkSaved();
+      });
+    };
+    const loadInfo = async () => {
+      await getPinInfo();
+      await getCurrentUserInfo();
+    };
     loadInfo();
   }, [id]);
 
@@ -494,7 +492,6 @@ export default function Pin() {
 
   if (pinInfoReady && userInfoReady) {
     const { _id: currentUserId } = currentUserInfo;
-    const boards = userBoards.map(({ _id }) => _id);
     return (
       <Flexbox
         justifyContent="flex-start"
@@ -563,7 +560,7 @@ export default function Pin() {
                 </Flexbox>
                 <Flexbox>
                   <DropdownBoards
-                    boardIds={boards}
+                    boardIds={authUserData?.boards || [""]}
                     onClickCreateBoard={() => {
                       setShowCreateBoard(true);
                     }}

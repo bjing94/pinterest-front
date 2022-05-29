@@ -27,7 +27,7 @@ export default function CommunityInfo({
   onClickSubscribe,
   className = "",
 }: CommunityInfoProps) {
-  const { isAuth } = useContext(UserContext);
+  const { isAuth, authUserData } = useContext(UserContext);
 
   return (
     <Flexbox
@@ -53,7 +53,7 @@ export default function CommunityInfo({
         </Flexbox>
       </Link>
 
-      {isAuth && (
+      {isAuth && authUserData?.displayId !== displayId && (
         <Button
           onClick={onClickSubscribe}
           color={`${isSubscribed ? "secondary" : "primary"}`}

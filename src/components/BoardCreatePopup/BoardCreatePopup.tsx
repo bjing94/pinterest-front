@@ -11,6 +11,7 @@ import Box from "../Box/Box";
 import Button from "../Button/Button";
 import Flexbox from "../Flexbox/Flexbox";
 import Input from "../Input";
+import Popup from "../Popup";
 import Typography from "../Typgoraphy/Typography";
 
 import "./BoardCreatePopup.scss";
@@ -60,28 +61,23 @@ export default function BoardCreatePopup({
       onSubmit();
     }
   };
-
   return (
-    <div className="create-board-popup">
-      <div className="create-board-popup__background" onClick={onClose}></div>
-      <div className="create-board-popup__container" style={{ width: "400px" }}>
-        <Flexbox flexDirection="column" fluid>
-          <Typography fontSize={18} fontWeight="bold">
-            Create board
-          </Typography>
-          <Box margin="45px 0 0 0" width="100%">
-            <Input placeholder="имя доски" ref={titleRef} />
+    <Popup containerClass="create-board-popup" onClickBackground={onClose}>
+      <Flexbox flexDirection="column" fluid>
+        <Typography fontSize={18} fontWeight="bold">
+          Create board
+        </Typography>
+        <Box margin="45px 0 0 0" width="100%">
+          <Input placeholder="имя доски" ref={titleRef} />
+        </Box>
+        <Flexbox fluid justifyContent="flex-end">
+          <Box margin="30px 0 0 0">
+            <Button className="board-create__btn" onClick={handleCreateBoard}>
+              Create
+            </Button>
           </Box>
-
-          <Flexbox fluid justifyContent="flex-end">
-            <Box margin="30px 0 0 0">
-              <Button className="board-create__btn" onClick={handleCreateBoard}>
-                Create
-              </Button>
-            </Box>
-          </Flexbox>
         </Flexbox>
-      </div>
-    </div>
+      </Flexbox>
+    </Popup>
   );
 }

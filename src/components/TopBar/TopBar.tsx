@@ -31,9 +31,8 @@ export default function TopBar({
   const navigate = useNavigate();
   const location = useLocation();
   const darkGray = " #767676";
-  const currUserInfo = useContext(UserContext);
+  const { authUserData, isAuth } = useContext(UserContext);
   const searchRef = useRef<HTMLInputElement>(null);
-  const { isAuth, displayId } = currUserInfo;
 
   const handleSearch = async () => {
     if (!searchRef.current || searchRef.current.value.length === 0) return;
@@ -76,12 +75,12 @@ export default function TopBar({
           />
         </Col>
         <Col xs={true} style={{ flexGrow: 0 }}>
-          {isAuth ? (
+          {isAuth && authUserData ? (
             <Flexbox>
               <RoundButton size={32} onClick={onClickLogout}>
                 <IoIosLogOut size={24} fill={darkGray} />
               </RoundButton>
-              <Link to={`/user/${displayId}`}>
+              <Link to={`/user/${authUserData.displayId}`}>
                 <RoundButton size={32}>
                   <FaUser size={24} fill={darkGray} />
                 </RoundButton>

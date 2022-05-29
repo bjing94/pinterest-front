@@ -4,9 +4,7 @@ import { AiFillHeart, AiFillLike } from "react-icons/ai";
 import { FiMoreHorizontal } from "react-icons/fi";
 import { IoIosArrowForward } from "react-icons/io";
 import convertAgeToString from "../../helpers/AgeToString";
-import {
-  getComment,
-} from "../../services/CommentService";
+import { getComment } from "../../services/CommentService";
 import { CommentData, UserData } from "../../services/responses/responses";
 import { getUser } from "../../services/UserService";
 import { darkGray, red } from "../../styles/colors";
@@ -154,7 +152,7 @@ function CommentActions({
           <FiMoreHorizontal size={18} color={darkGray} />
         </RoundButton>
         {showMoreDropdown && (
-          <Dropdown width="60px" left="32px">
+          <Dropdown className="comment-more-dropdown" width="60px" left="32px">
             {isAuthor && (
               <Box
                 width="100%"
@@ -277,24 +275,23 @@ export default function CommentSection({
   const [showComments, setShowComments] = useState(true);
   const [comments, setComments] = useState<CommentData[]>([]);
 
-  const getComments = async () => {
-    const commentsResponse = await Promise.all(
-      commentIds.map((id) => {
-        return getComment(id);
-      })
-    );
-
-    const newComments = commentsResponse
-      .filter((response): response is AxiosResponse<CommentData> => {
-        return response !== undefined && response.status === 200;
-      })
-      .map((response) => {
-        return response.data as CommentData;
-      });
-    setComments(newComments);
-  };
-
   useEffect(() => {
+    const getComments = async () => {
+      const commentsResponse = await Promise.all(
+        commentIds.map((id) => {
+          return getComment(id);
+        })
+      );
+
+      const newComments = commentsResponse
+        .filter((response): response is AxiosResponse<CommentData> => {
+          return response !== undefined && response.status === 200;
+        })
+        .map((response) => {
+          return response.data as CommentData;
+        });
+      setComments(newComments);
+    };
     getComments();
   }, [commentIds]);
 

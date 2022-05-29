@@ -32,16 +32,12 @@ import UserContext from "../../store/userContext";
 import Box from "../../components/Box/Box";
 import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
 
-interface PinBuilderProps {
-  isAuth?: boolean;
-}
-
-export default function PinBuilder({ isAuth }: PinBuilderProps) {
-  const { setTextPopup } = useContext(UserContext);
+export default function PinBuilder() {
+  const { setTextPopup, updateUserInfo, isAuth, authUserData } =
+    useContext(UserContext);
 
   const [uploadedImg, setUploadedImg] = useState<string | undefined>(undefined);
   const [error, setError] = useState("");
-  const [userInfo, setUserInfo] = useState<UserData | undefined>();
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [boardId, setBoardId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -158,30 +154,14 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
     }
   };
 
-  useEffect(() => {
-    getCurrentUser().then((response) => {
-      if (!response?.data) {
-        return;
-      }
-      if (response.status === 200) {
-        const user = response.data as UserData;
-        setUserInfo(user);
-        if (user.boards.length > 0) {
-          setBoardId(user.boards[0]);
-        }
-      }
-    });
-  }, []);
+  useEffect(() => {}, []);
 
-  if (!isAuth) {
+  if (!isAuth || !authUserData) {
     return <Navigate to="/" />;
   }
 
-  if (!userInfo) {
-    return <div>Please log in!</div>;
-  }
+  const { boards: boardIds } = authUserData;
 
-  const { boards, username, avatarSrc } = userInfo;
   return (
     <div className="pin-builder-container">
       <Toolbar />
@@ -190,7 +170,9 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
           onClose={() => {
             setShowCreateBoard(false);
           }}
-          onSubmit={() => {}}
+          onSubmit={() => {
+            updateUserInfo();
+          }}
         />
       )}
       <Card
@@ -232,7 +214,7 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
           )}
           <ButtonGroup style={{ width: "236px" }}>
             <DropdownBoards
-              boardIds={boards}
+              boardIds={boardIds}
               onClickCreateBoard={() => {
                 setShowCreateBoard(true);
               }}
@@ -306,8 +288,8 @@ export default function PinBuilder({ isAuth }: PinBuilderProps) {
               className="input-title"
             />
             <ProfileInfo
-              username={username}
-              avatarId={avatarSrc}
+              username={authUserData.username}
+              avatarId={authUserData.avatarSrc}
               className="pin-builder__profile-info"
             />
             <ResponsiveInput

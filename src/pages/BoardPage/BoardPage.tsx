@@ -14,6 +14,7 @@ import copyCurrentUrl from "../../helpers/copyCurrentUrl";
 import { checkLogin, getCurrentUser } from "../../services/AuthService";
 import {
   getBoard,
+  getBoards,
   savePinToBoard,
   savePinToProfile,
   updateBoard,
@@ -37,13 +38,7 @@ const breakpointColumnsObj = {
 export default function BoardPage() {
   const { id } = useParams();
 
-  const {
-    userBoards,
-    currentSavedPins,
-    setTextPopup,
-    setErrorPopup,
-    _id: currentUserId,
-  } = useContext(UserContext);
+  const { setTextPopup, setErrorPopup, authUserData } = useContext(UserContext);
 
   // Board info
   const [boardData, setBoardData] = useState<BoardData | null>(null);
@@ -54,7 +49,7 @@ export default function BoardPage() {
   const [showSubscribersPopup, setShowSubscribersPopup] = useState(false);
   const [showEditPin, setShowEditPin] = useState(false);
   const [editedPinId, setEditedPinId] = useState("");
-
+  const [boardsData, setBoardsData] = useState<BoardData[]>();
   const handleDeletePinFromBoard = async () => {
     if (!id || !editedPinId) {
       return;
@@ -195,9 +190,15 @@ export default function BoardPage() {
     const userData = userResponse.data as UserData;
     setAuthorInfo(userData);
   };
+  const getAuthUserBoards = async () => {
+    if (!authUserData) return;
+    const boardsData = await getBoards(authUserData.boards);
+    setBoardsData(boardsData);
+  };
 
   useEffect(() => {
     getBoardInfo();
+    getAuthUserBoards();
   }, []);
 
   if (!boardData || !authorInfo) {
@@ -205,10 +206,13 @@ export default function BoardPage() {
   }
 
   const pinElements = boardData.pins.map((id) => {
-    const isOwner = boardData.userId === currentUserId;
-    const isSaved =
-      userBoards.findIndex((board) => board.pins.includes(id)) !== -1 ||
-      currentSavedPins.includes(id);
+    const isOwner = boardData.userId === authUserData?._id;
+    let isSaved = false;
+    if (authUserData && boardsData) {
+      isSaved =
+        boardsData.findIndex((board) => board.pins.includes(id)) !== -1 ||
+        authUserData.savedPins.includes(id);
+    }
 
     return (
       <Flexbox
@@ -295,8 +299,13 @@ export default function BoardPage() {
         <Box margin="10px 0px 0px 0px">
           <Button
             onClick={() => {
-              copyCurrentUrl();
-              setTextPopup("Copied to clipboard");
+              copyCurrentUrl()
+                .then(() => {
+                  setTextPopup("Copied to clipboard.");
+                })
+                .catch(() => {
+                  setErrorPopup("Didn't copy!");
+                });
             }}
           >
             Share

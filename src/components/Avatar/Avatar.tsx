@@ -22,7 +22,7 @@ export default function Avatar({ imgId, size }: AvatarProps) {
       alt="avatar"
       width={size}
       height={size}
-      src={avatarSrc}
+      src={avatarSrc || `https://via.placeholder.com/${size}`}
       style={{ borderRadius: "50%" }}
     />
   );
