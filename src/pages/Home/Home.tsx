@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import Masonry from "react-masonry-css";
@@ -7,21 +8,20 @@ import Flexbox from "../../components/Flexbox/Flexbox";
 import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import Toolbar from "../../components/Toolbar/Toolbar";
-import { getCurrentUser } from "../../services/AuthService";
 import {
   getBoards,
   savePinToBoard,
   savePinToProfile,
 } from "../../services/BoardService";
 import { getRandomPins } from "../../services/PinService";
-import { BoardData, UserData } from "../../services/responses/responses";
+import { BoardData, ErrorData } from "../../services/responses/responses";
 import UserContext from "../../store/userContext";
 
 import "./Home.scss";
 
 const breakpointColumnsObj = {
   default: 7,
-  1820: 6, // 1800 or less
+  1820: 6,
   1600: 5,
   1400: 4,
   930: 3,
@@ -42,16 +42,15 @@ export default function Home() {
       return;
     }
 
-    const response = await getCurrentUser();
-    if (response && response.status === 200) {
+    if (authUserData) {
       if (!boardId) {
-        const userInfo = response.data as UserData;
-        savePinToProfile(id, userInfo)
+        savePinToProfile(id, authUserData)
           .then(() => {
             setTextPopup("Pin saved to profile!");
           })
-          .catch((err: string) => {
-            setErrorPopup(err);
+          .catch((err: AxiosError<ErrorData>) => {
+            if (!err.response) return;
+            setErrorPopup(err.response.data.message);
           });
 
         return;
@@ -61,8 +60,9 @@ export default function Home() {
         .then(() => {
           setTextPopup("Pin saved to board!");
         })
-        .catch((err) => {
-          setErrorPopup(err);
+        .catch((err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
         });
     }
 
@@ -71,14 +71,15 @@ export default function Home() {
 
   useEffect(() => {
     const getPins = async () => {
-      const data = await getRandomPins();
+      const data = await getRandomPins().catch((err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      });
 
       if (!data) {
-        setErrorPopup("No pins on the server!");
         return;
       }
 
-      console.log("Got pins: ", data);
       setPinIds(
         data.map((pin) => {
           return pin._id;

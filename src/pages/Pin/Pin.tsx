@@ -16,7 +16,6 @@ import {
   getStaticImage,
 } from "../../services/FileService";
 import { getPin, updatePin } from "../../services/PinService";
-import { checkLogin, getCurrentUser } from "../../services/AuthService";
 import {
   CommentData,
   ErrorData,
@@ -40,13 +39,15 @@ import {
 } from "../../services/BoardService";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
 import UserContext from "../../store/userContext";
-import ErrorPage from "../ErrorPages/ErrorPage";
 import LoadingPage from "../LoadingPage/LoadingPage";
+import { AxiosError } from "axios";
+import ErrorPageContext from "../../store/errorPageContext";
 
 export default function Pin() {
   const { id } = useParams();
-  const { setTextPopup, setErrorPopup, updateUserInfo, authUserData } =
+  const { setTextPopup, setErrorPopup, updateUserInfo, authUserData, isAuth } =
     useContext(UserContext);
+  const { setErrorPageData } = useContext(ErrorPageContext);
 
   // Current user information
   const [boardId, setBoardId] = useState<string | undefined>(undefined);
@@ -54,8 +55,6 @@ export default function Pin() {
   const [isSubscribed, setIsSubscribed] = useState<boolean | undefined>(
     undefined
   );
-  const [currentUserInfo, setCurrentUserInfo] = useState<UserData | null>(null);
-  const [isAuth, setIsAuth] = useState<boolean | undefined>(undefined);
 
   // Author information
   const [authorInfo, setAuthorInfo] = useState<UserData | undefined>(undefined);
@@ -74,78 +73,83 @@ export default function Pin() {
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [showBoards, setShowBoards] = useState(false);
 
-  //Error handling
-  const [errorMsg, setErrorMsg] = useState("");
-  const [errorCode, setErrorCode] = useState(0);
-
   const getAuthorInfo = async () => {
     if (!authorInfo?._id) {
       setErrorPopup("Error loading author data!");
       return;
     }
-    const userResponse = await getUser(authorInfo._id);
+    const userResponse = await getUser(authorInfo._id).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     if (userResponse && userResponse.status === 200) {
       const userData = userResponse.data as UserData;
       setAuthorInfo(userData);
     }
   };
   const getPinInfo = async () => {
-    if (id) {
-      const pinResponse = await getPin(id);
-      console.log("PinId", id);
-      if (!pinResponse) {
-        return;
+    if (!id) return;
+    const pinResponse = await getPin(id).catch((err: AxiosError<ErrorData>) => {
+      if (!err.response) return;
+      setErrorPageData({
+        code: err.response.data.statusCode,
+        message: err.response.data.message,
+      });
+    });
+    if (!pinResponse) {
+      return;
+    }
+    const pinInfo = pinResponse.data as PinData;
+    setDescription(pinInfo.content);
+    setTitle(pinInfo.title);
+    setComments(pinInfo.comments ?? []);
+
+    const userResponse = await getUser(pinInfo.userId).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
       }
-      if (pinResponse.status === 200) {
-        const pinInfo = pinResponse.data as PinData;
-        setDescription(pinInfo.content);
-        setTitle(pinInfo.title);
-        setComments(pinInfo.comments ?? []);
-        const userResponse = await getUser(pinInfo.userId);
-        if (userResponse && userResponse.status === 200) {
-          const userData = userResponse.data as UserData;
-          setAuthorInfo(userData);
-        }
-        downloadStaticImage(pinInfo.imgId).then((res: string) => {
-          setDownloadLink(res);
-        });
-        const link = await getStaticImage(pinInfo.imgId);
-        if (link) {
-          setImgSrc(link);
-        }
-      } else {
-        const error = pinResponse.data as ErrorData;
-        setErrorMsg(error.message);
-        setErrorCode(error.statusCode);
+    );
+
+    if (!userResponse || userResponse.status !== 200) return;
+    const userData = userResponse.data as UserData;
+    setAuthorInfo(userData);
+    setDownloadLink(downloadStaticImage(pinInfo.imgId));
+
+    const link = await getStaticImage(pinInfo.imgId).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
       }
+    );
+
+    if (link) {
+      setImgSrc(link);
     }
   };
 
   const checkSubscribed = async () => {
-    const res = await getCurrentUser();
-    if (res) {
-      if (res.status === 200) {
-        const { _id } = res.data as UserData;
-        if (authorInfo) {
-          const subbed =
-            authorInfo.subscribers.find((a) => {
-              return a === _id;
-            }) !== undefined;
-          setIsSubscribed(subbed);
-          return;
-        }
+    if (authUserData) {
+      const { _id } = authUserData;
+      if (authorInfo) {
+        const subbed =
+          authorInfo.subscribers.find((a) => {
+            return a === _id;
+          }) !== undefined;
+        setIsSubscribed(subbed);
+        return;
       }
     }
     setIsSubscribed(false);
   };
 
   const checkSaved = async () => {
-    const userResponse = await getCurrentUser();
-    if (!userResponse || userResponse.status !== 200 || !id) {
+    if (!authUserData || !id) {
       return;
     }
-    const userData = userResponse.data as UserData;
-    const currentBoardsData = await getBoards(userData.boards);
+    const currentBoardsData = await getBoards(authUserData.boards);
 
     // check if saved in boards
     for (let i = 0; i < currentBoardsData.length; i++) {
@@ -156,8 +160,8 @@ export default function Pin() {
     }
 
     // check if saved in profile
-    for (let i = 0; i < userData.savedPins.length; i++) {
-      if (userData.savedPins[i] === id) {
+    for (let i = 0; i < authUserData.savedPins.length; i++) {
+      if (authUserData.savedPins[i] === id) {
         setIsSaved(true);
         return;
       }
@@ -172,15 +176,29 @@ export default function Pin() {
 
     if (isAuth) {
       if (!isSubscribed) {
-        await subscribe(authorInfo._id);
+        await subscribe(authorInfo._id).catch((err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
+        });
         setTextPopup("Subscribed!");
-        await getAuthorInfo();
+        await getAuthorInfo().catch((err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
+        });
         return;
       }
       if (isSubscribed) {
-        await unsubscribe(authorInfo._id);
+        await unsubscribe(authorInfo._id).catch(
+          (err: AxiosError<ErrorData>) => {
+            if (!err.response) return;
+            setErrorPopup(err.response.data.message);
+          }
+        );
         setTextPopup("Unsubscribed!");
-        await getAuthorInfo();
+        await getAuthorInfo().catch((err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
+        });
         return;
       }
     } else {
@@ -201,38 +219,34 @@ export default function Pin() {
   };
 
   const handleSavePin = async () => {
-    if (!id) {
+    if (!id || !authUserData) {
       return;
     }
 
-    const response = await getCurrentUser();
-    if (response && response.status === 200) {
-      if (!boardId) {
-        const userInfo = response.data as UserData;
-        savePinToProfile(id, userInfo)
-          .then(() => {
-            setTextPopup("Pin saved to profile!");
-          })
-          .catch((err: string) => {
-            setErrorPopup(err);
-          });
-        return;
-      }
-
-      savePinToBoard(id, boardId)
+    if (!boardId) {
+      savePinToProfile(id, authUserData)
         .then(() => {
-          setTextPopup("Pin saved to board!");
+          setTextPopup("Pin saved to profile!");
         })
-        .catch((err) => {
+        .catch((err: string) => {
           setErrorPopup(err);
         });
+      return;
     }
+
+    savePinToBoard(id, boardId)
+      .then(() => {
+        setTextPopup("Pin saved to board!");
+      })
+      .catch((err) => {
+        setErrorPopup(err);
+      });
 
     return;
   };
 
   const handleCreateComment = async (content: string) => {
-    if (!currentUserInfo) {
+    if (!authUserData) {
       setTextPopup("Please log in");
       return;
     }
@@ -240,22 +254,27 @@ export default function Pin() {
     if (!id) {
       return;
     }
-    const { _id: currentUserId } = currentUserInfo;
+    const { _id: currentUserId } = authUserData;
 
-    console.log("Creating comment:", currentUserId, content);
     const commentResponse = await createComment({
       userId: currentUserId,
       content: content,
+    }).catch((err: AxiosError<ErrorData>) => {
+      if (!err.response) return;
+      setErrorPopup(err.response.data.message);
     });
+
     if (!commentResponse || commentResponse.status !== 201) {
-      setErrorPopup("Comment wasnt created");
       return;
     }
     const commentData = commentResponse.data as CommentData;
 
-    const pinResponse = await getPin(id);
+    const pinResponse = await getPin(id).catch((err: AxiosError<ErrorData>) => {
+      if (!err.response) return;
+      setErrorPopup(err.response.data.message);
+    });
     if (!pinResponse || pinResponse.status !== 200) {
-      setErrorPopup("Pin not  found");
+      setErrorPopup("Pin not found");
       return;
     }
 
@@ -264,7 +283,12 @@ export default function Pin() {
       return;
     }
     newPin.comments.push(commentData._id);
-    await updatePin(id, { comments: newPin.comments });
+    await updatePin(id, { comments: newPin.comments }).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     getPinInfo();
   };
 
@@ -272,12 +296,20 @@ export default function Pin() {
     if (!id) {
       return;
     }
-    const commentResponse = await deleteComment(commentId);
+    const commentResponse = await deleteComment(commentId).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     if (!commentResponse) {
       return;
     }
 
-    const pinResponse = await getPin(id);
+    const pinResponse = await getPin(id).catch((err: AxiosError<ErrorData>) => {
+      if (!err.response) return;
+      setErrorPopup(err.response.data.message);
+    });
     if (!pinResponse || pinResponse.status !== 200) {
       return;
     }
@@ -289,12 +321,17 @@ export default function Pin() {
     newPin.comments = newPin.comments.filter((id) => {
       return id !== commentId;
     });
-    await updatePin(id, { comments: newPin.comments });
+    await updatePin(id, { comments: newPin.comments }).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     getPinInfo();
   };
 
   const handleLikeComment = async (commentId: string) => {
-    if (!currentUserInfo) {
+    if (!authUserData) {
       setTextPopup("Please log in");
       return;
     }
@@ -302,9 +339,14 @@ export default function Pin() {
     if (!id) {
       return;
     }
-    const { _id: currentUserId } = currentUserInfo;
+    const { _id: currentUserId } = authUserData;
 
-    const commentResponse = await getComment(commentId);
+    const commentResponse = await getComment(commentId).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     if (!commentResponse || commentResponse.status !== 200) {
       return;
     }
@@ -316,12 +358,17 @@ export default function Pin() {
     } else {
       newComment.likedBy.push(currentUserId);
     }
-    await updateComment(commentId, newComment);
+    await updateComment(commentId, { likedBy: newComment.likedBy }).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     getPinInfo();
   };
 
   const handleUsefulComment = async (commentId: string) => {
-    if (!currentUserInfo) {
+    if (!authUserData) {
       setTextPopup("Please log in");
       return;
     }
@@ -329,9 +376,14 @@ export default function Pin() {
     if (!id) {
       return;
     }
-    const { _id: currentUserId } = currentUserInfo;
+    const { _id: currentUserId } = authUserData;
 
-    const commentResponse = await getComment(commentId);
+    const commentResponse = await getComment(commentId).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     if (!commentResponse || commentResponse.status !== 200) {
       return;
     }
@@ -343,49 +395,35 @@ export default function Pin() {
     } else {
       newComment.usefulBy.push(currentUserId);
     }
-    await updateComment(commentId, newComment);
+    await updateComment(commentId, { usefulBy: newComment.usefulBy }).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     getPinInfo();
   };
 
   useEffect(() => {
-    const getCurrentUserInfo = async () => {
-      const resAuth = await checkLogin();
-      setIsAuth(resAuth);
-      if (!resAuth) return;
-
-      await getCurrentUser().then((response) => {
-        if (!response || response.status !== 200) {
-          return;
-        }
-
-        setCurrentUserInfo(response.data as UserData);
-
-        checkSaved();
-      });
-    };
     const loadInfo = async () => {
       await getPinInfo();
-      await getCurrentUserInfo();
+      await checkSaved();
     };
     loadInfo();
-  }, [id]);
+  }, [id, authUserData]);
 
   useEffect(() => {
     checkSubscribed();
-  }, [authorInfo]);
+  }, [authorInfo, authUserData]);
 
   if (!id) {
     return <div>No such pin!</div>;
   }
 
-  if (errorMsg) {
-    return <ErrorPage errorCode={errorCode} />;
-  }
-
   const userInfoReady =
     isSaved !== undefined &&
     isSubscribed !== undefined &&
-    currentUserInfo !== null;
+    authUserData !== undefined;
 
   const pinInfoReady =
     comments !== undefined &&
@@ -491,7 +529,7 @@ export default function Pin() {
   }
 
   if (pinInfoReady && userInfoReady) {
-    const { _id: currentUserId } = currentUserInfo;
+    const { _id: currentUserId } = authUserData;
     return (
       <Flexbox
         justifyContent="flex-start"
@@ -508,7 +546,7 @@ export default function Pin() {
             onClose={() => {
               setShowCreateBoard(false);
             }}
-            onSubmit={(value: string) => {
+            onSubmit={() => {
               updateUserInfo();
             }}
           />

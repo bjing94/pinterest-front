@@ -43,7 +43,6 @@ export default function EditBoardPopup({
 
   const handleUpdateBoard = async () => {
     if (titleValue === boardData?.title) {
-      console.log("Nothing to update!");
       return;
     }
 

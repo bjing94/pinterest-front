@@ -16,6 +16,7 @@ import InputSearch from "../InputSearch/InputSearch";
 
 import "./EditPinPopup.scss";
 import EditPopup from "../EditPopup/EditPopup";
+import { getBoards } from "../../services/BoardService";
 
 interface EditPinPopupProps {
   pinId: string;
@@ -190,7 +191,14 @@ export default function EditPinPopup({
   const [oldBoardId, setOldBoardId] = useState("");
   const [userBoards, setUserBoards] = useState<BoardData[]>();
 
+  const getAuthUserBoards = async () => {
+    if (!authUserData) return;
+    const boardsData = await getBoards(authUserData.boards);
+    setUserBoards(boardsData);
+  };
+
   const getPinInfo = async () => {
+    await getAuthUserBoards();
     const pinResponse = await getPin(pinId);
     if (pinResponse?.status !== 200 || !pinResponse || !userBoards) return;
 

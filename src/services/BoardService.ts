@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { axiosInstance } from "./axiosInstance";
 import { CreateBoardDto } from "./dto/create-board.dto";
 import { UpdateBoardDto } from "./dto/update-board.dto";
@@ -12,10 +12,6 @@ export async function getBoard(
     .get(`board/${id}`)
     .then((response: AxiosResponse<BoardData>) => {
       return response;
-    })
-    .catch((err: AxiosError<ErrorData>) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
@@ -45,10 +41,6 @@ export async function createBoard(dto: CreateBoardDto) {
     .post(`board/create`, dto)
     .then((response: AxiosResponse<BoardData>) => {
       return response;
-    })
-    .catch((err: AxiosError<ErrorData>) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
@@ -57,10 +49,6 @@ export async function updateBoard(id: string, dto: UpdateBoardDto) {
     .patch(`board/${id}`, dto)
     .then((response: AxiosResponse<BoardData>) => {
       return response;
-    })
-    .catch((err: AxiosError<ErrorData>) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
@@ -69,10 +57,6 @@ export async function deleteBoard(id: string) {
     .delete(`board/${id}`)
     .then((response: AxiosResponse<BoardData>) => {
       return response;
-    })
-    .catch((err: AxiosError<ErrorData>) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 

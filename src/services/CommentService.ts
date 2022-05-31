@@ -1,7 +1,8 @@
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { axiosInstance } from "./axiosInstance";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { CommentData, ErrorData } from "./responses/responses";
+import { UpdateCommentDto } from "./dto/update-comment.dto";
 
 export async function createComment(
   dto: CreateCommentDto
@@ -10,25 +11,17 @@ export async function createComment(
     .post(`/comment/create`, dto)
     .then((response: AxiosResponse<CommentData>) => {
       return response;
-    })
-    .catch((error: AxiosError<ErrorData>) => {
-      console.log(error.response);
-      return error.response;
     });
 }
 
 export async function updateComment(
   id: string,
-  dto: CreateCommentDto
+  dto: UpdateCommentDto
 ): Promise<AxiosResponse<CommentData | ErrorData> | undefined> {
   return axiosInstance
     .patch(`/comment/${id}`, dto)
     .then((response: AxiosResponse<CommentData>) => {
       return response;
-    })
-    .catch((error: AxiosError<ErrorData>) => {
-      console.log(error.response);
-      return error.response;
     });
 }
 
@@ -39,10 +32,6 @@ export async function getComment(
     .get(`/comment/${id}`)
     .then((response: AxiosResponse<CommentData>) => {
       return response;
-    })
-    .catch((error: AxiosError<ErrorData>) => {
-      console.log(error.response);
-      return error.response;
     });
 }
 
@@ -53,9 +42,5 @@ export async function deleteComment(
     .delete(`/comment/${id}`)
     .then((response: AxiosResponse<CommentData>) => {
       return response;
-    })
-    .catch((error: AxiosError<ErrorData>) => {
-      console.log(error.response);
-      return error.response;
     });
 }

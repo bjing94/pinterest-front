@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { axiosInstance } from "./axiosInstance";
 import { FindUserDto } from "./dto/find-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -11,10 +11,6 @@ export async function subscribe(
     .post(`user/subscribe/${userId}`)
     .then((response: AxiosResponse<UserData>) => {
       return response;
-    })
-    .catch((err: AxiosError<ErrorData>) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
@@ -25,10 +21,6 @@ export async function unsubscribe(
     .post(`user/unsubscribe/${userId}`)
     .then((response: AxiosResponse<UserData>) => {
       return response;
-    })
-    .catch((err: AxiosError<ErrorData>) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
@@ -39,10 +31,6 @@ export async function getUser(
     .get(`user/${userId}`)
     .then((response: AxiosResponse<UserData>) => {
       return response;
-    })
-    .catch((error: AxiosError<ErrorData>) => {
-      console.log(error.response);
-      return error.response;
     });
 }
 
@@ -53,10 +41,6 @@ export async function findUser(
     .post(`search/users`, dto)
     .then((response: AxiosResponse<UserData>) => {
       return response;
-    })
-    .catch((error: AxiosError<ErrorData>) => {
-      console.log(error.response);
-      return error.response;
     });
 }
 
@@ -68,9 +52,5 @@ export async function updateUser(
     .patch(`user/${userId}`, dto)
     .then((response: AxiosResponse<UserData>) => {
       return response;
-    })
-    .catch((error: AxiosError<ErrorData>) => {
-      console.log(error.response);
-      return error.response;
     });
 }

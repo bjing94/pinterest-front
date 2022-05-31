@@ -21,9 +21,13 @@ export default function Dropdown({
 }: DropdownProps) {
   let childElements = null;
   if (children) {
-    childElements = children.map((child: any) => {
+    childElements = children.map((child: any, id: number) => {
       return (
-        <div className={`dropdown__item`} onClick={onClickItem}>
+        <div
+          className={`dropdown__item`}
+          onClick={onClickItem}
+          key={`dropdown-item-${id}`}
+        >
           {child}
         </div>
       );

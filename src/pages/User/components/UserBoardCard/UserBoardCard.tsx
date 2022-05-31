@@ -85,8 +85,6 @@ export default function UserBoardCard({
             )
           );
         }
-      } else {
-        console.log("ERROR!");
       }
     };
     handleGetBoard();

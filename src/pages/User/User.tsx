@@ -14,9 +14,13 @@ import {
   unsubscribe,
   updateUser,
 } from "../../services/UserService";
-import { BoardData, UserData } from "../../services/responses/responses";
+import {
+  BoardData,
+  ErrorData,
+  UserData,
+} from "../../services/responses/responses";
 import UserBoardCard from "./components/UserBoardCard/UserBoardCard";
-import { checkLogin, getCurrentUser } from "../../services/AuthService";
+import { checkLogin } from "../../services/AuthService";
 import { getStaticImage } from "../../services/FileService";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import {
@@ -35,12 +39,12 @@ import EditBoardPopup from "../../components/EditBoardPopup/EditBoardPopup";
 import { deletePin, updatePin } from "../../services/PinService";
 import EditPinPopup from "../../components/EditPinPopup/EditPinPopup";
 import { UpdatePinDto } from "../../services/dto/update-pin.dto";
-import ErrorPage from "../ErrorPages/ErrorPage";
 import EditUserPopup from "./components/EditUserPopup/EditUserPopup";
 import copyCurrentUrl from "../../helpers/copyCurrentUrl";
 
 import "./User.scss";
 import { UpdateUserDto } from "../../services/dto/update-user.dto";
+import { AxiosError } from "axios";
 
 const breakpointColumnsObj = {
   default: 7,
@@ -61,7 +65,6 @@ export default function User() {
 
   const [profileInfo, setProfileInfo] = useState<UserData | undefined>();
   const [showCreated, setShowCreated] = useState(true);
-  const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [avatar, setAvatar] = useState("");
 
@@ -69,7 +72,6 @@ export default function User() {
   const [boardId, setBoardId] = useState<string | undefined>(undefined);
 
   //Current user info
-  const [currentUserInfo, setCurrentUserInfo] = useState<UserData | null>();
   const [boardsToPins, setBoardToPins] = useState<
     { boardId: string; pins: string[] }[]
   >([]);
@@ -85,21 +87,6 @@ export default function User() {
   const [editedPinId, setEditedPinId] = useState("");
   const [showEditUser, setShowEditUser] = useState(false);
 
-  const checkSubscribed = async () => {
-    if (!profileInfo) {
-      return;
-    }
-    const res = await getCurrentUser();
-    if (res) {
-      if (res.status === 200) {
-        const { _id } = res.data as UserData;
-        if (profileInfo.subscribers.find((a) => a === _id) !== undefined) {
-          setIsSubscribed(true);
-        }
-      }
-    }
-  };
-
   const handleSubscribe = async (subscribeToId: string) => {
     if (!profileInfo) {
       return;
@@ -107,8 +94,9 @@ export default function User() {
     const isAuth = await checkLogin();
     if (isAuth) {
       await subscribe(subscribeToId);
+      setTextPopup("Subscribed");
     } else {
-      console.log("Not authenticated!");
+      setErrorPopup("Not authenticated!");
     }
     refetchProfileInfo();
   };
@@ -120,8 +108,9 @@ export default function User() {
     const isAuth = await checkLogin();
     if (isAuth) {
       await unsubscribe(subscribeToId);
+      setTextPopup("Unsubscribed");
     } else {
-      console.log("Not authenticated!");
+      setErrorPopup("Not authenticated!");
     }
     refetchProfileInfo();
   };
@@ -163,9 +152,11 @@ export default function User() {
         title: createBoardTitle,
         pins: [editedPinId],
         userId: authUserData._id,
+      }).catch((err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
       });
       if (!createBoardResponse || createBoardResponse.status !== 201) {
-        console.log("Error creating board.");
         return;
       }
 
@@ -175,38 +166,54 @@ export default function User() {
 
     if (oldBoardId !== "" && oldBoardId !== newBoardId) {
       // change old board
-      const oldBoardResponse = await getBoard(oldBoardId);
+      const oldBoardResponse = await getBoard(oldBoardId).catch(
+        (err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
+        }
+      );
 
       if (!oldBoardResponse || oldBoardResponse.status !== 200) {
-        console.log("Error getting old board.");
         return;
       }
       const oldBoard = oldBoardResponse.data as BoardData;
 
       oldBoard.pins = oldBoard.pins.filter((pinId) => pinId !== editedPinId);
 
-      const updateOldResponse = await updateBoard(oldBoardId, oldBoard);
+      const updateOldResponse = await updateBoard(oldBoardId, oldBoard).catch(
+        (err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
+        }
+      );
       if (!updateOldResponse) {
-        console.log("Error updating old board.");
         return;
       }
     }
 
     if (!createBoardTitle && newBoardId !== "" && oldBoardId !== newBoardId) {
       // update new board if it's not fresh
-      const newBoardResponse = await getBoard(newBoardId);
+      const newBoardResponse = await getBoard(newBoardId).catch(
+        (err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
+        }
+      );
 
       if (!newBoardResponse || newBoardResponse.status !== 200) {
-        console.log("Error getting new board.");
         return;
       }
       const newBoard = newBoardResponse.data as BoardData;
 
       newBoard.pins.push(editedPinId);
 
-      const updateNewResponse = await updateBoard(newBoardId, newBoard);
+      const updateNewResponse = await updateBoard(newBoardId, newBoard).catch(
+        (err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
+        }
+      );
       if (!updateNewResponse) {
-        console.log("Error updating new board");
         return;
       }
     }
@@ -218,7 +225,12 @@ export default function User() {
 
   const handleUpdateUser = async (dto: UpdateUserDto) => {
     if (!profileInfo) return;
-    await updateUser(profileInfo._id, dto);
+    await updateUser(profileInfo._id, dto).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     await refetchProfileInfo();
     await updateUserInfo();
     if (dto.displayId !== displayId) {
@@ -227,47 +239,54 @@ export default function User() {
   };
 
   const handleSavePin = async (pindId: string) => {
-    if (!pindId || !boardId) {
+    if (!pindId || !boardId || !authUserData) {
       return;
     }
 
-    const response = await getCurrentUser();
-    if (response && response.status === 200) {
-      if (!boardId) {
-        const userInfo = response.data as UserData;
-        savePinToProfile(pindId, userInfo)
-          .then(() => {
-            setTextPopup("Pin saved to profile!");
-          })
-          .catch((err: string) => {
-            setErrorPopup(err);
-          });
-        return;
-      }
-
-      savePinToBoard(pindId, boardId)
+    if (!boardId) {
+      savePinToProfile(pindId, authUserData)
         .then(() => {
-          setTextPopup("Pin saved to board!");
+          setTextPopup("Pin saved to profile!");
         })
-        .catch((err) => {
-          setErrorPopup(err);
+        .catch((err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
         });
+      return;
     }
+
+    savePinToBoard(pindId, boardId)
+      .then(() => {
+        setTextPopup("Pin saved to board!");
+      })
+      .catch((err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      });
 
     return;
   };
 
   const refetchProfileInfo = async () => {
     if (displayId) {
-      const response = await findUser({ displayId: displayId });
+      const response = await findUser({ displayId: displayId }).catch(
+        (err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
+        }
+      );
 
       if (response) {
         if (response.status === 200) {
           const user = response.data as UserData;
           setProfileInfo(user);
-          await checkSubscribed();
 
-          const staticSrc = await getStaticImage(user.avatarSrc);
+          const staticSrc = await getStaticImage(user.avatarSrc).catch(
+            (err: AxiosError<ErrorData>) => {
+              if (!err.response) return;
+              setErrorPopup(err.response.data.message);
+            }
+          );
           setAvatar(staticSrc ?? "https://via.placeholder.com/128.jpg");
           setIsLoading(false);
         } else {
@@ -281,13 +300,11 @@ export default function User() {
 
   useEffect(() => {
     const getCurrentUserInfo = async () => {
-      const response = await getCurrentUser();
-      if (!response || response.status !== 200) return;
+      if (!authUserData) return;
 
-      const userData = response.data as UserData;
-      setCurrentUserInfo(userData);
-
-      const currentBoardsData: BoardData[] = await getBoards(userData.boards);
+      const currentBoardsData: BoardData[] = await getBoards(
+        authUserData.boards
+      );
 
       const newBoardsToPins: { boardId: string; pins: string[] }[] = [];
       currentBoardsData.forEach((board) => {
@@ -299,15 +316,24 @@ export default function User() {
 
     const getProfileInfo = async () => {
       if (displayId) {
-        const response = await findUser({ displayId: displayId });
+        const response = await findUser({ displayId: displayId }).catch(
+          (err: AxiosError<ErrorData>) => {
+            if (!err.response) return;
+            setErrorPopup(err.response.data.message);
+          }
+        );
 
         if (response) {
           if (response.status === 200) {
             const user = response.data as UserData;
             setProfileInfo(user);
-            await checkSubscribed();
 
-            const staticSrc = await getStaticImage(user.avatarSrc);
+            const staticSrc = await getStaticImage(user.avatarSrc).catch(
+              (err: AxiosError<ErrorData>) => {
+                if (!err.response) return;
+                setErrorPopup(err.response.data.message);
+              }
+            );
             setAvatar(staticSrc ?? "https://via.placeholder.com/128.jpg");
             setIsLoading(false);
           } else {
@@ -322,8 +348,6 @@ export default function User() {
     getCurrentUserInfo();
   }, [displayId]);
 
-  useEffect(() => {}, [profileInfo, currentUserInfo]);
-
   if (isLoading) {
     return (
       <Flexbox style={{ width: "100%" }} justifyContent="center">
@@ -333,7 +357,7 @@ export default function User() {
   }
 
   if (!profileInfo) {
-    return <ErrorPage errorCode={404} />;
+    return <div></div>;
   }
 
   const isOwner = authUserData?._id === profileInfo._id;
@@ -391,6 +415,8 @@ export default function User() {
     );
   });
 
+  const isSubscribed =
+    profileInfo.subscribers.find((a) => a === authUserData?._id) !== undefined;
   if (!isOwner) {
     return (
       <div>
@@ -491,7 +517,7 @@ export default function User() {
               >
                 <FiLink size={24} />
               </RoundButton>
-              {!isSubscribed && currentUserInfo && (
+              {!isSubscribed && authUserData && (
                 <Button
                   onClick={() => {
                     handleSubscribe(profileInfo._id);
@@ -500,8 +526,14 @@ export default function User() {
                   Subscribe
                 </Button>
               )}
-              {isSubscribed && currentUserInfo && (
-                <Button className="user__subscribed-btn" color="secondary">
+              {isSubscribed && authUserData && (
+                <Button
+                  className="user__subscribed-btn"
+                  color="secondary"
+                  onClick={() => {
+                    handleUnSubscribe(profileInfo._id);
+                  }}
+                >
                   Subscribed
                 </Button>
               )}

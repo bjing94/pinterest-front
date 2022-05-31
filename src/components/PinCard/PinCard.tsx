@@ -49,14 +49,13 @@ export default function PinCard({
   const [avatarId, setAvatarId] = useState<string | undefined>(undefined);
   const [title, setTitle] = useState<string | undefined>(undefined);
 
-  const { isAuth, setTextPopup } = useContext(UserContext);
+  const { isAuth, setTextPopup, setErrorPopup } = useContext(UserContext);
 
   const getPinInfo = async () => {
     if (pinId) {
       const pinResponse = await getPin(pinId);
       if (!pinResponse || pinResponse.status !== 200) {
         setTextPopup(`error getting pins!`);
-        console.log(pinResponse);
         return;
       }
 
@@ -65,7 +64,6 @@ export default function PinCard({
         const pinUser = await getUser(pinInfo.userId);
 
         if (!pinUser || pinUser.status !== 200) {
-          console.log(pinUser);
           return;
         }
 
@@ -86,7 +84,6 @@ export default function PinCard({
         }
       } else {
         setTextPopup(`wrong type of data!`);
-        console.log(pinResponse.data);
       }
     }
   };
@@ -99,7 +96,7 @@ export default function PinCard({
         setTextPopup("Copied to clipboard.");
       })
       .catch(() => {
-        console.log("Didn't copy!");
+        setErrorPopup("Didn't copy!");
       });
   };
 
@@ -116,13 +113,7 @@ export default function PinCard({
       style={{ height: "100%" }}
     >
       {isAuth && (
-        <Flexbox
-          fluid
-          justifyContent="space-between"
-          onClick={() => {
-            setTextPopup("Clicked!");
-          }}
-        >
+        <Flexbox fluid justifyContent="space-between">
           <DropdownBoards
             boardIds={boards}
             onClickCreateBoard={() => {

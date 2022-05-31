@@ -1,11 +1,6 @@
 import React, { useContext, useRef } from "react";
-import { getCurrentUser } from "../../services/AuthService";
 import { createBoard } from "../../services/BoardService";
-import {
-  BoardData,
-  ErrorData,
-  UserData,
-} from "../../services/responses/responses";
+import { BoardData } from "../../services/responses/responses";
 import UserContext from "../../store/userContext";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
@@ -26,7 +21,7 @@ export default function BoardCreatePopup({
   onClose,
   onSubmit,
 }: BoardCreatePopupProps) {
-  const { setTextPopup, setErrorPopup } = useContext(UserContext);
+  const { setTextPopup, setErrorPopup, authUserData } = useContext(UserContext);
   const titleRef = useRef<HTMLInputElement>(null);
 
   const handleCreateBoard = async () => {
@@ -34,16 +29,14 @@ export default function BoardCreatePopup({
       setErrorPopup("Reference error!");
       return;
     }
-    const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.status !== 200) {
+    if (!authUserData) {
       setErrorPopup("Please log in!");
       return;
     }
-    const userData = currentUser.data as UserData;
     const newBoard = await createBoard({
       pins: [],
       title: titleRef.current.value,
-      userId: userData._id,
+      userId: authUserData._id,
     });
 
     if (!newBoard) {
@@ -51,8 +44,8 @@ export default function BoardCreatePopup({
       return;
     }
     if (newBoard.status !== 201) {
-      const error = newBoard.data as ErrorData;
-      setErrorPopup(error.message);
+      // const error = newBoard.data as ErrorData;
+      // setErrorPopup(error.message);
       return;
     } else {
       newBoard.data as BoardData;

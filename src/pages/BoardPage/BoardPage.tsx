@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import Masonry from "react-masonry-css";
 import { Link, useParams } from "react-router-dom";
@@ -11,7 +12,7 @@ import Toolbar from "../../components/Toolbar/Toolbar";
 import Typography from "../../components/Typgoraphy/Typography";
 import UsersPopup from "../../components/UsersPopup/UsersPopup";
 import copyCurrentUrl from "../../helpers/copyCurrentUrl";
-import { checkLogin, getCurrentUser } from "../../services/AuthService";
+import { checkLogin } from "../../services/AuthService";
 import {
   getBoard,
   getBoards,
@@ -20,8 +21,13 @@ import {
   updateBoard,
 } from "../../services/BoardService";
 import { UpdatePinDto } from "../../services/dto/update-pin.dto";
-import { BoardData, UserData } from "../../services/responses/responses";
+import {
+  BoardData,
+  ErrorData,
+  UserData,
+} from "../../services/responses/responses";
 import { getUser, subscribe, unsubscribe } from "../../services/UserService";
+import ErrorPageContext from "../../store/errorPageContext";
 import UserContext from "../../store/userContext";
 import LoadingPage from "../LoadingPage/LoadingPage";
 
@@ -39,7 +45,7 @@ export default function BoardPage() {
   const { id } = useParams();
 
   const { setTextPopup, setErrorPopup, authUserData } = useContext(UserContext);
-
+  const { setErrorPageData } = useContext(ErrorPageContext);
   // Board info
   const [boardData, setBoardData] = useState<BoardData | null>(null);
   const [authorInfo, setAuthorInfo] = useState<UserData | null>(null);
@@ -55,19 +61,27 @@ export default function BoardPage() {
       return;
     }
 
-    const oldBoardResponse = await getBoard(id);
+    const oldBoardResponse = await getBoard(id).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
 
     if (!oldBoardResponse || oldBoardResponse.status !== 200) {
-      console.log("Error getting old board.");
       return;
     }
     const oldBoard = oldBoardResponse.data as BoardData;
 
     oldBoard.pins = oldBoard.pins.filter((pinId) => pinId !== editedPinId);
 
-    const updateOldResponse = await updateBoard(id, oldBoard);
+    const updateOldResponse = await updateBoard(id, oldBoard).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     if (!updateOldResponse) {
-      console.log("Error updating old board.");
       return;
     }
     setTextPopup("Pin deleted from board");
@@ -83,40 +97,56 @@ export default function BoardPage() {
       return;
 
     // change old board
-    const oldBoardResponse = await getBoard(oldBoardId);
+    const oldBoardResponse = await getBoard(oldBoardId).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
 
     if (!oldBoardResponse || oldBoardResponse.status !== 200) {
-      console.log("Error getting old board.");
       return;
     }
     const oldBoard = oldBoardResponse.data as BoardData;
 
     oldBoard.pins = oldBoard.pins.filter((pinId) => pinId !== editedPinId);
 
-    const updateOldResponse = await updateBoard(oldBoardId, oldBoard);
+    const updateOldResponse = await updateBoard(oldBoardId, oldBoard).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     if (!updateOldResponse) {
-      console.log("Error updating old board.");
       return;
     }
 
     // update new board if it's not fresh
-    const newBoardResponse = await getBoard(newBoardId);
+    const newBoardResponse = await getBoard(newBoardId).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
 
     if (!newBoardResponse || newBoardResponse.status !== 200) {
-      console.log("Error getting new board.");
       return;
     }
     const newBoard = newBoardResponse.data as BoardData;
 
     newBoard.pins.push(editedPinId);
 
-    const updateNewResponse = await updateBoard(newBoardId, newBoard);
+    const updateNewResponse = await updateBoard(newBoardId, newBoard).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     if (!updateNewResponse) {
-      console.log("Error updating new board");
       return;
     }
 
-    setTextPopup("Pin updated.");
+    setTextPopup("Board updated.");
   };
 
   const handleSubscribe = async (subscribeToId: string) => {
@@ -125,9 +155,12 @@ export default function BoardPage() {
     }
     const isAuth = await checkLogin();
     if (isAuth) {
-      await subscribe(subscribeToId);
+      await subscribe(subscribeToId).catch((err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      });
     } else {
-      console.log("Not authenticated!");
+      setErrorPopup("Not authenticated!");
     }
   };
 
@@ -137,9 +170,12 @@ export default function BoardPage() {
     }
     const isAuth = await checkLogin();
     if (isAuth) {
-      await unsubscribe(subscribeToId);
+      await unsubscribe(subscribeToId).catch((err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      });
     } else {
-      console.log("Not authenticated!");
+      setErrorPopup("Not authenticated!");
     }
   };
 
@@ -148,16 +184,15 @@ export default function BoardPage() {
       return;
     }
 
-    const response = await getCurrentUser();
-    if (response && response.status === 200) {
+    if (authUserData) {
       if (!boardId) {
-        const userInfo = response.data as UserData;
-        savePinToProfile(id, userInfo)
+        savePinToProfile(id, authUserData)
           .then(() => {
             setTextPopup("Pin saved to profile!");
           })
-          .catch((err: string) => {
-            setErrorPopup(err);
+          .catch((err: AxiosError<ErrorData>) => {
+            if (!err.response) return;
+            setErrorPopup(err.response.data.message);
           });
         return;
       }
@@ -166,8 +201,9 @@ export default function BoardPage() {
         .then(() => {
           setTextPopup("Pin saved to board!");
         })
-        .catch((err) => {
-          setErrorPopup(err);
+        .catch((err: AxiosError<ErrorData>) => {
+          if (!err.response) return;
+          setErrorPopup(err.response.data.message);
         });
     }
 
@@ -176,7 +212,15 @@ export default function BoardPage() {
 
   const getBoardInfo = async () => {
     if (!id) return;
-    const boardResponse = await getBoard(id);
+    const boardResponse = await getBoard(id).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPageData({
+          code: err.response.data.statusCode,
+          message: err.response.data.message,
+        });
+      }
+    );
     if (!boardResponse || boardResponse.status !== 200) {
       return;
     }
@@ -184,7 +228,12 @@ export default function BoardPage() {
     const boardData = boardResponse.data as BoardData;
     setBoardData(boardData);
 
-    const userResponse = await getUser(boardData.userId);
+    const userResponse = await getUser(boardData.userId).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     if (!userResponse || userResponse.status !== 200) return;
 
     const userData = userResponse.data as UserData;

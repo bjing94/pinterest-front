@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { axiosInstance, frontURL } from "./axiosInstance";
 import { ErrorData, FileData } from "./responses/responses";
 
@@ -15,22 +15,17 @@ export async function uploadFile(
     })
     .then((response: AxiosResponse<FileData>) => {
       return response;
-    })
-    .catch((err: AxiosError<ErrorData>) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
 export async function getStaticImage(imgId: string): Promise<string | null> {
+  if (imgId.length === 0) {
+    return null;
+  }
   const imgInfo = await axiosInstance
     .get(`files/${imgId}`)
     .then((response: AxiosResponse<FileData>) => {
       return response.data;
-    })
-    .catch((err: AxiosError<ErrorData>) => {
-      console.log(err.response);
-      return null;
     });
 
   if (!imgInfo) {
@@ -40,7 +35,7 @@ export async function getStaticImage(imgId: string): Promise<string | null> {
   return frontURL + "/images" + `/${imgInfo.url}`; // 12-05-2022/img5.jpg
 }
 
-export async function downloadStaticImage(imgId: string) {
+export function downloadStaticImage(imgId: string) {
   const link = axiosInstance.defaults.baseURL + "/files/download/" + imgId;
   return link;
 }

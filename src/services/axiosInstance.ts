@@ -17,5 +17,4 @@ const axiosInstance = axios.create({
     "api-key": process.env.REACT_APP_API_KEY || "no-key",
   },
 });
-console.log(baseURL, frontURL, axiosInstance);
 export { axiosInstance, baseURL, frontURL };

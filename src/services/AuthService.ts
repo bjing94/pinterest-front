@@ -11,10 +11,6 @@ export async function login(dto: {
     .post(`auth/login`, dto)
     .then((response: AxiosResponse<{ message: string }>) => {
       return response;
-    })
-    .catch((err: AxiosError<ErrorData>) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
@@ -25,15 +21,7 @@ export async function register(
     .post(`auth/register`, dto)
     .then((response: AxiosResponse<{ message: string }>) => {
       return response;
-    })
-    .catch(
-      (
-        err: AxiosError<{ statusCode: number; message: string; error: string }>
-      ) => {
-        console.log(err.response);
-        return err.response;
-      }
-    );
+    });
 }
 
 export async function logout() {
@@ -41,10 +29,6 @@ export async function logout() {
     .post(`auth/logout`)
     .then((response: AxiosResponse<UserData>) => {
       return response;
-    })
-    .catch((error: AxiosError<ErrorData>) => {
-      console.log(error.response);
-      return error.response;
     });
 }
 
@@ -56,9 +40,8 @@ export async function getCurrentUser(): Promise<
     .then((response: AxiosResponse<UserData>) => {
       return response;
     })
-    .catch((error: AxiosError<ErrorData>) => {
-      console.log(error.response);
-      return error.response;
+    .catch((err: AxiosError<ErrorData>) => {
+      return err.response;
     });
 }
 
@@ -66,11 +49,20 @@ export async function checkLogin(): Promise<boolean> {
   return axiosInstance
     .get(`auth/check`)
     .then((response: AxiosResponse<{ loggedIn: boolean }>) => {
-      console.log("Authorized!");
       return true;
     })
-    .catch((err: AxiosError) => {
-      console.log("Not authorized!");
+    .catch(() => {
       return false;
     });
 }
+
+// export async function checkServerStatus(): Promise<boolean> {
+//   return axiosInstance
+//     .get(`auth/check`)
+//     .then(() => {
+//       return true;
+//     })
+//     .catch((err: AxiosError<ErrorData>) => {
+//       return err.response?.status === 500;
+//     });
+// }

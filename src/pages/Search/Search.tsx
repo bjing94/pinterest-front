@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import Masonry from "react-masonry-css";
@@ -7,14 +8,14 @@ import Flexbox from "../../components/Flexbox/Flexbox";
 import PinCard from "../../components/PinCard/PinCard";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import Toolbar from "../../components/Toolbar/Toolbar";
-import { getCurrentUser } from "../../services/AuthService";
 import {
   getBoards,
   savePinToBoard,
   savePinToProfile,
 } from "../../services/BoardService";
 import { findPins, getRandomPins } from "../../services/PinService";
-import { BoardData, UserData } from "../../services/responses/responses";
+import { BoardData, ErrorData } from "../../services/responses/responses";
+import ErrorPageContext from "../../store/errorPageContext";
 import UserContext from "../../store/userContext";
 
 const breakpointColumnsObj = {
@@ -30,6 +31,7 @@ const breakpointColumnsObj = {
 export default function Search() {
   const { isAuth, setTextPopup, setErrorPopup, authUserData, updateUserInfo } =
     useContext(UserContext);
+  const { setErrorPageData } = useContext(ErrorPageContext);
 
   const [pinsIds, setPinIds] = useState<string[]>([]);
   const [boardId, setBoardId] = useState<string>();
@@ -38,19 +40,23 @@ export default function Search() {
 
   const handleSearchPins = async () => {
     const queryString = window.location.search;
-    await findPins(queryString);
+    await findPins(queryString).catch((err: AxiosError<ErrorData>) => {
+      if (!err.response) return;
+      setErrorPageData({
+        code: err.response.data.statusCode,
+        message: err.response.data.message,
+      });
+    });
   };
 
   const handleSavePin = async (id: string) => {
-    if (!id) {
+    if (!id || !authUserData) {
       return;
     }
 
-    const response = await getCurrentUser();
-    if (response && response.status === 200) {
+    if (!authUserData) {
       if (!boardId) {
-        const userInfo = response.data as UserData;
-        savePinToProfile(id, userInfo)
+        savePinToProfile(id, authUserData)
           .then(() => {
             setTextPopup("Pin saved to profile!");
           })
@@ -90,7 +96,7 @@ export default function Search() {
       setBoardsData(boardsData);
     };
     getPins();
-    handleSearchPins();
+    // handleSearchPins();
     getAuthUserBoards();
   }, [authUserData]);
 
@@ -134,7 +140,7 @@ export default function Search() {
           onClose={() => {
             setShowCreateBoard(false);
           }}
-          onSubmit={(value: string) => {
+          onSubmit={() => {
             updateUserInfo();
           }}
         />

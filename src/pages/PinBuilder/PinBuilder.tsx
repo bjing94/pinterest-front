@@ -12,12 +12,7 @@ import { CreatePinDto } from "../../services/dto/create-pin.dto";
 import "./PinBuilder.scss";
 import { AiFillDelete } from "react-icons/ai";
 import ProfileInfo from "../../components/ProfileInfo/ProfileInfo";
-import {
-  ErrorData,
-  FileData,
-  UserData,
-} from "../../services/responses/responses";
-import { getCurrentUser } from "../../services/AuthService";
+import { ErrorData, FileData } from "../../services/responses/responses";
 import { uploadFile } from "../../services/FileService";
 import { createPin } from "../../services/PinService";
 import Typography from "../../components/Typgoraphy/Typography";
@@ -31,13 +26,13 @@ import { Navigate } from "react-router-dom";
 import UserContext from "../../store/userContext";
 import Box from "../../components/Box/Box";
 import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
+import { AxiosError } from "axios";
 
 export default function PinBuilder() {
-  const { setTextPopup, updateUserInfo, isAuth, authUserData } =
+  const { setTextPopup, setErrorPopup, updateUserInfo, isAuth, authUserData } =
     useContext(UserContext);
 
   const [uploadedImg, setUploadedImg] = useState<string | undefined>(undefined);
-  const [error, setError] = useState("");
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [boardId, setBoardId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -52,61 +47,70 @@ export default function PinBuilder() {
   const fileRef: React.RefObject<HTMLInputElement> = useRef(null);
 
   const handleCreatePin = async () => {
-    setError("");
     if (!(fileRef && fileRef.current && fileRef.current.files)) {
-      setError("Reference error!");
+      setErrorPopup("Reference error!");
       return;
     }
 
     const imgFile = fileRef.current?.files[0];
     if (title.length === 0) {
-      setError("Title must not be empty!");
+      setErrorPopup("Title must not be empty!");
       return;
     }
     if (boardId.length === 0) {
-      setError("Select a board!");
+      setErrorPopup("Select a board!");
       return;
     }
     if (!imgFile) {
-      setError("Image must not be empty!");
+      setErrorPopup("Image must not be empty!");
       return;
     }
-
+    if (!authUserData) {
+      setErrorPopup("Pleas log in!");
+      return;
+    }
     setIsLoading(true);
 
-    const uploadRes = await uploadFile(imgFile);
+    const uploadRes = await uploadFile(imgFile).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
     if (!uploadRes || uploadRes.status !== 200) {
-      console.log(uploadRes);
       if (uploadRes?.status === 413) {
-        setError("Image is too large! Limit is 5 Mb.");
+        setErrorPopup("Image is too large! Limit is 5 Mb.");
       } else {
-        setError("Image was not uploaded!");
+        setErrorPopup("Image was not uploaded!");
       }
       setIsLoading(false);
       return;
     }
 
-    const userData = (await getCurrentUser())!.data as UserData;
-
     const dto: CreatePinDto = {
       title: title,
       imgId: (uploadRes.data as FileData)._id,
       content: description,
-      userId: userData._id,
+      userId: authUserData._id,
       boardId: boardId,
     };
 
-    const pinResponse = await createPin(dto);
+    const pinResponse = await createPin(dto).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
 
     if (!pinResponse) {
-      setError("Server error!");
+      setErrorPopup("Server error!");
       setIsLoading(false);
       return;
     }
 
     if (pinResponse.status !== 201) {
       const error = pinResponse.data as ErrorData;
-      setError(error.message);
+      setErrorPopup(error.message);
       setIsLoading(false);
       return;
     }
@@ -181,7 +185,6 @@ export default function PinBuilder() {
         id="builder-card"
       >
         {isLoading && <PinLoader />}
-        {error && <Typography fontSize={12}>{`Error: ${error}`}</Typography>}
         <Flexbox justifyContent="space-between">
           <RoundButton
             size={32}

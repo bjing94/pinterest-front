@@ -37,8 +37,6 @@ export default function TopBar({
   const handleSearch = async () => {
     if (!searchRef.current || searchRef.current.value.length === 0) return;
 
-    console.log("searching");
-
     const value = searchRef.current.value;
     navigate(`/search/?q=${value}&random=false`);
   };

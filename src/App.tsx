@@ -15,6 +15,7 @@ import TextPopup from "./components/TextPopup";
 import BoardPage from "./pages/BoardPage/BoardPage";
 import Search from "./pages/Search";
 import Sidebar from "./components/Sidebar";
+import ErrorHandler from "./components/ErrorHandler";
 
 function App() {
   const [showAuthPopup, setShowAuthPopup] = useState(false);
@@ -73,8 +74,8 @@ function App() {
   useEffect(() => {
     checkIsAuth();
     getAuthUserInfo();
-    console.log("checking auth");
   }, []);
+
   return (
     <UserProvider
       value={{
@@ -125,14 +126,16 @@ function App() {
             setShowRegisterPopup(true);
           }}
         />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/pin-builder" element={<PinBuilder />} />
-          <Route path="/pin/:id" element={<Pin />} />
-          <Route path="/user/:id" element={<User />} />
-          <Route path="/board/:id" element={<BoardPage />} />
-          <Route path="/search" element={<Search />} />
-        </Routes>
+        <ErrorHandler>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/pin-builder" element={<PinBuilder />} />
+            <Route path="/pin/:id" element={<Pin />} />
+            <Route path="/user/:id" element={<User />} />
+            <Route path="/board/:id" element={<BoardPage />} />
+            <Route path="/search" element={<Search />} />
+          </Routes>
+        </ErrorHandler>
       </div>
     </UserProvider>
   );

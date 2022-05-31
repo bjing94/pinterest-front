@@ -7,33 +7,20 @@ import Typography from "../../components/Typgoraphy/Typography";
 import "./ErrorPage.scss";
 
 interface ErrorPageProps {
-  errorCode: number;
+  code: number;
+  message: string;
 }
 
-export default function ErrorPage({ errorCode }: ErrorPageProps) {
-  let description;
-  switch (errorCode) {
-    case 400:
-      description = "Bad request";
-      break;
-    case 404:
-      description = "Not found";
-      break;
-  }
+export default function ErrorPage({ code, message }: ErrorPageProps) {
   return (
     <div className="error-page__container">
       <Toolbar />
       <Box margin="140px 0px 0px 0px">
         <Flexbox flexDirection="column" fluid>
-          <img
-            className="error-page__img"
-            src="https://i.pinimg.com/564x/36/1f/01/361f0121332de3d36c152261e4d92fdb.jpg"
-            width={320}
-            height={400}
-            alt="not_found"
-          />
-          <Typography>{errorCode}</Typography>
-          <Typography>{description}</Typography>
+          <Typography fontSize={64} fontWeight="bold">
+            {code}
+          </Typography>
+          <Typography fontSize={24}>{message}</Typography>
         </Flexbox>
       </Box>
     </div>

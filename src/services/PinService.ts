@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { axiosInstance } from "./axiosInstance";
 import { CreatePinDto } from "./dto/create-pin.dto";
 import { UpdatePinDto } from "./dto/update-pin.dto";
@@ -9,12 +9,7 @@ export async function getRandomPins(): Promise<PinData[] | null> {
     .get(`search/pins?random=true`)
     .then((response: AxiosResponse<PinData[]>) => {
       return response.data;
-    })
-    .catch((err: AxiosError) => {
-      console.log(err.response);
-      return null;
     });
-  console.log(axiosInstance.defaults);
   return res;
 }
 
@@ -25,10 +20,6 @@ export async function getPin(
     .get(`pin/${pinId}`)
     .then((response: AxiosResponse<PinData>) => {
       return response;
-    })
-    .catch((err: AxiosError) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
@@ -39,10 +30,6 @@ export async function createPin(
     .post("pin/create", dto)
     .then((response: AxiosResponse<PinData>) => {
       return response;
-    })
-    .catch((err: AxiosError) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
@@ -54,10 +41,6 @@ export async function updatePin(
     .patch(`pin/${pinId}`, dto)
     .then((response: AxiosResponse<PinData>) => {
       return response;
-    })
-    .catch((err: AxiosError) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
@@ -68,10 +51,6 @@ export async function deletePin(
     .delete(`pin/${pinId}`)
     .then((response: AxiosResponse<PinData>) => {
       return response;
-    })
-    .catch((err: AxiosError) => {
-      console.log(err.response);
-      return err.response;
     });
 }
 
@@ -82,9 +61,5 @@ export async function findPins(
     .get(`search/pins/${query}`)
     .then((response: AxiosResponse<PinData[]>) => {
       return response;
-    })
-    .catch((err: AxiosError) => {
-      console.log(err.response);
-      return err.response;
     });
 }
