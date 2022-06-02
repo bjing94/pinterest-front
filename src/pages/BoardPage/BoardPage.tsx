@@ -91,6 +91,7 @@ export default function BoardPage() {
     dto: UpdatePinDto,
     oldBoardId: string,
     newBoardId: string,
+    newImgFile?: File,
     createBoardTitle?: string
   ) => {
     if (oldBoardId === "" || newBoardId === "" || oldBoardId === newBoardId)

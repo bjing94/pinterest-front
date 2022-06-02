@@ -6,7 +6,11 @@ import Input from "../Input";
 import Typography from "../Typgoraphy/Typography";
 import { getPin } from "../../services/PinService";
 import { UpdatePinDto } from "../../services/dto/update-pin.dto";
-import { BoardData, PinData } from "../../services/responses/responses";
+import {
+  BoardData,
+  ErrorData,
+  PinData,
+} from "../../services/responses/responses";
 import UserContext from "../../store/userContext";
 import ResponsiveImage from "../ResponsiveImage/ResponsiveImage";
 import { getStaticImage } from "../../services/FileService";
@@ -17,6 +21,7 @@ import InputSearch from "../InputSearch/InputSearch";
 import "./EditPinPopup.scss";
 import EditPopup from "../EditPopup/EditPopup";
 import { getBoards } from "../../services/BoardService";
+import { AxiosError } from "axios";
 
 interface EditPinPopupProps {
   pinId: string;
@@ -27,6 +32,7 @@ interface EditPinPopupProps {
     dto: UpdatePinDto,
     oldBoardId: string,
     newBoardId: string,
+    newImgFile?: File,
     createBoardTitle?: string
   ) => void;
   isSaver?: boolean;
@@ -60,7 +66,7 @@ function BoardsSelectionProperty({
   ];
 
   if (boards && boards.length > 0) {
-    dropdownItems = boards.map((board) => {
+    dropdownItems = boards.map((board, id) => {
       return (
         <Box
           padding="10px"
@@ -68,6 +74,7 @@ function BoardsSelectionProperty({
             onSelect(board._id);
             setShowDropdown(false);
           }}
+          key={`board-dropdown-item-${id}`}
         >
           <Typography fontSize={14} textAlign="start" fontWeight="bold">
             {board.title}
@@ -76,6 +83,34 @@ function BoardsSelectionProperty({
       );
     });
   }
+  const searchPanel = (
+    <Box padding="5px" className="search-panel" key={`board-dropdown-search`}>
+      <Flexbox fluid justifyContent="space-between">
+        <Box margin="0px 5px 0px 5px">
+          <InputSearch
+            placeholder="Search"
+            ref={inputRef}
+            onChange={() => {
+              setCreateButtonActive(
+                !!inputRef.current && inputRef.current.value.length > 5
+              );
+            }}
+          />
+        </Box>
+        <Button
+          active={createButtonActive}
+          onClick={() => {
+            if (inputRef.current) {
+              onCreate(inputRef.current.value);
+              setShowDropdown(false);
+            }
+          }}
+        >
+          Create
+        </Button>
+      </Flexbox>
+    </Box>
+  );
 
   return (
     <Box width="100%" margin="0px 0px 20px 0px">
@@ -110,36 +145,8 @@ function BoardsSelectionProperty({
               top="55px"
               className="edit-pin-popup__dropdown"
               onClickItem={() => {}}
-            >
-              <Box padding="5px" className="search-panel">
-                <Flexbox fluid justifyContent="space-between">
-                  <Box margin="0px 5px 0px 5px">
-                    <InputSearch
-                      placeholder="Search"
-                      ref={inputRef}
-                      onChange={() => {
-                        setCreateButtonActive(
-                          !!inputRef.current &&
-                            inputRef.current.value.length > 5
-                        );
-                      }}
-                    />
-                  </Box>
-                  <Button
-                    active={createButtonActive}
-                    onClick={() => {
-                      if (inputRef.current) {
-                        onCreate(inputRef.current.value);
-                        setShowDropdown(false);
-                      }
-                    }}
-                  >
-                    Create
-                  </Button>
-                </Flexbox>
-              </Box>
-              {dropdownItems}
-            </Dropdown>
+              children={[searchPanel, ...dropdownItems]}
+            />
           )}
         </Box>
       </Flexbox>
@@ -179,8 +186,7 @@ export default function EditPinPopup({
   onUpdate,
   isSaver = false,
 }: EditPinPopupProps) {
-  const { authUserData } = useContext(UserContext);
-
+  const { authUserData, setErrorPopup } = useContext(UserContext);
   const [pinData, setPinData] = useState<PinData | null>(null);
   const [imgSrc, setImgSrc] = useState<string>("");
 
@@ -191,6 +197,28 @@ export default function EditPinPopup({
   const [oldBoardId, setOldBoardId] = useState("");
   const [userBoards, setUserBoards] = useState<BoardData[]>();
 
+  const newImgInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUploadImg = () => {
+    if (
+      newImgInputRef &&
+      newImgInputRef.current &&
+      newImgInputRef.current.files
+    ) {
+      const selectedFile = newImgInputRef.current.files[0];
+
+      const fr = new FileReader();
+
+      fr.onload = function () {
+        if (fr.result) {
+          setImgSrc(`${fr.result?.toString()}`);
+        }
+      };
+
+      fr.readAsDataURL(selectedFile);
+    }
+  };
+
   const getAuthUserBoards = async () => {
     if (!authUserData) return;
     const boardsData = await getBoards(authUserData.boards);
@@ -198,8 +226,13 @@ export default function EditPinPopup({
   };
 
   const getPinInfo = async () => {
-    await getAuthUserBoards();
-    const pinResponse = await getPin(pinId);
+    const pinResponse = await getPin(pinId).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPopup(err.response.data.message);
+      }
+    );
+    console.log(pinResponse?.status, userBoards, authUserData);
     if (pinResponse?.status !== 200 || !pinResponse || !userBoards) return;
 
     const pinData = pinResponse.data as PinData;
@@ -225,8 +258,12 @@ export default function EditPinPopup({
   };
 
   useEffect(() => {
+    getAuthUserBoards();
+  }, [authUserData]);
+
+  useEffect(() => {
     getPinInfo();
-  }, []);
+  }, [pinId, userBoards]);
 
   const savedOnBoardName =
     temporaryBoardTitle !== ""
@@ -237,7 +274,26 @@ export default function EditPinPopup({
         })?.title || ""
       : "";
 
-  if (!pinData) return <div>whoops</div>;
+  if (!pinData) return null;
+  const editImgOverlay = (
+    <Flexbox
+      justifyContent="center"
+      fluid
+      className="edit-pin-popup__img-overlay"
+    >
+      <label htmlFor="input-img">
+        <Typography fontSize={16} color="secondary">
+          Change image?
+        </Typography>
+      </label>
+      <input
+        onInput={handleUploadImg}
+        ref={newImgInputRef}
+        type="file"
+        id="input-img"
+      />
+    </Flexbox>
+  );
   const mainContent = (
     <>
       <Flexbox alignItems="flex-start">
@@ -274,7 +330,11 @@ export default function EditPinPopup({
           </Flexbox>
         </Box>
         <Box width="200px" margin="0px 16px 0px 16px">
-          <ResponsiveImage src={imgSrc} maxHeight="500px" />
+          <ResponsiveImage
+            src={imgSrc}
+            maxHeight="500px"
+            overlayContent={editImgOverlay}
+          />
         </Box>
       </Flexbox>
     </>
@@ -297,10 +357,16 @@ export default function EditPinPopup({
           </Box>
           <Button
             onClick={() => {
+              let imgFile: File | undefined = undefined;
+              if (newImgInputRef.current && newImgInputRef.current.files) {
+                console.log("File data:", newImgInputRef.current.files[0]);
+                imgFile = newImgInputRef.current.files[0];
+              }
               onUpdate(
                 { title: titleValue, content: contentValue },
                 oldBoardId,
                 selectedBoardId,
+                imgFile,
                 temporaryBoardTitle
               );
               onClose();

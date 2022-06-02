@@ -1,6 +1,9 @@
-import React, { useRef, useState } from "react";
+import { AxiosError } from "axios";
+import React, { useContext, useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { register, login } from "../../services/AuthService";
+import { ErrorData } from "../../services/responses/responses";
+import UserContext from "../../store/userContext";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
 import Flexbox from "../Flexbox/Flexbox";
@@ -13,15 +16,15 @@ import "./AuthPopup.scss";
 
 interface AuthPopupProps {
   onClose: any;
-  onSubmit?: any;
   registerMode?: boolean;
 }
 
 export default function AuthPopup({
   onClose,
-  onSubmit,
   registerMode = false,
 }: AuthPopupProps) {
+  const { setErrorPopup } = useContext(UserContext);
+
   const [error, setError] = useState("");
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -79,7 +82,12 @@ export default function AuthPopup({
         setError(res?.data.message ?? "");
       }
     } else {
-      const res = await login({ email: email, password: password });
+      const res = await login({ email: email, password: password }).catch(
+        (error: AxiosError<ErrorData>) => {
+          if (!error.response) return;
+          setErrorPopup(error.response.data.message);
+        }
+      );
       if (res?.status === 200) {
         onClose();
         window.location.reload();
@@ -94,7 +102,6 @@ export default function AuthPopup({
         onSubmit={(event) => {
           event.preventDefault();
           handleAuth();
-          onSubmit();
         }}
       >
         <Flexbox flexDirection="column">

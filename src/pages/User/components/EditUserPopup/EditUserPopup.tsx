@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Box from "../../../../components/Box/Box";
 import Button from "../../../../components/Button/Button";
 import Flexbox from "../../../../components/Flexbox/Flexbox";
@@ -44,7 +44,8 @@ interface EditPopupProps {
   userData: UserData;
   title: string;
   onClose: () => void;
-  onUpdate: (dto: UpdateUserDto) => void;
+  onUpdate: (dto: UpdateUserDto, newAvatar?: File) => void;
+  avatarSrc: string;
 }
 
 export default function EditUserPopup({
@@ -52,14 +53,51 @@ export default function EditUserPopup({
   onClose,
   onUpdate,
   userData,
+  avatarSrc,
 }: EditPopupProps) {
   const [currentUsername, setCurrentUsername] = useState(userData.username);
   const [currentDisplayId, setCurrentDisplayId] = useState(userData.displayId);
   const [currentEmail, setCurrentEmail] = useState(userData.email);
   const [newPassword, setNewPassword] = useState("");
+  const [imgSrc, setImgSrc] = useState(avatarSrc);
+  const [newAvatar, setNewAvatar] = useState<File | undefined>(undefined);
+
+  const imgInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUploadImg = () => {
+    if (imgInputRef && imgInputRef.current && imgInputRef.current.files) {
+      const selectedFile = imgInputRef.current.files[0];
+      setNewAvatar(selectedFile);
+      const fr = new FileReader();
+
+      fr.onload = function () {
+        if (fr.result) {
+          setImgSrc(`${fr.result?.toString()}`);
+        }
+      };
+
+      fr.readAsDataURL(selectedFile);
+    }
+  };
 
   const mainContent = (
     <Box className="edit-user-popup__content">
+      <Box margin="0px 0px 20px 0px">
+        <Flexbox justifyContent="center" fluid>
+          <div
+            className="edit-user-popup__avatar-input"
+            style={{ backgroundImage: `url(${imgSrc})` }}
+          >
+            <label htmlFor="avatar-input">Change image?</label>
+            <input
+              ref={imgInputRef}
+              onInput={handleUploadImg}
+              type="file"
+              id="avatar-input"
+            />
+          </div>
+        </Flexbox>
+      </Box>
       <TextProperty
         label="Username"
         value={currentUsername}
@@ -99,7 +137,8 @@ export default function EditUserPopup({
     newPassword !== "" ||
     currentEmail !== userData.email ||
     currentDisplayId !== userData.displayId ||
-    currentUsername !== userData.username;
+    currentUsername !== userData.username ||
+    avatarSrc !== imgSrc;
 
   const bottomContent = (
     <>
@@ -107,11 +146,14 @@ export default function EditUserPopup({
         <Button onClick={onClose}>Close</Button>
         <Button
           onClick={() => {
-            onUpdate({
-              username: currentUsername,
-              displayId: currentDisplayId,
-              newPassword: newPassword,
-            });
+            onUpdate(
+              {
+                username: currentUsername,
+                displayId: currentDisplayId,
+                newPassword: newPassword,
+              },
+              newAvatar
+            );
             onClose();
           }}
           active={hasChanged}

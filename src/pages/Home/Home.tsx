@@ -94,7 +94,7 @@ export default function Home() {
     };
     getPins();
     getAuthUserBoards();
-  }, []);
+  }, [authUserData]);
 
   const pinCards = pinsIds.map((id) => {
     let isSaved = false;

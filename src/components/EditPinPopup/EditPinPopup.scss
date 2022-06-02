@@ -1,21 +1,40 @@
 .edit-pin-popup {
   &__input {
-    max-width: 368px;
+    max-width: 320px;
   }
 
   &__selection {
-    max-width: 368px;
+    max-width: 320px;
     background-color: lightgray;
     border-radius: 1rem;
   }
 
   &__dropdown {
+    padding: 0;
+    overflow: hidden;
     width: 100%;
     border: 1px lightgray solid;
 
     & .search-panel:hover {
       background: white;
       cursor: default;
+    }
+  }
+
+  &__img-overlay {
+    height: 100%;
+
+    & input {
+      display: none;
+    }
+
+    & label {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      cursor: pointer;
+      justify-content: center;
+      align-items: center;
     }
   }
 }

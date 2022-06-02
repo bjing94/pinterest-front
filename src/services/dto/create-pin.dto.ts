@@ -3,13 +3,13 @@ export interface CreatePinDto {
 
   userId: string;
 
-  boardId: string;
-
   imgId: string;
 
   content: string;
 
   comments?: string[];
+
+  boardId?: string;
 }
 
 export interface CreateUserDto {

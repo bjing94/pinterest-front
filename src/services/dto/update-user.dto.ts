@@ -5,6 +5,8 @@ export interface UpdateUserDto {
 
   displayId?: string;
 
+  avatarSrc?: string;
+
   email?: string;
 
   newPassword?: string;

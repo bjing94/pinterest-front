@@ -43,7 +43,7 @@ export default function Sidebar({
       )}
 
       {isAuth && authUserData && (
-        <Link to={`/user/${authUserData._id}`}>
+        <Link to={`/user/${authUserData.displayId}`}>
           <Typography fontSize={18} fontWeight="bold">
             Profile
           </Typography>

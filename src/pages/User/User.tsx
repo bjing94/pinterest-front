@@ -17,11 +17,12 @@ import {
 import {
   BoardData,
   ErrorData,
+  FileData,
   UserData,
 } from "../../services/responses/responses";
 import UserBoardCard from "./components/UserBoardCard/UserBoardCard";
 import { checkLogin } from "../../services/AuthService";
-import { getStaticImage } from "../../services/FileService";
+import { getStaticImage, uploadFile } from "../../services/FileService";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import {
   createBoard,
@@ -45,6 +46,7 @@ import copyCurrentUrl from "../../helpers/copyCurrentUrl";
 import "./User.scss";
 import { UpdateUserDto } from "../../services/dto/update-user.dto";
 import { AxiosError } from "axios";
+import SavedPinsCard from "./components/SavedPinsCard/SavedPinsCard";
 
 const breakpointColumnsObj = {
   default: 7,
@@ -67,6 +69,7 @@ export default function User() {
   const [showCreated, setShowCreated] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [avatar, setAvatar] = useState("");
+  const [profilePins, setProfilePins] = useState<string[]>([]);
 
   // Pin info
   const [boardId, setBoardId] = useState<string | undefined>(undefined);
@@ -140,6 +143,7 @@ export default function User() {
     dto: UpdatePinDto,
     oldId: string,
     newId: string,
+    newImgFile?: File,
     createBoardTitle?: string
   ) => {
     if (!authUserData) return;
@@ -218,19 +222,42 @@ export default function User() {
       }
     }
 
-    updatePin(editedPinId, dto); // update pin info
+    if (newImgFile) {
+      const uploadedImg = await uploadFile(newImgFile);
+      if (!uploadedImg || uploadedImg.status !== 200) return;
+
+      const imgData = uploadedImg.data as FileData;
+      dto.imgId = imgData._id;
+    }
+    updatePin(editedPinId, { ...dto }); // update pin info
     setTextPopup("Pin updated.");
     refetchProfileInfo();
+    reloadPins();
   };
 
-  const handleUpdateUser = async (dto: UpdateUserDto) => {
+  const reloadPins = () => {
     if (!profileInfo) return;
-    await updateUser(profileInfo._id, dto).catch(
+    setProfilePins([]);
+    setProfilePins(profileInfo.createdPins);
+  };
+
+  const handleUpdateUser = async (dto: UpdateUserDto, newAvatar?: File) => {
+    if (!profileInfo) return;
+    if (newAvatar) {
+      const uploadedImg = await uploadFile(newAvatar);
+      if (!uploadedImg || uploadedImg.status !== 200) return;
+
+      const imgData = uploadedImg.data as FileData;
+      dto.avatarSrc = imgData._id;
+    }
+    const response = await updateUser(profileInfo._id, dto).catch(
       (err: AxiosError<ErrorData>) => {
         if (!err.response) return;
         setErrorPopup(err.response.data.message);
       }
     );
+    if (response?.status !== 200) return;
+    setTextPopup("User updated");
     await refetchProfileInfo();
     await updateUserInfo();
     if (dto.displayId !== displayId) {
@@ -288,6 +315,7 @@ export default function User() {
             }
           );
           setAvatar(staticSrc ?? "https://via.placeholder.com/128.jpg");
+          setProfilePins(user.createdPins);
           setIsLoading(false);
         } else {
           setIsLoading(false);
@@ -334,6 +362,7 @@ export default function User() {
                 setErrorPopup(err.response.data.message);
               }
             );
+            setProfilePins(user.createdPins);
             setAvatar(staticSrc ?? "https://via.placeholder.com/128.jpg");
             setIsLoading(false);
           } else {
@@ -362,7 +391,7 @@ export default function User() {
 
   const isOwner = authUserData?._id === profileInfo._id;
 
-  const pinElements = profileInfo.createdPins.map((id) => {
+  const pinElements = profilePins.map((id) => {
     const isSaved = !!boardsToPins.find((data) => {
       return data.pins.includes(id);
     });
@@ -395,7 +424,6 @@ export default function User() {
       </Flexbox>
     );
   });
-
   const boardElements = profileInfo.boards.map((boardId) => {
     return (
       <Flexbox
@@ -414,291 +442,150 @@ export default function User() {
       </Flexbox>
     );
   });
+  boardElements.push(
+    <Flexbox
+      justifyContent="center"
+      style={{ width: "100%" }}
+      key={`board-card-${boardId}`}
+    >
+      <SavedPinsCard
+        savedPins={profileInfo.savedPins}
+        onEdit={() => {
+          // setShowEditBoard(true);
+          // setEditedBoardId(boardId);
+        }}
+        isOwner={authUserData?._id === profileInfo._id}
+      />
+    </Flexbox>
+  );
 
   const isSubscribed =
     profileInfo.subscribers.find((a) => a === authUserData?._id) !== undefined;
-  if (!isOwner) {
-    return (
-      <div>
-        {showEditBoard && (
-          <EditBoardPopup
-            boardId={editedBoardId}
-            title={"Edit board"}
-            onClose={() => {
-              setShowEditBoard(false);
-            }}
-            onSubmit={() => {
-              updateUserInfo();
-            }}
-          />
-        )}
-        {showSubscribersPopup && (
-          <UsersPopup
-            userIds={profileInfo.subscribers}
-            title={`${profileInfo.subscribers.length} subscribers`}
-            onClose={() => {
-              setShowSubscribersPopup(false);
-            }}
-            onSubscribe={handleSubscribe}
-            onUnSubscribe={handleUnSubscribe}
-          />
-        )}
-        {showSubscribtionsPopup && (
-          <UsersPopup
-            userIds={profileInfo.subscriptions}
-            title={`${profileInfo.subscriptions.length} subscribtions`}
-            onClose={() => {
-              setShowSubscribtionsPopup(false);
-            }}
-            onSubscribe={handleSubscribe}
-            onUnSubscribe={handleUnSubscribe}
-          />
-        )}
-        {showCreateBoard && (
-          <BoardCreatePopup
-            onClose={() => {
-              setShowCreateBoard(false);
-            }}
-            onSubmit={() => {
-              updateUserInfo();
-            }}
-          />
-        )}
-        <Toolbar />
-        <Flexbox
-          flexDirection="column"
-          alignItems="center"
-          className="user-page"
-        >
-          <RoundButton
-            size={128}
-            style={{ background: `url(${avatar}) center center` }}
-          ></RoundButton>
-          <Typography fontWeight="bold">{profileInfo.username}</Typography>
-          <Typography fontSize={14}>
-            {`@${profileInfo.displayId} ${profileInfo.description ?? ""}`}
-          </Typography>
-          <div style={{ marginTop: "1rem" }}>
-            <Flexbox>
-              <Button
-                variant="text"
-                onClick={() => {
-                  setShowSubscribersPopup(true);
-                }}
-              >
-                <Typography fontSize={16} fontWeight="bold">
-                  {profileInfo.subscribers.length} subscribers
-                </Typography>
-              </Button>
 
-              <Button
-                variant="text"
-                onClick={() => {
-                  setShowSubscribtionsPopup(true);
-                }}
-              >
-                <Typography
-                  fontSize={16}
-                  fontWeight="bold"
-                  className="user__subscriptions"
-                >
-                  {profileInfo.subscriptions.length} subscriptions
-                </Typography>
-              </Button>
-            </Flexbox>
-          </div>
-          <Box margin="20px 0 0 0">
-            <Flexbox>
-              <RoundButton
-                size={48}
-                onClick={() => {
-                  handleCopyUserLink();
-                }}
-              >
-                <FiLink size={24} />
-              </RoundButton>
-              {!isSubscribed && authUserData && (
-                <Button
-                  onClick={() => {
-                    handleSubscribe(profileInfo._id);
-                  }}
-                >
-                  Subscribe
-                </Button>
-              )}
-              {isSubscribed && authUserData && (
-                <Button
-                  className="user__subscribed-btn"
-                  color="secondary"
-                  onClick={() => {
-                    handleUnSubscribe(profileInfo._id);
-                  }}
-                >
-                  Subscribed
-                </Button>
-              )}
-            </Flexbox>
-          </Box>
-          <Box margin="40px 0 0 0">
-            <Flexbox>
-              <ButtonSection
-                isActive={showCreated}
-                onClick={() => {
-                  setShowCreated(true);
-                }}
-              >
-                <Typography fontSize={16} fontWeight="bold">
-                  Created
-                </Typography>
-              </ButtonSection>
-              <ButtonSection
-                isActive={!showCreated}
-                onClick={() => {
-                  setShowCreated(false);
-                }}
-              >
-                <Typography fontSize={16} fontWeight="bold">
-                  Saved
-                </Typography>
-              </ButtonSection>
-            </Flexbox>
-          </Box>
-          <Flexbox style={{ width: "100%" }}>
-            <Masonry
-              breakpointCols={breakpointColumnsObj}
-              className="user-masonry-grid"
-              columnClassName="user-masonry-grid_column"
+  return (
+    <>
+      {isOwner && showEditUser && (
+        <EditUserPopup
+          userData={profileInfo}
+          title={"Edit profile"}
+          onClose={() => {
+            setShowEditUser(false);
+          }}
+          onUpdate={handleUpdateUser}
+          avatarSrc={avatar}
+        />
+      )}
+      {isOwner && showEditBoard && (
+        <EditBoardPopup
+          boardId={editedBoardId}
+          title={"Edit board"}
+          onClose={() => {
+            setShowEditBoard(false);
+          }}
+          onSubmit={() => {
+            updateUserInfo();
+            refetchProfileInfo();
+          }}
+        />
+      )}
+      {isOwner && showEditPin && (
+        <EditPinPopup
+          pinId={editedPinId}
+          title={"Edit pin"}
+          onClose={() => {
+            setShowEditPin(false);
+          }}
+          onDelete={() => {
+            handleDeletePin(editedPinId);
+          }}
+          onUpdate={handleUpdatePin}
+        />
+      )}
+      {showSubscribersPopup && (
+        <UsersPopup
+          userIds={profileInfo.subscribers}
+          title={`${profileInfo.subscribers.length} subscribers`}
+          onClose={() => {
+            setShowSubscribersPopup(false);
+          }}
+          onSubscribe={handleSubscribe}
+          onUnSubscribe={handleUnSubscribe}
+        />
+      )}
+      {showSubscribtionsPopup && (
+        <UsersPopup
+          userIds={profileInfo.subscriptions}
+          title={`${profileInfo.subscriptions.length} subscribtions`}
+          onClose={() => {
+            setShowSubscribtionsPopup(false);
+          }}
+          onSubscribe={handleSubscribe}
+          onUnSubscribe={handleUnSubscribe}
+        />
+      )}
+      {showCreateBoard && (
+        <BoardCreatePopup
+          onClose={() => {
+            setShowCreateBoard(false);
+          }}
+          onSubmit={() => {
+            updateUserInfo();
+          }}
+        />
+      )}
+      <Toolbar />
+      <Flexbox flexDirection="column" alignItems="center" className="user-page">
+        <RoundButton
+          size={128}
+          style={{
+            background: `url(${avatar}) center center`,
+            backgroundSize: "cover",
+          }}
+        ></RoundButton>
+        <Typography fontWeight="bold">{profileInfo.username}</Typography>
+        <Typography fontSize={14}>
+          {`@${profileInfo.displayId} ${profileInfo.description ?? ""}`}
+        </Typography>
+        <div style={{ marginTop: "1rem" }}>
+          <Flexbox>
+            <Button
+              variant="text"
+              onClick={() => {
+                setShowSubscribersPopup(true);
+              }}
             >
-              {showCreated ? pinElements : boardElements}
-            </Masonry>
-          </Flexbox>
-        </Flexbox>
-      </div>
-    );
-  } else {
-    return (
-      <>
-        {showEditUser && (
-          <EditUserPopup
-            userData={profileInfo}
-            title={"Edit profile"}
-            onClose={() => {
-              setShowEditUser(false);
-            }}
-            onUpdate={handleUpdateUser}
-          />
-        )}
-        {showEditBoard && (
-          <EditBoardPopup
-            boardId={editedBoardId}
-            title={"Edit board"}
-            onClose={() => {
-              setShowEditBoard(false);
-            }}
-            onSubmit={() => {
-              updateUserInfo();
-              refetchProfileInfo();
-            }}
-          />
-        )}
-        {showEditPin && (
-          <EditPinPopup
-            pinId={editedPinId}
-            title={"Edit pin"}
-            onClose={() => {
-              setShowEditPin(false);
-            }}
-            onDelete={() => {
-              handleDeletePin(editedPinId);
-            }}
-            onUpdate={handleUpdatePin}
-          />
-        )}
-        {showSubscribersPopup && (
-          <UsersPopup
-            userIds={profileInfo.subscribers}
-            title={`${profileInfo.subscribers.length} subscribers`}
-            onClose={() => {
-              setShowSubscribersPopup(false);
-            }}
-            onSubscribe={handleSubscribe}
-            onUnSubscribe={handleUnSubscribe}
-          />
-        )}
-        {showSubscribtionsPopup && (
-          <UsersPopup
-            userIds={profileInfo.subscriptions}
-            title={`${profileInfo.subscriptions.length} subscribtions`}
-            onClose={() => {
-              setShowSubscribtionsPopup(false);
-            }}
-            onSubscribe={handleSubscribe}
-            onUnSubscribe={handleUnSubscribe}
-          />
-        )}
-        {showCreateBoard && (
-          <BoardCreatePopup
-            onClose={() => {
-              setShowCreateBoard(false);
-            }}
-            onSubmit={() => {
-              updateUserInfo();
-            }}
-          />
-        )}
-        <Toolbar />
-        <Flexbox
-          flexDirection="column"
-          alignItems="center"
-          className="user-page"
-        >
-          <RoundButton
-            size={128}
-            style={{ background: `url(${avatar}) center center` }}
-          ></RoundButton>
-          <Typography fontWeight="bold">{profileInfo.username}</Typography>
-          <Typography fontSize={14}>
-            {`@${profileInfo.displayId} ${profileInfo.description ?? ""}`}
-          </Typography>
-          <div style={{ marginTop: "1rem" }}>
-            <Flexbox>
-              <Button
-                variant="text"
-                onClick={() => {
-                  setShowSubscribersPopup(true);
-                }}
-              >
-                <Typography fontSize={16} fontWeight="bold">
-                  {profileInfo.subscribers.length} subscribers
-                </Typography>
-              </Button>
+              <Typography fontSize={16} fontWeight="bold">
+                {profileInfo.subscribers.length} subscribers
+              </Typography>
+            </Button>
 
-              <Button
-                variant="text"
-                onClick={() => {
-                  setShowSubscribtionsPopup(true);
-                }}
+            <Button
+              variant="text"
+              onClick={() => {
+                setShowSubscribtionsPopup(true);
+              }}
+            >
+              <Typography
+                fontSize={16}
+                fontWeight="bold"
+                className="user__subscriptions"
               >
-                <Typography
-                  fontSize={16}
-                  fontWeight="bold"
-                  className="user__subscriptions"
-                >
-                  {profileInfo.subscriptions.length} subscriptions
-                </Typography>
-              </Button>
-            </Flexbox>
-          </div>
-          <Box margin="20px 0 0 0">
-            <Flexbox>
-              <RoundButton
-                size={48}
-                onClick={() => {
-                  handleCopyUserLink();
-                }}
-              >
-                <FiLink size={24} />
-              </RoundButton>
+                {profileInfo.subscriptions.length} subscriptions
+              </Typography>
+            </Button>
+          </Flexbox>
+        </div>
+        <Box margin="20px 0 0 0">
+          <Flexbox>
+            <RoundButton
+              size={48}
+              onClick={() => {
+                handleCopyUserLink();
+              }}
+            >
+              <FiLink size={24} />
+            </RoundButton>
+            {isOwner && (
               <Button
                 onClick={() => {
                   setShowEditUser(true);
@@ -706,43 +593,63 @@ export default function User() {
               >
                 Edit profile
               </Button>
-            </Flexbox>
-          </Box>
-          <Box margin="40px 0 0 0">
-            <Flexbox>
-              <ButtonSection
-                isActive={showCreated}
+            )}
+            {!isSubscribed && !isOwner && authUserData && (
+              <Button
                 onClick={() => {
-                  setShowCreated(true);
+                  handleSubscribe(profileInfo._id);
                 }}
               >
-                <Typography fontSize={16} fontWeight="bold">
-                  Created
-                </Typography>
-              </ButtonSection>
-              <ButtonSection
-                isActive={!showCreated}
+                Subscribe
+              </Button>
+            )}
+            {isSubscribed && !isOwner && authUserData && (
+              <Button
+                className="user__subscribed-btn"
+                color="secondary"
                 onClick={() => {
-                  setShowCreated(false);
+                  handleUnSubscribe(profileInfo._id);
                 }}
               >
-                <Typography fontSize={16} fontWeight="bold">
-                  Saved
-                </Typography>
-              </ButtonSection>
-            </Flexbox>
-          </Box>
-          <Flexbox style={{ width: "100%" }}>
-            <Masonry
-              breakpointCols={breakpointColumnsObj}
-              className="user-masonry-grid"
-              columnClassName="user-masonry-grid_column"
-            >
-              {showCreated ? pinElements : boardElements}
-            </Masonry>
+                Subscribed
+              </Button>
+            )}
           </Flexbox>
+        </Box>
+        <Box margin="40px 0 0 0">
+          <Flexbox>
+            <ButtonSection
+              isActive={showCreated}
+              onClick={() => {
+                setShowCreated(true);
+              }}
+            >
+              <Typography fontSize={16} fontWeight="bold">
+                Created
+              </Typography>
+            </ButtonSection>
+            <ButtonSection
+              isActive={!showCreated}
+              onClick={() => {
+                setShowCreated(false);
+              }}
+            >
+              <Typography fontSize={16} fontWeight="bold">
+                Saved
+              </Typography>
+            </ButtonSection>
+          </Flexbox>
+        </Box>
+        <Flexbox style={{ width: "100%" }}>
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className="user-masonry-grid"
+            columnClassName="user-masonry-grid_column"
+          >
+            {showCreated ? pinElements : boardElements}
+          </Masonry>
         </Flexbox>
-      </>
-    );
-  }
+      </Flexbox>
+    </>
+  );
 }

@@ -57,16 +57,12 @@ export default function PinBuilder() {
       setErrorPopup("Title must not be empty!");
       return;
     }
-    if (boardId.length === 0) {
-      setErrorPopup("Select a board!");
-      return;
-    }
     if (!imgFile) {
       setErrorPopup("Image must not be empty!");
       return;
     }
     if (!authUserData) {
-      setErrorPopup("Pleas log in!");
+      setErrorPopup("Please log in!");
       return;
     }
     setIsLoading(true);
@@ -78,11 +74,6 @@ export default function PinBuilder() {
       }
     );
     if (!uploadRes || uploadRes.status !== 200) {
-      if (uploadRes?.status === 413) {
-        setErrorPopup("Image is too large! Limit is 5 Mb.");
-      } else {
-        setErrorPopup("Image was not uploaded!");
-      }
       setIsLoading(false);
       return;
     }
@@ -92,12 +83,13 @@ export default function PinBuilder() {
       imgId: (uploadRes.data as FileData)._id,
       content: description,
       userId: authUserData._id,
-      boardId: boardId,
+      boardId: boardId.length === 0 ? undefined : boardId,
     };
 
     const pinResponse = await createPin(dto).catch(
       (err: AxiosError<ErrorData>) => {
         if (!err.response) return;
+        console.log(err.response.data);
         setErrorPopup(err.response.data.message);
       }
     );
