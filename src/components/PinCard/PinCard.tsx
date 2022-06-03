@@ -151,7 +151,7 @@ export default function PinCard({
           <RoundButton
             type="action"
             size={32}
-            onClick={(e: Event) => {
+            onClick={(e: any) => {
               e.preventDefault();
               handleCopyPinLink();
             }}
@@ -165,7 +165,7 @@ export default function PinCard({
               <RoundButton
                 type="action"
                 size={32}
-                onClick={(e: Event) => {
+                onClick={(e: any) => {
                   e.preventDefault();
                   handleCopyPinLink();
                 }}
@@ -176,7 +176,7 @@ export default function PinCard({
             <RoundButton
               type="action"
               size={32}
-              onClick={(e: Event) => {
+              onClick={(e: any) => {
                 e.preventDefault();
                 onEdit();
               }}

@@ -258,10 +258,11 @@ export default function User() {
     );
     if (response?.status !== 200) return;
     setTextPopup("User updated");
-    await refetchProfileInfo();
     await updateUserInfo();
     if (dto.displayId !== displayId) {
       navigate(`/user/${dto.displayId}`, {});
+    } else {
+      await refetchProfileInfo();
     }
   };
 

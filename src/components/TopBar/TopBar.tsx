@@ -54,6 +54,7 @@ export default function TopBar({
               <Button
                 color={`${location.pathname === "/" ? "secondary" : "primary"}`}
                 variant={`${location.pathname === "/" ? "filled" : "text"}`}
+                data-test-id="home-btn"
               >
                 Home
               </Button>
@@ -75,22 +76,34 @@ export default function TopBar({
         <Col xs={true} style={{ flexGrow: 0 }}>
           {isAuth && authUserData ? (
             <Flexbox>
-              <RoundButton size={32} onClick={onClickLogout}>
+              <RoundButton
+                size={32}
+                onClick={onClickLogout}
+                data-test-id="logout-btn"
+              >
                 <IoIosLogOut size={24} fill={darkGray} />
               </RoundButton>
               <Link to={`/user/${authUserData.displayId}`}>
-                <RoundButton size={32}>
+                <RoundButton size={32} data-test-id="profile-btn">
                   <FaUser size={24} fill={darkGray} />
                 </RoundButton>
               </Link>
             </Flexbox>
           ) : (
             <Flexbox>
-              <Button onClick={onClickLogin} color="secondary">
+              <Button
+                onClick={onClickLogin}
+                color="secondary"
+                data-test-id="login-btn"
+              >
                 Login
               </Button>
               <Box margin="0px 0px 0px 10px">
-                <Button onClick={onClickRegister} color="secondary">
+                <Button
+                  onClick={onClickRegister}
+                  color="secondary"
+                  data-test-id="register-btn"
+                >
                   Register
                 </Button>
               </Box>

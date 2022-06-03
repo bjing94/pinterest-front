@@ -13,9 +13,10 @@ export default function Popup({
   children,
   onClickBackground,
   containerClass = "",
-}: PopupProps) {
+  ...rest
+}: PopupProps & React.HTMLProps<HTMLDivElement>) {
   return (
-    <div className="popup__root">
+    <div className="popup__root" {...rest}>
       <div className="popup__background" onClick={onClickBackground} />
       <Card className={`${containerClass} popup__container`}>{children}</Card>
     </div>

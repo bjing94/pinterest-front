@@ -99,7 +99,9 @@ function App() {
             setShowSidebar(!showSidebar);
           }}
         />
-        {textPopupMsg && <TextPopup>{textPopupMsg}</TextPopup>}
+        {textPopupMsg && (
+          <TextPopup data-test-id="text-popup">{textPopupMsg}</TextPopup>
+        )}
         {errorPopupMsg && <TextPopup type="error">{errorPopupMsg}</TextPopup>}
         {showAuthPopup && (
           <AuthPopup

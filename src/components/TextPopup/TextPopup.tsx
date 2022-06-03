@@ -7,9 +7,13 @@ interface TextPopupProps {
   children?: any;
   type?: "info" | "error" | "warning";
 }
-export default function TextPopup({ children, type = "info" }: TextPopupProps) {
+export default function TextPopup({
+  children,
+  type = "info",
+  ...rest
+}: TextPopupProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={`text-popup ${type}`}>
+    <div className={`text-popup ${type}`} {...rest}>
       <Card>{children}</Card>
     </div>
   );

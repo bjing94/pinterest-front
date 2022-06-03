@@ -121,7 +121,7 @@ export default function UserBoardCard({
             <RoundButton
               type="action"
               size={32}
-              onClick={(e: Event) => {
+              onClick={(e: any) => {
                 e.preventDefault();
                 copyCurrentUrl()
                   .then(() => {

@@ -482,7 +482,7 @@ export default function Pin() {
                   )}
                   <RoundButton
                     size={32}
-                    onClick={(event: Event) => {
+                    onClick={(event: any) => {
                       event.stopPropagation();
                       setShowOptionsDropdown(!showOptionsDropdown);
                     }}
@@ -585,7 +585,7 @@ export default function Pin() {
                   )}
                   <RoundButton
                     size={32}
-                    onClick={(event: Event) => {
+                    onClick={(event: any) => {
                       event.stopPropagation();
                       setShowOptionsDropdown(!showOptionsDropdown);
                     }}

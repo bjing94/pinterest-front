@@ -23,7 +23,7 @@ export default function AuthPopup({
   onClose,
   registerMode = false,
 }: AuthPopupProps) {
-  const { setErrorPopup } = useContext(UserContext);
+  const { setErrorPopup, setTextPopup } = useContext(UserContext);
 
   const [error, setError] = useState("");
   const emailRef = useRef<HTMLInputElement>(null);
@@ -76,6 +76,7 @@ export default function AuthPopup({
       });
 
       if (res?.status === 201) {
+        setTextPopup("User registered!");
         setError("");
         onClose();
       } else {
@@ -97,7 +98,11 @@ export default function AuthPopup({
     }
   };
   return (
-    <Popup containerClass="auth-popup__container" onClickBackground={onClose}>
+    <Popup
+      containerClass="auth-popup__container"
+      onClickBackground={onClose}
+      data-test-id="auth-popup"
+    >
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -133,12 +138,14 @@ export default function AuthPopup({
                   className="auth-popup__input"
                   ref={usernameRef}
                   type="text"
+                  data-test-id="auth-username"
                 />
                 <Input
                   placeholder="super-id"
                   className="auth-popup__input"
                   ref={displayIdRef}
                   type="text"
+                  data-test-id="auth-id"
                 />
               </>
             )}
@@ -147,12 +154,14 @@ export default function AuthPopup({
               className="auth-popup__input"
               ref={emailRef}
               type="text"
+              data-test-id="auth-email"
             />
             <Input
               placeholder="awesome_password"
               className="auth-popup__input"
               ref={passwordRef}
               type="text"
+              data-test-id="auth-password"
             />
             {registerMode && (
               <>
@@ -161,15 +170,24 @@ export default function AuthPopup({
                   className="auth-popup__input"
                   ref={repeatPasswordRef}
                   type="text"
+                  data-test-id="auth-repeat-password"
                 />
 
-                <Button className="auth-popup__register-button" type="submit">
+                <Button
+                  data-test-id="auth-register-btn"
+                  className="auth-popup__register-button"
+                  type="submit"
+                >
                   Register
                 </Button>
               </>
             )}
             {!registerMode && (
-              <Button className="auth-popup__login-button" type="submit">
+              <Button
+                data-test-id="auth-login-btn"
+                className="auth-popup__login-button"
+                type="submit"
+              >
                 Login
               </Button>
             )}

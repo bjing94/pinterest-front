@@ -251,7 +251,7 @@ export default function DropdownBoards({
           </Typography>
           <RoundButton
             size={32}
-            onClick={(e: Event) => {
+            onClick={(e: any) => {
               onClickArrow(e);
             }}
             style={{ transform: `${showDropdown ? "rotate(90deg)" : ""}` }}

@@ -180,7 +180,7 @@ export default function PinBuilder() {
         <Flexbox justifyContent="space-between">
           <RoundButton
             size={32}
-            onClick={(event: Event) => {
+            onClick={(event: any) => {
               event?.stopPropagation();
               setShowOptionsDropdown(true);
             }}

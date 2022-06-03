@@ -29,7 +29,7 @@ export default function Button({
         active ? "" : "inactive"
       } ${color} ${variant}`}
       onClick={(event) => {
-        if (active) {
+        if (active && onClick) {
           onClick(event);
         }
       }}

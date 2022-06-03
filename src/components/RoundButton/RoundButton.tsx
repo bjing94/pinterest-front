@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLProps } from "react";
 import { BaseStyle } from "../../types/types";
 
 import "./RoundButton.scss";
@@ -6,7 +6,6 @@ import "./RoundButton.scss";
 interface RoundButtonProps extends BaseStyle {
   children?: any;
   type?: "default" | "action";
-  style?: any;
   onClick?: any;
   size?: number;
 }
@@ -17,7 +16,8 @@ export default function RoundButton({
   onClick,
   className = "",
   size = 16,
-}: RoundButtonProps) {
+  ...rest
+}: RoundButtonProps & HTMLProps<HTMLButtonElement>) {
   return (
     <button
       className={`btn-round ${
@@ -25,6 +25,7 @@ export default function RoundButton({
       } ${className}`}
       style={{ ...style, width: `${size}px`, height: `${size}px` }}
       onClick={onClick}
+      {...rest}
     >
       {children}
     </button>
