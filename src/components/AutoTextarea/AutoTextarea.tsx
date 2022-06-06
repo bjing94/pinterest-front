@@ -21,9 +21,11 @@ const AutoTextarea = React.forwardRef<HTMLTextAreaElement, AutoTextareaProps>(
     return (
       <div
         className="responsive-textarea-container"
+        data-testid="auto-textarea-container"
         style={{ ...styles, fontSize }}
       >
         <textarea
+          data-testid="auto-textarea"
           name="text"
           onInput={(event) => {
             if (symbolsLimit) {

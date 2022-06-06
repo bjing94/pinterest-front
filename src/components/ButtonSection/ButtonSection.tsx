@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLAttributes } from "react";
 
 import "./ButtonSection.scss";
 
@@ -12,11 +12,16 @@ export default function ButtonSection({
   children,
   isActive,
   onClick,
-}: ButtonSectionProps) {
+  className,
+  ...rest
+}: ButtonSectionProps & HTMLAttributes<HTMLButtonElement>) {
   return (
     <button
-      className={`btn-section ${isActive ? "btn-section-active" : ""}`}
+      className={`btn-section ${
+        isActive ? "btn-section-active" : ""
+      } ${className}`}
       onClick={onClick}
+      {...rest}
     >
       {children}
     </button>

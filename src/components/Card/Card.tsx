@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLAttributes } from "react";
 import { BaseStyle } from "../../types/types";
 
 import "./Card.scss";
@@ -14,15 +14,16 @@ export default function Card({
   className = "",
   onClick,
   id,
-}: CardProps) {
+  ...rest
+}: CardProps & HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={`card-container ${className}`}
       style={style}
       onClick={onClick}
       id={id}
+      {...rest}
     >
-      {" "}
       {children}
     </div>
   );

@@ -1,9 +1,13 @@
 module.exports = {
   testTimeout: 30000,
-  preset: "jest-puppeteer",
-  testRegex: "/test/.*",
+  testRegex: ".*CommunityInfo.test.tsx",
   transform: {
-    "^.+\\.ts$": "ts-jest",
+    "^.+\\.(j|t)sx?$": "ts-jest",
   },
-  testPathIgnorePatterns: ["/node_modules/", ".*RegisterUser.test.ts", "build"],
+  testPathIgnorePatterns: ["/node_modules/", "build", "/test/"],
+  moduleNameMapper: {
+    "\\.(css|scss)$": "identity-obj-proxy",
+  },
+  moduleFileExtensions: ["js", "ts", "jsx", "tsx"],
+  testEnvironment: "jsdom",
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLAttributes } from "react";
 import { BaseStyle } from "../../types/types";
 
 import "./Typography.scss";
@@ -24,7 +24,8 @@ export default function Typography({
   fontWeight,
   className = "",
   textAlign = "center",
-}: TypographyProps) {
+  ...rest
+}: TypographyProps & HTMLAttributes<HTMLDivElement>) {
   const lineHeight = fontSize * 1.5;
   return (
     <div
@@ -35,6 +36,7 @@ export default function Typography({
         textAlign: textAlign,
       }}
       className={`typography ${className} ${color}`}
+      {...rest}
     >
       {children}
     </div>

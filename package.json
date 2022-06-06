@@ -4,9 +4,6 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.3",
-    "@testing-library/react": "^12.1.4",
-    "@testing-library/user-event": "^13.5.0",
     "@types/node": "^16.11.26",
     "@types/react": "^17.0.43",
     "@types/react-dom": "^17.0.14",
@@ -27,8 +24,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --testPathIgnorePatterns=.*e2e.test.js",
-    "test:e2e": "jest -c jest.config.js --runInBand",
+    "test": "react-scripts test",
+    "test:e2e": "jest -c ./test/jest.config.js --runInBand",
+    "test:unit": "jest -c jest.config.js --runInBand",
     "eject": "react-scripts eject",
     "stylelint": "npx stylelint src/**/*.scss ",
     "stylelint:fix": "npx stylelint src/**/*.scss --fix",
@@ -61,7 +59,8 @@
           "argsIgnorePattern": "^_"
         }
       ],
-      "no-useless-concat": "off"
+      "no-useless-concat": "off",
+      "testing-library/prefer-screen-queries": "off"
     }
   },
   "browserslist": {
@@ -77,6 +76,9 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^14.2.0",
     "@types/app-root-path": "^1.2.4",
     "@types/axios": "^0.14.0",
     "@types/express": "^4.17.13",
@@ -88,8 +90,11 @@
     "csstype": "^3.0.11",
     "dotenv": "^16.0.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^28.1.0",
+    "jest-environment-jsdom": "^28.1.0",
     "jest-puppeteer": "^6.1.0",
+    "msw": "^0.42.0",
     "puppeteer": "^14.2.1",
     "stylelint": "^14.6.1",
     "stylelint-config-standard": "^25.0.0",

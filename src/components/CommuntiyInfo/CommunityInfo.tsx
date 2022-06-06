@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { HTMLAttributes, useContext } from "react";
 import { Link } from "react-router-dom";
 import UserContext from "../../store/userContext";
 import { BaseStyle } from "../../types/types";
@@ -26,13 +26,15 @@ export default function CommunityInfo({
   subscribersCount,
   onClickSubscribe,
   className = "",
-}: CommunityInfoProps) {
+  ...rest
+}: CommunityInfoProps & HTMLAttributes<HTMLDivElement>) {
   const { isAuth, authUserData } = useContext(UserContext);
 
   return (
     <Flexbox
       className={`profile-info ${className}`}
       justifyContent="space-between"
+      {...rest}
     >
       <Link to={`/user/${displayId}`}>
         <Flexbox>
@@ -42,11 +44,14 @@ export default function CommunityInfo({
             alignItems="flex-start"
             style={{ marginLeft: "0.5rem" }}
           >
-            <Typography fontSize={14} fontWeight="bold">
-              {" "}
+            <Typography
+              data-testid="community-username"
+              fontSize={14}
+              fontWeight="bold"
+            >
               {username}
             </Typography>
-            <Typography fontSize={14}>
+            <Typography fontSize={14} data-testid="community-subscribers">
               {subscribersCount} subscribers
             </Typography>
           </Flexbox>
@@ -57,6 +62,7 @@ export default function CommunityInfo({
         <Button
           onClick={onClickSubscribe}
           color={`${isSubscribed ? "secondary" : "primary"}`}
+          data-testid="community-btn"
         >
           {`${isSubscribed ? "Unsubscribe" : "Subscribe"}`}
         </Button>

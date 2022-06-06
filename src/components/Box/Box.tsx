@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLProps } from "react";
 import { BaseStyle } from "../../types/types";
 
 interface BoxProps extends BaseStyle {
@@ -20,7 +20,8 @@ export default function Box({
   height,
   className = "",
   onClick,
-}: BoxProps) {
+  ...rest
+}: BoxProps & HTMLProps<HTMLDivElement>) {
   return (
     <div
       style={{
@@ -33,6 +34,7 @@ export default function Box({
       }}
       className={className}
       onClick={onClick}
+      {...rest}
     >
       {children}
     </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLAttributes } from "react";
 
 import "./Flexbox.scss";
 import { BaseStyle } from "../../types/types";
@@ -27,12 +27,14 @@ export default function Flexbox({
   className = "",
   fluid = false,
   onClick,
-}: FlexboxProps) {
+  ...rest
+}: FlexboxProps & HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={`my-flexbox ${className} ${fluid ? "my-flexbox-fluid" : ""}`}
       style={{ ...style, justifyContent, flexDirection, alignItems }}
       onClick={onClick}
+      {...rest}
     >
       {children}
     </div>

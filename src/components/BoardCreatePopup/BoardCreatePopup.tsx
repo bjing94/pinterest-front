@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { HTMLAttributes, useContext, useRef } from "react";
 import { createBoard } from "../../services/BoardService";
 import { BoardData } from "../../services/responses/responses";
 import UserContext from "../../store/userContext";
@@ -20,7 +20,8 @@ interface BoardCreatePopupProps {
 export default function BoardCreatePopup({
   onClose,
   onSubmit,
-}: BoardCreatePopupProps) {
+  ...rest
+}: BoardCreatePopupProps & HTMLAttributes<HTMLDivElement>) {
   const { setTextPopup, setErrorPopup, authUserData } = useContext(UserContext);
   const titleRef = useRef<HTMLInputElement>(null);
 
@@ -44,8 +45,6 @@ export default function BoardCreatePopup({
       return;
     }
     if (newBoard.status !== 201) {
-      // const error = newBoard.data as ErrorData;
-      // setErrorPopup(error.message);
       return;
     } else {
       newBoard.data as BoardData;
@@ -55,17 +54,29 @@ export default function BoardCreatePopup({
     }
   };
   return (
-    <Popup containerClass="create-board-popup" onClickBackground={onClose}>
+    <Popup
+      containerClass="create-board-popup"
+      onClickBackground={onClose}
+      {...rest}
+    >
       <Flexbox flexDirection="column" fluid>
-        <Typography fontSize={18} fontWeight="bold">
+        <Typography
+          data-testid="board-create-title"
+          fontSize={18}
+          fontWeight="bold"
+        >
           Create board
         </Typography>
         <Box margin="45px 0 0 0" width="100%">
-          <Input placeholder="имя доски" ref={titleRef} />
+          <Input placeholder="Board name" ref={titleRef} />
         </Box>
         <Flexbox fluid justifyContent="flex-end">
           <Box margin="30px 0 0 0">
-            <Button className="board-create__btn" onClick={handleCreateBoard}>
+            <Button
+              data-testid="board-create-btn"
+              className="board-create__btn"
+              onClick={handleCreateBoard}
+            >
               Create
             </Button>
           </Box>

@@ -101,7 +101,7 @@ export default function AuthPopup({
     <Popup
       containerClass="auth-popup__container"
       onClickBackground={onClose}
-      data-test-id="auth-popup"
+      data-testid="auth-popup"
     >
       <form
         onSubmit={(event) => {
@@ -118,6 +118,7 @@ export default function AuthPopup({
               size={32}
               onClick={onClose}
               className="auth-popup__close"
+              data-testid="auth-close"
             >
               <AiOutlineClose size={24} />
             </RoundButton>
@@ -138,14 +139,14 @@ export default function AuthPopup({
                   className="auth-popup__input"
                   ref={usernameRef}
                   type="text"
-                  data-test-id="auth-username"
+                  data-testid="auth-username"
                 />
                 <Input
                   placeholder="super-id"
                   className="auth-popup__input"
                   ref={displayIdRef}
                   type="text"
-                  data-test-id="auth-id"
+                  data-testid="auth-id"
                 />
               </>
             )}
@@ -154,14 +155,14 @@ export default function AuthPopup({
               className="auth-popup__input"
               ref={emailRef}
               type="text"
-              data-test-id="auth-email"
+              data-testid="auth-email"
             />
             <Input
               placeholder="awesome_password"
               className="auth-popup__input"
               ref={passwordRef}
               type="text"
-              data-test-id="auth-password"
+              data-testid="auth-password"
             />
             {registerMode && (
               <>
@@ -170,11 +171,11 @@ export default function AuthPopup({
                   className="auth-popup__input"
                   ref={repeatPasswordRef}
                   type="text"
-                  data-test-id="auth-repeat-password"
+                  data-testid="auth-repeat-password"
                 />
 
                 <Button
-                  data-test-id="auth-register-btn"
+                  data-testid="auth-register-btn"
                   className="auth-popup__register-button"
                   type="submit"
                 >
@@ -184,7 +185,7 @@ export default function AuthPopup({
             )}
             {!registerMode && (
               <Button
-                data-test-id="auth-login-btn"
+                data-testid="auth-login-btn"
                 className="auth-popup__login-button"
                 type="submit"
               >
