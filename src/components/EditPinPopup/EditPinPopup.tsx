@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  HTMLAttributes,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Box from "../Box/Box";
 import Button from "../Button/Button";
 import Flexbox from "../Flexbox/Flexbox";
@@ -23,7 +29,7 @@ import EditPopup from "../EditPopup/EditPopup";
 import { getBoards } from "../../services/BoardService";
 import { AxiosError } from "axios";
 
-interface EditPinPopupProps {
+export interface EditPinPopupProps {
   pinId: string;
   title: string;
   onClose: () => void;
@@ -41,7 +47,7 @@ interface EditPinPopupProps {
 interface BoardsSelectionPropertyProps {
   label: string;
   value: string;
-  onSelect: (boardId: string) => void;
+  onSelectBoard: (boardId: string) => void;
   boards?: BoardData[];
   onCreate: (boardTitle: string) => void;
 }
@@ -49,10 +55,11 @@ interface BoardsSelectionPropertyProps {
 function BoardsSelectionProperty({
   label,
   value,
-  onSelect,
+  onSelectBoard,
   onCreate,
   boards,
-}: BoardsSelectionPropertyProps) {
+  ...rest
+}: BoardsSelectionPropertyProps & HTMLAttributes<HTMLDivElement>) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [createButtonActive, setCreateButtonActive] = useState(false);
 
@@ -71,7 +78,7 @@ function BoardsSelectionProperty({
         <Box
           padding="10px"
           onClick={() => {
-            onSelect(board._id);
+            onSelectBoard(board._id);
             setShowDropdown(false);
           }}
           key={`board-dropdown-item-${id}`}
@@ -113,7 +120,7 @@ function BoardsSelectionProperty({
   );
 
   return (
-    <Box width="100%" margin="0px 0px 20px 0px">
+    <Box width="100%" margin="0px 0px 20px 0px" {...rest}>
       <Flexbox fluid justifyContent="space-between" alignItems="center">
         <Box margin="0px 50px 0px 0px">
           <label>{label}</label>
@@ -160,7 +167,12 @@ interface TextPropertyProps {
   onInput: any;
 }
 
-function TextProperty({ label, value, onInput }: TextPropertyProps) {
+function TextProperty({
+  label,
+  value,
+  onInput,
+  ...rest
+}: TextPropertyProps & HTMLAttributes<HTMLDivElement>) {
   return (
     <Box width="100%" margin="0px 0px 20px 0px">
       <Flexbox fluid justifyContent="space-between" alignItems="center">
@@ -172,6 +184,7 @@ function TextProperty({ label, value, onInput }: TextPropertyProps) {
           value={value}
           onInput={onInput}
           className="edit-pin-popup__input"
+          {...rest}
         />
       </Flexbox>
     </Box>
@@ -185,7 +198,8 @@ export default function EditPinPopup({
   onDelete,
   onUpdate,
   isSaver = false,
-}: EditPinPopupProps) {
+  ...rest
+}: EditPinPopupProps & HTMLAttributes<HTMLDivElement>) {
   const { authUserData, setErrorPopup } = useContext(UserContext);
   const [pinData, setPinData] = useState<PinData | null>(null);
   const [imgSrc, setImgSrc] = useState<string>("");
@@ -302,11 +316,12 @@ export default function EditPinPopup({
             <BoardsSelectionProperty
               label="Board"
               value={savedOnBoardName}
-              onSelect={(boardId) => {
+              onSelectBoard={(boardId: string) => {
                 setSelectedBoardId(boardId);
               }}
               boards={userBoards}
               onCreate={handleCreateTemporaryBoard}
+              data-testid="edit-pin-boards"
             />
             {!isSaver && (
               <>
@@ -317,6 +332,7 @@ export default function EditPinPopup({
                   onInput={(event: any) => {
                     setTitleValue(event.target.value);
                   }}
+                  data-testid="edit-pin-title"
                 />
                 <TextProperty
                   label="Description"
@@ -324,6 +340,7 @@ export default function EditPinPopup({
                   onInput={(event: any) => {
                     setContentValue(event.target.value);
                   }}
+                  data-testid="edit-pin-description"
                 />
               </>
             )}
@@ -348,12 +365,15 @@ export default function EditPinPopup({
             onDelete();
             onClose();
           }}
+          data-testid="edit-pin-delete-btn"
         >
           Delete
         </Button>
         <Flexbox>
           <Box margin="0px 10px 0px 0px">
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose} data-testid="edit-pin-cancel-btn">
+              Cancel
+            </Button>
           </Box>
           <Button
             onClick={() => {
@@ -371,6 +391,7 @@ export default function EditPinPopup({
               );
               onClose();
             }}
+            data-testid="edit-pin-update-btn"
           >
             Done
           </Button>
@@ -384,6 +405,7 @@ export default function EditPinPopup({
       onClose={onClose}
       mainContent={mainContent}
       bottomContent={bottomContent}
+      {...rest}
     />
   );
 }

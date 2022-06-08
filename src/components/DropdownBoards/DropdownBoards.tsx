@@ -1,8 +1,7 @@
-import { AxiosResponse } from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { HTMLAttributes, useEffect, useRef, useState } from "react";
 import { BsPlus } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
-import { getBoard } from "../../services/BoardService";
+import { getBoards } from "../../services/BoardService";
 import { getStaticImage } from "../../services/FileService";
 import { getPin } from "../../services/PinService";
 import { BoardData, PinData } from "../../services/responses/responses";
@@ -26,7 +25,7 @@ function DropdownFooter({ onClick }: FooterProps) {
     <Flexbox
       className="board-dropdown__footer"
       justifyContent="flex-start"
-      onClick={(e: Event) => {
+      onClick={(e: any) => {
         e.preventDefault();
         e.stopPropagation();
         onClick();
@@ -181,7 +180,7 @@ function DropdownList({ boards, onClickFooter, onSelect }: DropdownListProps) {
 interface DropdownProps extends BaseStyle {
   boardIds: string[];
   onClickCreateBoard?: any;
-  onSelect: (boardId: string) => void;
+  onSelectBoard: (boardId: string) => void;
   onClickArrow: (e: Event) => void;
   showDropdown: boolean;
   className?: string;
@@ -192,32 +191,24 @@ interface DropdownProps extends BaseStyle {
 export default function DropdownBoards({
   boardIds,
   onClickCreateBoard,
-  onSelect,
+  onSelectBoard,
   showDropdown,
   onClickArrow,
   style,
   className = "",
   arrowStyle,
   textColor = "primary",
-}: DropdownProps) {
+  ...rest
+}: DropdownProps & HTMLAttributes<HTMLDivElement>) {
   const [selection, setSelection] = useState<string | null>(null);
   const [boards, setBoards] = useState<BoardData[]>([]);
 
   useEffect(() => {
     const handleGetBoards = async () => {
-      const boards = await Promise.all(
-        boardIds.map((id) => {
-          return getBoard(id);
-        })
-      );
-      const filteredBoards = boards
-        .filter((board): board is AxiosResponse<BoardData> => {
-          return board !== undefined;
-        })
-        .map((response) => {
-          return response.data;
-        });
-      setBoards(filteredBoards);
+      console.log("Getting boards:", boardIds);
+      const boards = await getBoards(boardIds);
+      console.log("boards:", boards);
+      setBoards(boards);
     };
 
     handleGetBoards();
@@ -238,7 +229,7 @@ export default function DropdownBoards({
   }
 
   return (
-    <div style={{ width: "100%", position: "relative" }}>
+    <div style={{ width: "100%", position: "relative" }} {...rest}>
       <div className={`board-dropdown ${className}`} style={style}>
         <Flexbox fluid justifyContent="flex-end">
           <Typography
@@ -266,7 +257,7 @@ export default function DropdownBoards({
           onClickFooter={onClickCreateBoard}
           onSelect={(boardId: string) => {
             setSelection(boardId);
-            onSelect(boardId);
+            onSelectBoard(boardId);
           }}
         />
       )}

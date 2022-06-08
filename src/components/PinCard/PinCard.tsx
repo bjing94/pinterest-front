@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { HTMLAttributes, useContext, useEffect, useState } from "react";
 import { FiEdit, FiLink } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Box from "../Box/Box";
@@ -17,7 +17,7 @@ import { getUser } from "../../services/UserService";
 import { PinData, UserData } from "../../services/responses/responses";
 import ProfileInfo from "../ProfileInfo/ProfileInfo";
 
-interface PinCardProps {
+export interface PinCardProps {
   pinId: string;
   boards: string[];
   isSaved: boolean;
@@ -39,7 +39,8 @@ export default function PinCard({
   showInfo = false,
   isOwner = false,
   onEdit,
-}: PinCardProps) {
+  ...rest
+}: PinCardProps & HTMLAttributes<HTMLDivElement>) {
   const [user, setUser] = useState<string | undefined>(undefined);
   const [showBoards, setShowBoards] = useState(false);
   const [imgSrc, setImgSrc] = useState<string | undefined>(undefined);
@@ -72,6 +73,7 @@ export default function PinCard({
         setTitle(pinInfo.title);
 
         const link = await getStaticImage(pinInfo.imgId);
+        console.log("Link", link);
         if (link) {
           setImgSrc(link);
         }
@@ -119,7 +121,7 @@ export default function PinCard({
             onClickCreateBoard={() => {
               onShowCreateBoard();
             }}
-            onSelect={(boardId: string) => {
+            onSelectBoard={(boardId: string) => {
               onSetBoardId(boardId);
               setShowBoards(!showBoards);
             }}
@@ -131,6 +133,7 @@ export default function PinCard({
             style={{ background: "none", color: "white" }}
             textColor="secondary"
             arrowStyle={{ color: "white" }}
+            data-testid="pin-card-boards"
           />
 
           <Button
@@ -141,6 +144,7 @@ export default function PinCard({
               onSavePin(pinId);
             }}
             color={`${isSaved ? "secondary" : "primary"}`}
+            data-testid="pin-card-save-btn"
           >
             {isSaved ? "Saved" : "Save"}
           </Button>
@@ -155,6 +159,7 @@ export default function PinCard({
               e.preventDefault();
               handleCopyPinLink();
             }}
+            data-testid="pin-card-link"
           >
             <FiLink size={24} />
           </RoundButton>
@@ -169,6 +174,7 @@ export default function PinCard({
                   e.preventDefault();
                   handleCopyPinLink();
                 }}
+                data-testid="pin-card-link"
               >
                 <FiLink size={24} />
               </RoundButton>
@@ -180,6 +186,7 @@ export default function PinCard({
                 e.preventDefault();
                 onEdit();
               }}
+              data-testid="pin-card-edit"
             >
               <FiEdit size={24} />
             </RoundButton>
@@ -194,15 +201,18 @@ export default function PinCard({
     user !== undefined &&
     avatarId !== undefined &&
     userDisplayId !== undefined;
+  console.log({ imgSrc, user, avatarId, userDisplayId });
   if (!isLoaded) {
     return <div></div>;
   }
+  console.log("Rendering");
   return (
     <div
       className="user-pin-card__container"
       onMouseLeave={() => {
         setShowBoards(false);
       }}
+      {...rest}
     >
       <Link to={`/pin/${pinId}`}>
         <ResponsiveImage
@@ -214,11 +224,20 @@ export default function PinCard({
       </Link>
       {showInfo && (
         <>
-          <Typography fontSize={18} fontWeight="bold" textAlign="start">
+          <Typography
+            data-testid="pin-card-title"
+            fontSize={18}
+            fontWeight="bold"
+            textAlign="start"
+          >
             {title}
           </Typography>
           <Link to={`/user/${userDisplayId}`}>
-            <ProfileInfo username={user} avatarId={avatarId} />
+            <ProfileInfo
+              data-testid="pin-card-profile"
+              username={user}
+              avatarId={avatarId}
+            />
           </Link>
         </>
       )}

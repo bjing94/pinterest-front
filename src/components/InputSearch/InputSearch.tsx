@@ -15,7 +15,9 @@ const InputSearch = React.forwardRef<
 
   return (
     <div className={`input-search-container ${isActive ? "active" : ""}`}>
-      {!inputFocus && !isActive && <AiOutlineSearch size={18} />}
+      {!inputFocus && !isActive && (
+        <AiOutlineSearch data-testid="input-search-icon" size={18} />
+      )}
       <input
         placeholder={placeholder}
         onFocus={() => {

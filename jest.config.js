@@ -1,6 +1,6 @@
 module.exports = {
   testTimeout: 30000,
-  testRegex: ".*CommunityInfo.test.tsx",
+  testRegex: ".*ResponsiveImage.test.tsx",
   transform: {
     "^.+\\.(j|t)sx?$": "ts-jest",
   },

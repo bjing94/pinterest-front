@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLAttributes } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import Box from "../Box/Box";
 import Flexbox from "../Flexbox/Flexbox";
@@ -20,9 +20,14 @@ export default function EditPopup({
   title,
   mainContent,
   bottomContent,
-}: EditBoardPopupProps) {
+  ...rest
+}: EditBoardPopupProps & HTMLAttributes<HTMLDivElement>) {
   return (
-    <Popup containerClass="edit-popup__container" onClickBackground={onClose}>
+    <Popup
+      containerClass="edit-popup__container"
+      onClickBackground={onClose}
+      {...rest}
+    >
       <Flexbox flexDirection="column" style={{ height: "100%" }}>
         <Box margin="0px 0px 20px 0px">
           <Flexbox fluid justifyContent="center" alignItems="center">

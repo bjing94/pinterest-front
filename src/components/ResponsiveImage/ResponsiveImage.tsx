@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLAttributes } from "react";
 
 import "./ResponsiveImage.scss";
 
@@ -12,7 +12,7 @@ interface ResponsiveImageProps {
 
 const ResponsiveImage = React.forwardRef<
   HTMLImageElement,
-  ResponsiveImageProps
+  ResponsiveImageProps & HTMLAttributes<HTMLDivElement>
 >(
   (
     {
@@ -21,6 +21,7 @@ const ResponsiveImage = React.forwardRef<
       className = "",
       maxHeight = "none",
       minHeight = "none",
+      ...rest
     },
     ref
   ) => {
@@ -28,6 +29,7 @@ const ResponsiveImage = React.forwardRef<
       <div
         className={`responsive-image ${className}`}
         style={{ maxHeight: maxHeight, minHeight }}
+        {...rest}
       >
         <div
           className="responsive-image__container"

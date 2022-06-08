@@ -1,3 +1,4 @@
+import { HTMLAttributes } from "react";
 import { BaseStyle } from "../../types/types";
 import Avatar from "../Avatar/Avatar";
 import Box from "../Box/Box";
@@ -13,9 +14,10 @@ export default function ProfileInfo({
   username,
   avatarId,
   className = "",
-}: ProfileInfoProps) {
+  ...rest
+}: ProfileInfoProps & HTMLAttributes<HTMLDivElement>) {
   return (
-    <Flexbox className={`profile-info ${className}`}>
+    <Flexbox className={`profile-info ${className}`} {...rest}>
       <Avatar size={36} imgId={avatarId} />
       <Box margin="0 0 0 10px">
         <Typography fontSize={14} fontWeight="bold">

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { HTMLAttributes, useContext, useEffect, useState } from "react";
 import {
   getBoard,
   updateBoard,
@@ -27,7 +27,8 @@ export default function EditBoardPopup({
   title,
   onClose,
   onSubmit,
-}: EditBoardPopupProps) {
+  ...rest
+}: EditBoardPopupProps & HTMLAttributes<HTMLDivElement>) {
   const { setTextPopup } = useContext(UserContext);
 
   const [titleValue, setTitleValue] = useState("");
@@ -71,9 +72,12 @@ export default function EditBoardPopup({
           setTitleValue(event.currentTarget.value);
         }}
         label="Title"
+        data-testid="edit-board-title"
       />
       <Box margin="10px 0px 0px 0px">
-        <Button onClick={handleDeleteBoard}>Delete board</Button>
+        <Button onClick={handleDeleteBoard} data-testid="edit-board-delete-btn">
+          Delete board
+        </Button>
       </Box>
     </>
   );
@@ -81,7 +85,9 @@ export default function EditBoardPopup({
   const bottomContent = (
     <>
       <Flexbox fluid justifyContent="flex-end">
-        <Button onClick={handleUpdateBoard}>Done</Button>
+        <Button onClick={handleUpdateBoard} data-testid="edit-board-update-btn">
+          Done
+        </Button>
       </Flexbox>
     </>
   );
@@ -91,6 +97,7 @@ export default function EditBoardPopup({
       onClose={onClose}
       mainContent={mainContent}
       bottomContent={bottomContent}
+      {...rest}
     />
   );
 }
