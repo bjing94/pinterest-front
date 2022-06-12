@@ -11,30 +11,28 @@ describe("Register user", () => {
   it("Register button exists", async () => {
     await page.goto("http://localhost:3001");
     authButton = await page.waitForSelector(
-      "button[data-test-id='register-btn']"
+      "button[data-testid='register-btn']"
     );
     expect(authButton).toBeTruthy();
   });
 
   it("Auth popup opens", async () => {
-    await page.click("button[data-test-id='register-btn']");
+    await page.click("button[data-testid='register-btn']");
     const authPopup = await page.waitForSelector(
-      "div[data-test-id='auth-popup']"
+      "div[data-testid='auth-popup']"
     );
     expect(authPopup).toBeTruthy();
   });
 
   it("User registered successfully", async () => {
-    await page.type("input[data-test-id='auth-username']", "testovik");
-    await page.type("input[data-test-id='auth-id']", "tester96");
-    await page.type("input[data-test-id='auth-email']", "tester96@gmail.com");
-    await page.type("input[data-test-id='auth-password']", "12345");
-    await page.type("input[data-test-id='auth-repeat-password']", "12345");
-    await page.click("button[data-test-id='auth-register-btn']");
+    await page.type("input[data-testid='auth-username']", "testovik");
+    await page.type("input[data-testid='auth-id']", "tester96");
+    await page.type("input[data-testid='auth-email']", "tester96@gmail.com");
+    await page.type("input[data-testid='auth-password']", "12345");
+    await page.type("input[data-testid='auth-repeat-password']", "12345");
+    await page.click("button[data-testid='auth-register-btn']");
 
-    const textPopup = await page.waitForSelector(
-      "*[data-test-id='text-popup']"
-    );
+    const textPopup = await page.waitForSelector("*[data-testid='text-popup']");
     expect(textPopup).toBeTruthy();
   });
   afterAll(() => browser.close());

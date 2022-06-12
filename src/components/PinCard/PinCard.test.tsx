@@ -34,9 +34,7 @@ const WrapperComponent = ({
         value={{
           isAuth: isAuth,
           setTextPopup: () => {},
-          setErrorPopup: (err: string) => {
-            console.log("error", err);
-          },
+          setErrorPopup: (err: string) => {},
           updateUserInfo: () => {},
           authUserData: currentUser || undefined,
         }}
@@ -47,7 +45,7 @@ const WrapperComponent = ({
   );
 };
 
-describe("Edit board popup test", () => {
+describe("Pin card test", () => {
   const server = setupServer(
     rest.get("/files/:id", (req, res, ctx) => {
       return res(ctx.json({ url: "hello_there.png" }));
@@ -114,7 +112,6 @@ describe("Edit board popup test", () => {
     );
     await waitFor(() => {
       expect(
-        //eslint-disable-next-line
         (getByTestId("edit-pin").querySelector("img") as HTMLImageElement).src
       ).toBe("http://localhost/undefined/images/hello_there.png");
     });
@@ -122,7 +119,6 @@ describe("Edit board popup test", () => {
     expect(getByTestId("pin-card-title").textContent).toBe("testingpin1");
 
     expect(
-      //eslint-disable-next-line
       getByTestId("pin-card-profile").querySelector(".typography")!.textContent
     ).toBe("john");
   });
@@ -141,7 +137,6 @@ describe("Edit board popup test", () => {
     );
     await waitFor(() => {
       expect(
-        //eslint-disable-next-line
         (getByTestId("edit-pin").querySelector("img") as HTMLImageElement).src
       ).toBe("http://localhost/undefined/images/hello_there.png");
     });
@@ -166,7 +161,6 @@ describe("Edit board popup test", () => {
     );
     await waitFor(() => {
       expect(
-        //eslint-disable-next-line
         (getByTestId("edit-pin").querySelector("img") as HTMLImageElement).src
       ).toBe("http://localhost/undefined/images/hello_there.png");
     });
@@ -192,7 +186,6 @@ describe("Edit board popup test", () => {
     );
     await waitFor(() => {
       expect(
-        //eslint-disable-next-line
         (getByTestId("edit-pin").querySelector("img") as HTMLImageElement).src
       ).toBe("http://localhost/undefined/images/hello_there.png");
     });
@@ -220,7 +213,9 @@ describe("Edit board popup test", () => {
         isOwner={true}
       />
     );
-
+    await waitFor(() => {
+      expect(getByTestId("pin-card-save-btn")).toBeTruthy();
+    });
     fireEvent.click(getByTestId("pin-card-save-btn"));
 
     expect(wasSaved).toBe(true);

@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BsPlus } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
 import { getBoards } from "../../services/BoardService";
@@ -199,15 +199,13 @@ export default function DropdownBoards({
   arrowStyle,
   textColor = "primary",
   ...rest
-}: DropdownProps & HTMLAttributes<HTMLDivElement>) {
+}: DropdownProps) {
   const [selection, setSelection] = useState<string | null>(null);
   const [boards, setBoards] = useState<BoardData[]>([]);
 
   useEffect(() => {
     const handleGetBoards = async () => {
-      console.log("Getting boards:", boardIds);
       const boards = await getBoards(boardIds);
-      console.log("boards:", boards);
       setBoards(boards);
     };
 

@@ -8,8 +8,6 @@ import { InputPin } from "../../components/InputPin/InputPin";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import { darkGray } from "../../styles/colors";
 import { CreatePinDto } from "../../services/dto/create-pin.dto";
-
-import "./PinBuilder.scss";
 import { AiFillDelete } from "react-icons/ai";
 import ProfileInfo from "../../components/ProfileInfo/ProfileInfo";
 import { ErrorData, FileData } from "../../services/responses/responses";
@@ -27,6 +25,8 @@ import UserContext from "../../store/userContext";
 import Box from "../../components/Box/Box";
 import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
 import { AxiosError } from "axios";
+
+import "./PinBuilder.scss";
 
 export default function PinBuilder() {
   const { setTextPopup, setErrorPopup, updateUserInfo, isAuth, authUserData } =
@@ -89,7 +89,6 @@ export default function PinBuilder() {
     const pinResponse = await createPin(dto).catch(
       (err: AxiosError<ErrorData>) => {
         if (!err.response) return;
-        console.log(err.response.data);
         setErrorPopup(err.response.data.message);
       }
     );
@@ -213,7 +212,7 @@ export default function PinBuilder() {
               onClickCreateBoard={() => {
                 setShowCreateBoard(true);
               }}
-              onSelect={(boardId: string) => {
+              onSelectBoard={(boardId: string) => {
                 setBoardId(boardId);
                 setShowBoardsDropdown(!showBoardsDropdown);
               }}
@@ -276,7 +275,7 @@ export default function PinBuilder() {
               symbolsLimit={100}
               fontSize="20px"
               ref={titleRef}
-              onInput={(value: string) => {
+              onTextInput={(value: string) => {
                 setTitle(value);
               }}
               value={title}
@@ -292,7 +291,7 @@ export default function PinBuilder() {
               tip="Когда люди обычно нажимают на ваш пин, они видят первые 50 символов."
               symbolsLimit={500}
               ref={descriptionRef}
-              onInput={(value: string) => {
+              onTextInput={(value: string) => {
                 setDescription(value);
               }}
               value={description}

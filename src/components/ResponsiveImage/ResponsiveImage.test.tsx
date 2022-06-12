@@ -9,10 +9,9 @@ describe("Responsive image test", () => {
       </div>
     );
 
-    expect(
-      //eslint-disable-next-line
-      getByTestId("responsive").querySelector("img")!.src
-    ).toBe("http://localhost/example-src");
+    expect(getByTestId("responsive").querySelector("img")!.src).toBe(
+      "http://localhost/example-src"
+    );
   });
 
   it("Passes overlay", () => {
@@ -25,7 +24,7 @@ describe("Responsive image test", () => {
         />
       </div>
     );
-    //eslint-disable-next-line
+
     const overlayChild = getByTestId("responsive").querySelector(
       ".responsive-image__overlay"
     )!.childNodes[0] as HTMLDivElement;

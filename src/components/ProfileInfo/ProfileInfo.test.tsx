@@ -22,24 +22,18 @@ describe("Profile info test", () => {
       />
     );
 
-    expect(
-      //eslint-disable-next-line
-      getByTestId("profile-info").querySelector("img")
-    ).toBeTruthy();
+    expect(getByTestId("profile-info").querySelector("img")).toBeTruthy();
 
     expect(
-      //eslint-disable-next-line
       getByTestId("profile-info").querySelector(".typography")
     ).toBeTruthy();
 
     expect(
-      //eslint-disable-next-line
       getByTestId("profile-info").querySelector(".typography")!.textContent
     ).toBe("user");
 
     await waitFor(() => {
       expect(
-        //eslint-disable-next-line
         (getByTestId("profile-info").querySelector("img") as HTMLImageElement)
           .src
       ).toBe("http://localhost/undefined/images/hello_there.png");

@@ -37,7 +37,6 @@ describe("Popup test", () => {
       ></Popup>
     );
 
-    //eslint-disable-next-line
     fireEvent.click(getByTestId("popup").querySelector(".popup__background")!);
     expect(backgroundClicked).toBe(true);
   });

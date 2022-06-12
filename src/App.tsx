@@ -100,7 +100,7 @@ function App() {
           }}
         />
         {textPopupMsg && (
-          <TextPopup data-test-id="text-popup">{textPopupMsg}</TextPopup>
+          <TextPopup data-testid="text-popup">{textPopupMsg}</TextPopup>
         )}
         {errorPopupMsg && <TextPopup type="error">{errorPopupMsg}</TextPopup>}
         {showAuthPopup && (

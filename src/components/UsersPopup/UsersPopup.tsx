@@ -28,6 +28,7 @@ export default function UsersPopup({
   onClose,
   onSubscribe,
   onUnSubscribe,
+  ...rest
 }: UsersPopupProps) {
   const { authUserData, isAuth } = useContext(UserContext);
 
@@ -58,12 +59,17 @@ export default function UsersPopup({
       : false;
     const isYou = user._id === authUserData?._id;
     return (
-      <Flexbox fluid>
+      <Flexbox fluid key={`user-${user._id}`}>
         <Box margin="0px 10px 0px 0px">
           <Avatar size={50} imgId={user.avatarSrc} />
         </Box>
         <Box margin="0px 10px 0px 0px" className="users-popup__username">
-          <Typography fontSize={14} fontWeight="bold" textAlign="start">
+          <Typography
+            fontSize={14}
+            fontWeight="bold"
+            textAlign="start"
+            data-testid={`users-popup-username-${user._id}`}
+          >
             {user.username}
           </Typography>
         </Box>
@@ -77,6 +83,7 @@ export default function UsersPopup({
             onClick={() => {
               onSubscribe(user._id);
             }}
+            data-testid={`users-popup-subscribe-${user._id}`}
           >
             Subscribe
           </Button>
@@ -87,6 +94,7 @@ export default function UsersPopup({
             onClick={() => {
               onUnSubscribe(user._id);
             }}
+            data-testid={`users-popup-unsubscribe-${user._id}`}
           >
             Unsubscribe
           </Button>
@@ -98,12 +106,17 @@ export default function UsersPopup({
   useEffect(() => {
     loadUsers();
   }, [userIds, amountLoaded]);
+
   return (
-    <Popup containerClass="users-popup__container">
+    <Popup containerClass="users-popup__container" {...rest}>
       <Flexbox flexDirection="column" style={{ height: "100%" }}>
         <Box margin="0px 0px 20px 0px" width="400px">
           <Flexbox fluid justifyContent="center" alignItems="center">
-            <Typography fontSize={16} fontWeight="bold">
+            <Typography
+              fontSize={16}
+              fontWeight="bold"
+              data-testid="users-popup__title"
+            >
               {title}
             </Typography>
             <RoundButton size={32} onClick={onClose}>

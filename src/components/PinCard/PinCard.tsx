@@ -73,7 +73,6 @@ export default function PinCard({
         setTitle(pinInfo.title);
 
         const link = await getStaticImage(pinInfo.imgId);
-        console.log("Link", link);
         if (link) {
           setImgSrc(link);
         }
@@ -201,11 +200,9 @@ export default function PinCard({
     user !== undefined &&
     avatarId !== undefined &&
     userDisplayId !== undefined;
-  console.log({ imgSrc, user, avatarId, userDisplayId });
   if (!isLoaded) {
     return <div></div>;
   }
-  console.log("Rendering");
   return (
     <div
       className="user-pin-card__container"

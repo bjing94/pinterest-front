@@ -38,20 +38,6 @@ describe("Autotextarea test", () => {
     expect(inputedValue).toBe("165");
   });
 
-  // it("Grows with input", async () => {
-  //   const user = userEvent.setup();
-  //   const { getByTestId } = render(<WrapperComponent limit={500} />);
-  //   const oldHeight = getByTestId("auto-textarea-container").style.height;
-  //   await user.type(
-  //     getByTestId("auto-textarea"),
-  //     "16dfgdffffffffffffffffffffffffffffffffffffffffffffffffgdgdgfdgfdggfdgfdgdfdgfdgdfgdfgdgdgdfgdgfdgdfgfdgfdgfdgd5"
-  //   );
-  //   const newHeight = getByTestId("auto-textarea-container").style.height;
-  //   console.log({ oldHeight, newHeight });
-  //   console.log(getByTestId("auto-textarea-container").childNodes);
-  //   expect(oldHeight).not.toBe(newHeight);
-  // });
-
   it("Limits symbols", async () => {
     const user = userEvent.setup();
     const { getByTestId } = render(<WrapperComponent />);

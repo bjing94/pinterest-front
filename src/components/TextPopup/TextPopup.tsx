@@ -11,7 +11,7 @@ export default function TextPopup({
   children,
   type = "info",
   ...rest
-}: TextPopupProps & React.HTMLAttributes<HTMLDivElement>) {
+}: TextPopupProps) {
   return (
     <div className={`text-popup ${type}`} {...rest}>
       <Card>{children}</Card>

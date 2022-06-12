@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { HTMLAttributes, useState } from "react";
 import { BaseStyle } from "../../types/types";
 import Flexbox from "../Flexbox/Flexbox";
 
@@ -10,12 +10,12 @@ interface ResponsiveInputProps extends BaseStyle {
   fontSize?: string;
   symbolsLimit?: number;
   value?: string;
-  onInput?: any;
+  onTextInput?: any;
 }
 
 export const ResponsiveInput = React.forwardRef<
   HTMLTextAreaElement,
-  ResponsiveInputProps
+  ResponsiveInputProps & HTMLAttributes<HTMLDivElement>
 >(
   (
     {
@@ -25,8 +25,9 @@ export const ResponsiveInput = React.forwardRef<
       symbolsLimit,
       fontSize,
       value,
-      onInput,
+      onTextInput,
       className,
+      ...rest
     },
     ref
   ) => {
@@ -41,19 +42,20 @@ export const ResponsiveInput = React.forwardRef<
       <div
         className={`input-container ${className}`}
         style={{ ...styles, fontSize }}
+        {...rest}
       >
         <textarea
           name="text"
           onInput={(event) => {
             if (symbolsLimit) {
               if (event.currentTarget.value.length <= symbolsLimit) {
-                onInput(event.currentTarget.value);
+                onTextInput(event.currentTarget.value);
                 setSymbolsRemaining(
                   symbolsLimit - event.currentTarget.value.length
                 );
               }
             } else {
-              onInput(event.currentTarget.value);
+              onTextInput(event.currentTarget.value);
             }
           }}
           onFocus={() => {

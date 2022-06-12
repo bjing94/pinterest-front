@@ -41,7 +41,7 @@ const WrapperComponent = ({
   );
 };
 
-describe("Edit board popup test", () => {
+describe("Edit pin popup test", () => {
   const server = setupServer(
     rest.get("/pin/:id", (req, res, ctx) => {
       const id = req.params["id"] as string;

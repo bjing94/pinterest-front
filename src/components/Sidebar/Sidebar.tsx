@@ -17,10 +17,11 @@ export default function Sidebar({
   show,
   onClickLogin,
   onClickRegister,
+  ...rest
 }: SidebarProps) {
   const { authUserData } = useContext(UserContext);
   return (
-    <Dropdown className={`sidebar ${show ? "show" : ""}`}>
+    <Dropdown className={`sidebar ${show ? "show" : ""}`} {...rest}>
       <Link to="/">
         <Typography fontSize={18} fontWeight="bold">
           Home
@@ -28,14 +29,14 @@ export default function Sidebar({
       </Link>
 
       {!isAuth && (
-        <Box onClick={onClickLogin}>
+        <Box onClick={onClickLogin} data-testid="sidebar-login">
           <Typography fontSize={18} fontWeight="bold">
             Login
           </Typography>
         </Box>
       )}
       {!isAuth && (
-        <Box onClick={onClickRegister}>
+        <Box onClick={onClickRegister} data-testid="sidebar-register">
           <Typography fontSize={18} fontWeight="bold">
             Register
           </Typography>
@@ -43,7 +44,10 @@ export default function Sidebar({
       )}
 
       {isAuth && authUserData && (
-        <Link to={`/user/${authUserData.displayId}`}>
+        <Link
+          to={`/user/${authUserData.displayId}`}
+          data-testid="sidebar-profile"
+        >
           <Typography fontSize={18} fontWeight="bold">
             Profile
           </Typography>

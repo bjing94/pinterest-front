@@ -5,15 +5,15 @@ describe("Login user", () => {
   it("Login button exists", async () => {
     await page.goto("http://localhost:3001");
     const authButton = await page.waitForSelector(
-      "button[data-test-id='login-btn']"
+      "button[data-testid='login-btn']"
     );
     expect(authButton).toBeTruthy();
   });
 
   it("Auth popup opens", async () => {
-    await page.click("button[data-test-id='login-btn']");
+    await page.click("button[data-testid='login-btn']");
     const authPopup = await page.waitForSelector(
-      "div[data-test-id='auth-popup']"
+      "div[data-testid='auth-popup']"
     );
     expect(authPopup).toBeTruthy();
   });
@@ -21,7 +21,7 @@ describe("Login user", () => {
   it("Login successfully", async () => {
     await loginUser();
     const profileButton = await page.waitForSelector(
-      "button[data-test-id='profile-btn']"
+      "button[data-testid='profile-btn']"
     );
     expect(profileButton).toBeTruthy();
   });

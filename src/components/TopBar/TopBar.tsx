@@ -27,6 +27,7 @@ export default function TopBar({
   onClickRegister,
   onClickLogout,
   onClickBurger,
+  ...rest
 }: TopBarProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,7 +47,7 @@ export default function TopBar({
         <Col xs={true} style={{ flexGrow: 0 }}>
           <Flexbox>
             <Link to="/">
-              <RoundButton size={32}>
+              <RoundButton size={32} data-testid="top-bar-logo">
                 <img alt="logo" className="logo" width={24} height={24} />
               </RoundButton>
             </Link>
@@ -54,7 +55,7 @@ export default function TopBar({
               <Button
                 color={`${location.pathname === "/" ? "secondary" : "primary"}`}
                 variant={`${location.pathname === "/" ? "filled" : "text"}`}
-                data-test-id="home-btn"
+                data-testid="home-btn"
               >
                 Home
               </Button>
@@ -71,6 +72,7 @@ export default function TopBar({
                 handleSearch();
               }
             }}
+            data-testid="top-bar-search"
           />
         </Col>
         <Col xs={true} style={{ flexGrow: 0 }}>
@@ -79,12 +81,12 @@ export default function TopBar({
               <RoundButton
                 size={32}
                 onClick={onClickLogout}
-                data-test-id="logout-btn"
+                data-testid="logout-btn"
               >
                 <IoIosLogOut size={24} fill={darkGray} />
               </RoundButton>
               <Link to={`/user/${authUserData.displayId}`}>
-                <RoundButton size={32} data-test-id="profile-btn">
+                <RoundButton size={32} data-testid="profile-btn">
                   <FaUser size={24} fill={darkGray} />
                 </RoundButton>
               </Link>
@@ -94,7 +96,7 @@ export default function TopBar({
               <Button
                 onClick={onClickLogin}
                 color="secondary"
-                data-test-id="login-btn"
+                data-testid="login-btn"
               >
                 Login
               </Button>
@@ -102,7 +104,7 @@ export default function TopBar({
                 <Button
                   onClick={onClickRegister}
                   color="secondary"
-                  data-test-id="register-btn"
+                  data-testid="register-btn"
                 >
                   Register
                 </Button>
@@ -115,13 +117,13 @@ export default function TopBar({
   );
 
   const phoneGrid = (
-    <Grid fluid className="phone-grid">
+    <Grid fluid className="phone-grid" data-testid="phone-grid">
       <Row start="xs" middle="xs">
         <Col xs={12}>
           <Flexbox>
             <Box margin="0px 10px 0px 0px">
               <Link to="/">
-                <RoundButton size={32}>
+                <RoundButton size={32} data-testid="top-bar-logo-mobile">
                   <img alt="logo" className="logo" width={24} height={24} />
                 </RoundButton>
               </Link>
@@ -135,12 +137,14 @@ export default function TopBar({
                   handleSearch();
                 }
               }}
+              data-testid="top-bar-search-mobile"
             />
 
             <RoundButton
               size={32}
               className="burger-button"
               onClick={onClickBurger}
+              data-testid="top-bar-burger-mobile"
             >
               <AiOutlineMenu size={24} />
             </RoundButton>
@@ -150,7 +154,7 @@ export default function TopBar({
     </Grid>
   );
   return (
-    <div className="top-bar ">
+    <div className="top-bar " {...rest}>
       <Container>
         {desktopGrid}
         {phoneGrid}

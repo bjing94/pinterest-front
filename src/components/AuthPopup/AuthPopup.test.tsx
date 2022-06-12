@@ -8,15 +8,11 @@ describe("Auth popup test", () => {
   let isSubmitted = false;
   const server = setupServer(
     rest.post("/auth/register", (req, res, ctx) => {
-      console.log("received");
       isSubmitted = true;
-      console.log({ isSubmitted });
       return res(ctx.json({ msg: "success" }));
     }),
     rest.post("/auth/login", (req, res, ctx) => {
-      console.log("received");
       isSubmitted = true;
-      console.log({ isSubmitted });
       return res(ctx.json({ msg: "success" }));
     })
   );

@@ -14,7 +14,7 @@ describe("Homepage works", () => {
 
   it("Home button active", async () => {
     const homeButton = await page.waitForSelector(
-      "div[data-test-id='home-btn']"
+      "div[data-testid='home-btn']"
     );
     expect(homeButton?.getProperty("class")).toContain("filled");
   });

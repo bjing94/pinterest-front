@@ -246,7 +246,6 @@ export default function EditPinPopup({
         setErrorPopup(err.response.data.message);
       }
     );
-    console.log(pinResponse?.status, userBoards, authUserData);
     if (pinResponse?.status !== 200 || !pinResponse || !userBoards) return;
 
     const pinData = pinResponse.data as PinData;
@@ -379,7 +378,6 @@ export default function EditPinPopup({
             onClick={() => {
               let imgFile: File | undefined = undefined;
               if (newImgInputRef.current && newImgInputRef.current.files) {
-                console.log("File data:", newImgInputRef.current.files[0]);
                 imgFile = newImgInputRef.current.files[0];
               }
               onUpdate(

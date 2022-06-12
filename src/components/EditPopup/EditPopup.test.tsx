@@ -44,7 +44,7 @@ describe("Edit popup test", () => {
         }}
       />
     );
-    //eslint-disable-next-line
+
     const closeBtn = getByTestId("edit-popup").querySelector(".btn-round");
     expect(closeBtn).toBeTruthy();
     fireEvent.click(closeBtn!);
