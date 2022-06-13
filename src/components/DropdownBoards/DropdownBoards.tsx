@@ -71,7 +71,7 @@ function DropdownItem({ boardData, onClick }: DropdownItemProps) {
   }, []);
 
   return (
-    <li className="board-dropdown__item">
+    <li className="board-dropdown__item" onClick={onClick}>
       <Flexbox style={{ height: "100%" }} alignItems="center">
         <img
           alt="board-item"
@@ -88,9 +88,7 @@ function DropdownItem({ boardData, onClick }: DropdownItemProps) {
       </Flexbox>
       <div className="board-dropdown__item__overlay">
         <Flexbox fluid justifyContent="flex-end" style={{ height: "100%" }}>
-          <Button className="board-dropdown__item__btn" onClick={onClick}>
-            Save
-          </Button>
+          <Button className="board-dropdown__item__btn">Save</Button>
         </Flexbox>
       </div>
     </li>

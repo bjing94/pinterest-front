@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { FiMoreHorizontal } from "react-icons/fi";
 import Button from "../../components/Button/Button";
 import Card from "../../components/Card/Card";
@@ -134,7 +134,15 @@ export default function PinBuilder() {
   const handleUploadImg = () => {
     if (fileRef && fileRef.current && fileRef.current.files) {
       const selectedFile = fileRef.current.files[0];
-
+      const validTypes = ["image/jpeg", "image/png"];
+      if (!validTypes.includes(selectedFile.type)) {
+        setErrorPopup("File type must be .jpg or .png!");
+        return;
+      }
+      if (selectedFile.size >= 5 * 1024 * 1024) {
+        setErrorPopup("File exceeds 5Mb!");
+        return;
+      }
       const fr = new FileReader();
       const img = new Image();
 
@@ -148,8 +156,6 @@ export default function PinBuilder() {
       fr.readAsDataURL(selectedFile);
     }
   };
-
-  useEffect(() => {}, []);
 
   if (!isAuth || !authUserData) {
     return <Navigate to="/" />;
