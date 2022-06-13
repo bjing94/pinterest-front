@@ -74,7 +74,7 @@ export default function Home() {
     const getPins = async () => {
       const data = await getRandomPins().catch((err: AxiosError<ErrorData>) => {
         if (!err.response) return;
-        setErrorPopup(err.response.data.message);
+        setErrorPopup("No pins on the server!");
       });
 
       if (!data) {
@@ -95,7 +95,8 @@ export default function Home() {
     };
     getPins();
     getAuthUserBoards();
-  }, [authUserData, setErrorPopup, location]);
+    console.log(location.pathname);
+  }, [authUserData, location.pathname]);
 
   const pinCards = pinsIds.map((id) => {
     let isSaved = false;
