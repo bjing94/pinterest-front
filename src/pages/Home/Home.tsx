@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import Masonry from "react-masonry-css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
 import Flexbox from "../../components/Flexbox/Flexbox";
 import PinCard from "../../components/PinCard/PinCard";
@@ -32,6 +32,7 @@ const breakpointColumnsObj = {
 export default function Home() {
   const { isAuth, setTextPopup, setErrorPopup, updateUserInfo, authUserData } =
     useContext(UserContext);
+  const location = useLocation();
 
   const [pinsIds, setPinIds] = useState<string[]>([]);
   const [boardId, setBoardId] = useState<string>();
@@ -94,7 +95,7 @@ export default function Home() {
     };
     getPins();
     getAuthUserBoards();
-  }, [authUserData, setErrorPopup]);
+  }, [authUserData, setErrorPopup, location]);
 
   const pinCards = pinsIds.map((id) => {
     let isSaved = false;

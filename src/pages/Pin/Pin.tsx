@@ -6,8 +6,6 @@ import Card from "../../components/Card/Card";
 import Flexbox from "../../components/Flexbox/Flexbox";
 import RoundButton from "../../components/RoundButton/RoundButton";
 import Typography from "../../components/Typgoraphy/Typography";
-
-import "./Pin.scss";
 import CommunityInfo from "../../components/CommuntiyInfo/CommunityInfo";
 import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
 import CommentSection from "../../components/CommentSection/CommentSection";
@@ -42,6 +40,8 @@ import UserContext from "../../store/userContext";
 import LoadingPage from "../LoadingPage/LoadingPage";
 import { AxiosError } from "axios";
 import ErrorPageContext from "../../store/errorPageContext";
+
+import "./Pin.scss";
 
 export default function Pin() {
   const { id } = useParams();
@@ -602,7 +602,7 @@ export default function Pin() {
                     onClickCreateBoard={() => {
                       setShowCreateBoard(true);
                     }}
-                    onSelect={(boardId: string) => {
+                    onSelectBoard={(boardId: string) => {
                       setBoardId(boardId);
                       setShowBoards(!showBoards);
                     }}

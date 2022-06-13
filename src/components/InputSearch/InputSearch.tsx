@@ -1,18 +1,22 @@
-import React, { FormEvent, useState } from "react";
+import React, { useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import "./InputSearch.scss";
 
 interface InputSearchProperties {
   placeholder?: string;
   onChange?: any;
+  onInput?: any;
+  value?: any;
 }
-const InputSearch = React.forwardRef<
-  HTMLInputElement,
-  InputSearchProperties & React.InputHTMLAttributes<HTMLInputElement>
->(({ placeholder, onChange, ...rest }, ref) => {
+const InputSearch = ({
+  placeholder,
+  onChange,
+  onInput,
+  value,
+  ...rest
+}: InputSearchProperties) => {
   const [inputFocus, setInputFocus] = useState(false);
   const [isActive, setIsActive] = useState(false);
-
   return (
     <div className={`input-search-container ${isActive ? "active" : ""}`}>
       {!inputFocus && !isActive && (
@@ -26,19 +30,20 @@ const InputSearch = React.forwardRef<
         onBlur={() => {
           setInputFocus(false);
         }}
-        onInput={(event: FormEvent<HTMLInputElement>) => {
+        onInput={(event: any) => {
           if (event.currentTarget.value !== "") {
             setIsActive(true);
           } else {
             setIsActive(false);
           }
+          onInput(event);
         }}
         onChange={onChange}
-        ref={ref}
+        value={value}
         {...rest}
       />
     </div>
   );
-});
+};
 
 export default InputSearch;

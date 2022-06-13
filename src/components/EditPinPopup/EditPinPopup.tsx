@@ -63,7 +63,8 @@ function BoardsSelectionProperty({
   const [showDropdown, setShowDropdown] = useState(false);
   const [createButtonActive, setCreateButtonActive] = useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [dropdownSearch, setDropdownSearch] = useState("");
+
   let dropdownItems = [
     <Box padding="10px">
       <Typography fontSize={14} textAlign="start" fontWeight="bold">
@@ -96,19 +97,20 @@ function BoardsSelectionProperty({
         <Box margin="0px 5px 0px 5px">
           <InputSearch
             placeholder="Search"
-            ref={inputRef}
+            value={dropdownSearch}
+            onInput={(event: any) => {
+              setDropdownSearch(event.target.value);
+            }}
             onChange={() => {
-              setCreateButtonActive(
-                !!inputRef.current && inputRef.current.value.length > 5
-              );
+              setCreateButtonActive(dropdownSearch.length > 5);
             }}
           />
         </Box>
         <Button
           active={createButtonActive}
           onClick={() => {
-            if (inputRef.current) {
-              onCreate(inputRef.current.value);
+            if (dropdownSearch.length > 0) {
+              onCreate(dropdownSearch);
               setShowDropdown(false);
             }
           }}

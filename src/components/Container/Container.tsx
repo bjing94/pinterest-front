@@ -1,6 +1,6 @@
 import React, { HTMLAttributes } from "react";
 
-import "./Container.css";
+import "./Container.scss";
 
 interface ContainerProps {
   children?: any;

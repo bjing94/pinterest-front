@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext, useState } from "react";
 import { Col, Grid, Row } from "react-flexbox-grid";
 import { AiOutlineMenu } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
@@ -33,14 +33,19 @@ export default function TopBar({
   const location = useLocation();
   const darkGray = " #767676";
   const { authUserData, isAuth } = useContext(UserContext);
-  const searchRef = useRef<HTMLInputElement>(null);
 
-  const handleSearch = async () => {
-    if (!searchRef.current || searchRef.current.value.length === 0) return;
+  const searchQuery = location.search.split("&")[0].slice(3);
+  const [searchValue, setSearchValue] = useState(searchQuery ?? "");
 
-    const value = searchRef.current.value;
+  const handleSearch = async (value: string) => {
+    if (value.length === 0) {
+      navigate(`/`);
+      return;
+    }
+
     navigate(`/search/?q=${value}&random=false`);
   };
+
   const desktopGrid = (
     <Grid fluid className="desktop-grid">
       <Row start="xs" middle="xs">
@@ -65,13 +70,11 @@ export default function TopBar({
         <Col xs={true} style={{ flexGrow: 1 }}>
           <InputSearch
             placeholder="Search"
-            ref={searchRef}
-            onKeyPress={(ev) => {
-              if (ev.key === "Enter") {
-                ev.preventDefault();
-                handleSearch();
-              }
+            onInput={(event: any) => {
+              setSearchValue(event.target.value);
+              handleSearch(event.target.value);
             }}
+            value={searchValue}
             data-testid="top-bar-search"
           />
         </Col>
@@ -130,13 +133,11 @@ export default function TopBar({
             </Box>
             <InputSearch
               placeholder="Search"
-              ref={searchRef}
-              onKeyPress={(ev) => {
-                if (ev.key === "Enter") {
-                  ev.preventDefault();
-                  handleSearch();
-                }
+              onInput={(event: any) => {
+                setSearchValue(event.target.value);
+                handleSearch(event.target.value);
               }}
+              value={searchValue}
               data-testid="top-bar-search-mobile"
             />
 

@@ -107,14 +107,6 @@ function DropdownList({ boards, onClickFooter, onSelect }: DropdownListProps) {
   const searchRef = useRef<HTMLInputElement>(null);
   const [searchStr, setSearchStr] = useState<string>("");
 
-  const handleSearchChange = () => {
-    if (!searchRef || !searchRef.current) {
-      return;
-    }
-
-    setSearchStr(searchRef.current.value);
-  };
-
   const dropdownItems = boards
     .filter((board) => {
       return board.title.includes(searchStr);
@@ -156,8 +148,10 @@ function DropdownList({ boards, onClickFooter, onSelect }: DropdownListProps) {
           >
             <InputSearch
               placeholder="Search"
-              ref={searchRef}
-              onChange={handleSearchChange}
+              onInput={(event: any) => {
+                setSearchStr(event.target.value);
+              }}
+              value={searchStr}
             />
             <Box
               margin="1rem 0rem 0rem 0rem"

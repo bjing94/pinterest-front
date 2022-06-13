@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, useContext, useRef } from "react";
+import React, { useContext, useRef } from "react";
 import { createBoard } from "../../services/BoardService";
 import { BoardData } from "../../services/responses/responses";
 import UserContext from "../../store/userContext";
@@ -21,7 +21,7 @@ export default function BoardCreatePopup({
   onClose,
   onSubmit,
   ...rest
-}: BoardCreatePopupProps & HTMLAttributes<HTMLDivElement>) {
+}: BoardCreatePopupProps) {
   const { setTextPopup, setErrorPopup, authUserData } = useContext(UserContext);
   const titleRef = useRef<HTMLInputElement>(null);
 

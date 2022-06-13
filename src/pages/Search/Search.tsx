@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import Masonry from "react-masonry-css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import BoardCreatePopup from "../../components/BoardCreatePopup";
 import Flexbox from "../../components/Flexbox/Flexbox";
 import PinCard from "../../components/PinCard/PinCard";
@@ -14,7 +14,11 @@ import {
   savePinToProfile,
 } from "../../services/BoardService";
 import { findPins, getRandomPins } from "../../services/PinService";
-import { BoardData, ErrorData } from "../../services/responses/responses";
+import {
+  BoardData,
+  ErrorData,
+  PinData,
+} from "../../services/responses/responses";
 import ErrorPageContext from "../../store/errorPageContext";
 import UserContext from "../../store/userContext";
 
@@ -32,7 +36,7 @@ export default function Search() {
   const { isAuth, setTextPopup, setErrorPopup, authUserData, updateUserInfo } =
     useContext(UserContext);
   const { setErrorPageData } = useContext(ErrorPageContext);
-
+  const location = useLocation();
   const [pinsIds, setPinIds] = useState<string[]>([]);
   const [boardId, setBoardId] = useState<string>();
   const [boardsData, setBoardsData] = useState<BoardData[]>();
@@ -40,13 +44,18 @@ export default function Search() {
 
   const handleSearchPins = async () => {
     const queryString = window.location.search;
-    await findPins(queryString).catch((err: AxiosError<ErrorData>) => {
-      if (!err.response) return;
-      setErrorPageData({
-        code: err.response.data.statusCode,
-        message: err.response.data.message,
-      });
-    });
+    const response = await findPins(queryString).catch(
+      (err: AxiosError<ErrorData>) => {
+        if (!err.response) return;
+        setErrorPageData({
+          code: err.response.data.statusCode,
+          message: err.response.data.message,
+        });
+      }
+    );
+    if (!response) return;
+    const pinIds = response.data as PinData[];
+    setPinIds(pinIds.map((pin) => pin._id));
   };
 
   const handleSavePin = async (id: string) => {
@@ -96,9 +105,9 @@ export default function Search() {
       setBoardsData(boardsData);
     };
     getPins();
-    // handleSearchPins();
+    handleSearchPins();
     getAuthUserBoards();
-  }, [authUserData]);
+  }, [authUserData, location.search]);
 
   const pinCards = pinsIds.map((id) => {
     let isSaved = false;
